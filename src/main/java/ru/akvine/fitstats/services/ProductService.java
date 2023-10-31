@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
 
+    private static final String EMPTY_SPACE = " ";
+
     @Value("${uuid.length}")
     private int uuidLength;
 
@@ -54,8 +56,36 @@ public class ProductService {
                     .collect(Collectors.toList());
         } else {
             return productRepository
-                    .findByFilter(filter)
+                    .findAll()
                     .stream()
+                    .filter(product -> {
+                        String title = product.getTitle();
+                        String producer = product.getProducer();
+                        boolean titleContains = false;
+                        boolean producerContains = false;
+
+                        String[] titleWords = product
+                                .getTitle()
+                                .toLowerCase()
+                                .split(EMPTY_SPACE);
+                        String[] productWords = product
+                                .getProducer()
+                                .toLowerCase()
+                                .split(EMPTY_SPACE);
+                        for (String word : titleWords) {
+                            if (word.contains(filter.toLowerCase())) {
+                                titleContains = true;
+                                break;
+                            }
+                        }
+                        for (String word : productWords) {
+                            if (word.contains(filter.toLowerCase())) {
+                                producerContains = true;
+                                break;
+                            }
+                        }
+                        return titleContains || producerContains;
+                    })
                     .map(ProductBean::new)
                     .collect(Collectors.toList());
         }
