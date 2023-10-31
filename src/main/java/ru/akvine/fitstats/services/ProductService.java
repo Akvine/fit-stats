@@ -59,8 +59,6 @@ public class ProductService {
                     .findAll()
                     .stream()
                     .filter(product -> {
-                        String title = product.getTitle();
-                        String producer = product.getProducer();
                         boolean titleContains = false;
                         boolean producerContains = false;
 
