@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Setter
 @Accessors(chain = true)
 @Entity
-@Table(name = "PRODUCET_ENTITY")
+@Table(name = "PRODUCT_ENTITY")
 public class ProductEntity extends SoftBaseEntity {
     @Id
     @Column(name = "ID", updatable = false, nullable = false)
@@ -45,5 +45,6 @@ public class ProductEntity extends SoftBaseEntity {
     private double volume;
 
     @Column(name = "MEASUREMENT")
+    @Enumerated(EnumType.STRING)
     private VolumeMeasurement measurement;
 }

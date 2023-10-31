@@ -7,12 +7,10 @@ import ru.akvine.fitstats.controllers.rest.converter.DietConverter;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
 import ru.akvine.fitstats.controllers.rest.meta.DietControllerMeta;
-import ru.akvine.fitstats.controllers.rest.validators.DietValidator;
 import ru.akvine.fitstats.services.DietService;
 import ru.akvine.fitstats.services.dto.diet.AddDietRecordFinish;
 import ru.akvine.fitstats.services.dto.diet.AddDietRecordStart;
 import ru.akvine.fitstats.services.dto.diet.DietDisplay;
-import ru.akvine.fitstats.services.dto.diet.DietRecordBean;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.validation.Valid;
@@ -23,11 +21,9 @@ import javax.validation.Valid;
 public class DietController implements DietControllerMeta {
     private final DietConverter dietConverter;
     private final DietService dietService;
-    private final DietValidator dietValidator;
 
     @Override
     public Response add(@Valid AddRecordRequest request) {
-        dietValidator.verifyAddRecordRequest(request);
         AddDietRecordStart addDietRecordStart = dietConverter.convertToDietRecordBean(request);
         AddDietRecordFinish addDietRecordFinish = dietService.add(addDietRecordStart);
         return dietConverter.convertDietRecordResponse(addDietRecordFinish);

@@ -18,7 +18,7 @@ public class PasswordService {
         if (StringUtils.isBlank(password)) {
             return false;
         }
-        return passwordEncoder.matches(password, clientBean.getPassword());
+        return passwordEncoder.matches(password, clientBean.getHash());
     }
 
     @Nullable

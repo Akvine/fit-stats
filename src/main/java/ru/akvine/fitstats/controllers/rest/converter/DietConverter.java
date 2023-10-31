@@ -12,6 +12,9 @@ import ru.akvine.fitstats.services.dto.diet.AddDietRecordStart;
 import ru.akvine.fitstats.services.dto.diet.DietDisplay;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import static ru.akvine.fitstats.utils.MathUtils.round;
 
 @Component
@@ -22,8 +25,8 @@ public class DietConverter {
                 .setProductUuid(request.getProductUuid())
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .setVolume(request.getVolume())
-                .setDate(request.getDate())
-                .setTime(request.getTime());
+                .setDate(request.getDate() == null ? LocalDate.now() : request.getDate())
+                .setTime(request.getTime() == null ? LocalTime.now() : request.getTime());
     }
 
     public DietRecordResponse convertDietRecordResponse(AddDietRecordFinish dietRecordFinish) {
