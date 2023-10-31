@@ -27,6 +27,11 @@ public class CommonErrorCodes {
         String FIELD_BLANK_ERROR = "field.blank.error";
         String FIELD_NULL_ERROR = "field.null.error";
 
+        interface Admin {
+            String UUID_VALUE_BLANK_ERROR = "uuid.value.blank.error";
+            String MACRONUTRIENT_INVALID_ERROR = "macronutrient.invalid.error";
+        }
+
         interface Product {
             String MACRONUTRIENT_VALUE_INVALID_ERROR = "macronutrient.invalid.error";
             String VOLUME_VALUE_INVALID_ERROR = "volume.invalid.error";

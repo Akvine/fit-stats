@@ -10,9 +10,11 @@ import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.repositories.ProductRepository;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
+import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.utils.DietUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,63 @@ public class ProductService {
                         productBean.getFats(),
                         productBean.getCarbohydrates()));
         return new ProductBean(productRepository.save(productEntity));
+    }
+
+    public ProductBean update(UpdateProduct updateProduct) {
+        Preconditions.checkNotNull(updateProduct, "updateProduct is null");
+        ProductEntity productEntity = verifyExistsAndGet(updateProduct.getUuid());
+
+        boolean macronutrientsUpdated = false;
+        if (StringUtils.isNotBlank(updateProduct.getTitle())) {
+            productEntity.setTitle(updateProduct.getTitle());
+        }
+        if (StringUtils.isNotBlank(updateProduct.getProducer())) {
+            productEntity.setProducer(updateProduct.getProducer());
+        }
+        if (updateProduct.getMeasurement() != null) {
+            productEntity.setMeasurement(updateProduct.getMeasurement());
+        }
+        if (updateProduct.getProteins() != null) {
+            macronutrientsUpdated = true;
+            productEntity.setProteins(updateProduct.getProteins());
+        }
+        if (updateProduct.getFats() != null) {
+            macronutrientsUpdated = true;
+            productEntity.setFats(updateProduct.getFats());
+        }
+        if (updateProduct.getCarbohydrates() != null) {
+            macronutrientsUpdated = true;
+            productEntity.setCarbohydrates(updateProduct.getCarbohydrates());
+        }
+        if (updateProduct.getVolume() != null) {
+            productEntity.setVolume(updateProduct.getVolume());
+        }
+
+        if (macronutrientsUpdated) {
+            productEntity.setCalories(
+                    DietUtils.calculateCalories(
+                            productEntity.getProteins(),
+                            productEntity.getFats(),
+                            productEntity.getCarbohydrates())
+            );
+        }
+
+        productEntity.setUpdatedDate(LocalDateTime.now());
+        return new ProductBean(productRepository.save(productEntity));
+    }
+
+    public void deleteByUuid(String uuid) {
+        Preconditions.checkNotNull(uuid, "product uuid is null");
+        ProductEntity productEntity = verifyExistsAndGet(uuid);
+
+        productEntity.setDeleted(true);
+        productEntity.setDeletedDate(LocalDateTime.now());
+
+        productRepository.save(productEntity);
+    }
+
+    public List<ProductBean> getAll() {
+        return findByFilter(null);
     }
 
     public List<ProductBean> findByFilter(String filter) {
