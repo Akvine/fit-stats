@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
+import ru.akvine.fitstats.utils.MathUtils;
 
 @Getter
 @Setter
@@ -23,10 +24,10 @@ public class ProductRecordExport {
         this.uuid = productBean.getUuid();
         this.title = productBean.getTitle();
         this.producer = productBean.getProducer();
-        this.proteins = productBean.getProteins();
-        this.fats = productBean.getFats();
-        this.carbohydrates = productBean.getCarbohydrates();
-        this.calories = productBean.getCalories();
+        this.proteins = MathUtils.round(productBean.getProteins(), 2);
+        this.fats = MathUtils.round(productBean.getFats(), 2);
+        this.carbohydrates = MathUtils.round(productBean.getCarbohydrates(), 2);
+        this.calories = MathUtils.round(productBean.getCalories(), 2);
         this.volume = productBean.getVolume();
         this.measurement = productBean.getMeasurement().toString();
     }
