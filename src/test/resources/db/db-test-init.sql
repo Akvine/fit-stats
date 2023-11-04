@@ -1,8 +1,3 @@
---liquibase formatted sql logicalFilePath:db/changelog/database-changelog.sql
-
---changeset lymar-sa:FIT-STATS-1-1
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'CLIENT_ENTITY' and table_schema = 'public';
 CREATE TABLE IF NOT EXISTS CLIENT_ENTITY
 (
     ID BIGINT NOT NULL,
@@ -19,9 +14,6 @@ CREATE TABLE IF NOT EXISTS CLIENT_ENTITY
     CONSTRAINT CLIENT_PKEY PRIMARY KEY (id)
 );
 
---changeset lymar-sa:FIT-STATS-1-2
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'BIOMETRIC_ENTITY' and table_schema = 'public';
 CREATE TABLE IF NOT EXISTS BIOMETRIC_ENTITY
 (
     ID BIGINT NOT NULL,
@@ -39,9 +31,6 @@ CREATE TABLE IF NOT EXISTS BIOMETRIC_ENTITY
     CONSTRAINT BIOMETRIC_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
 );
 
---changeset lymar-sa:FIT-STATS-1-3
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PRODUCT_ENTITY' and table_schema = 'public';
 CREATE TABLE IF NOT EXISTS PRODUCT_ENTITY
 (
     ID BIGINT NOT NULL,
@@ -61,9 +50,6 @@ CREATE TABLE IF NOT EXISTS PRODUCT_ENTITY
     CONSTRAINT PRODUCT_PKEY PRIMARY KEY (ID)
 );
 
---changeset lymar-sa:FIT-STATS-1-4
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'DIET_RECORD_ENTITY' and table_schema = 'public';
 CREATE TABLE IF NOT EXISTS DIET_RECORD_ENTITY
 (
     ID BIGINT NOT NULL,
@@ -83,9 +69,6 @@ CREATE TABLE IF NOT EXISTS DIET_RECORD_ENTITY
     CONSTRAINT DIET_RECORD_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
 );
 
---changeset lymar-sa:FIT-STATS-1-5
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'DIET_SETTING_ENTITY' and table_schema = 'public';
 CREATE TABLE IF NOT EXISTS DIET_SETTING_ENTITY
 (
     ID BIGINT NOT NULL,
@@ -103,9 +86,6 @@ CREATE TABLE IF NOT EXISTS DIET_SETTING_ENTITY
     CONSTRAINT DIET_SETTING_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
 );
 
---changeset lymar-sa:FIT-STATS-1-6
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'SPRING_SESSION' and table_schema = 'public';
 CREATE TABLE SPRING_SESSION (
     PRIMARY_ID              VARCHAR2 (36)           NOT NULL,
     SESSION_ID              VARCHAR2 (36),
@@ -117,9 +97,6 @@ CREATE TABLE SPRING_SESSION (
     CONSTRAINT              SPRING_SESSION_PK PRIMARY KEY (PRIMARY_ID)
 );
 
---changeset lymar-sa:FIT-STATS-1-7
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'SPRING_SESSION_ATTRIBUTES' and table_schema = 'public';
 CREATE TABLE SPRING_SESSION_ATTRIBUTES (
    SESSION_PRIMARY_ID  VARCHAR2 (36),
    ATTRIBUTE_NAME      VARCHAR2 (200),
