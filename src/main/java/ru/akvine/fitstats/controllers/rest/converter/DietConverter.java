@@ -2,14 +2,12 @@ package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
-import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
-import ru.akvine.fitstats.controllers.rest.dto.diet.DietDisplayInfoDto;
-import ru.akvine.fitstats.controllers.rest.dto.diet.DietDisplayResponse;
-import ru.akvine.fitstats.controllers.rest.dto.diet.DietRecordResponse;
+import ru.akvine.fitstats.controllers.rest.dto.diet.*;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DietRecordDto;
 import ru.akvine.fitstats.services.dto.diet.AddDietRecordFinish;
 import ru.akvine.fitstats.services.dto.diet.AddDietRecordStart;
 import ru.akvine.fitstats.services.dto.diet.DietDisplay;
+import ru.akvine.fitstats.services.dto.diet.Display;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
@@ -41,6 +39,13 @@ public class DietConverter {
         return new DietDisplayResponse()
                 .setDietDisplayInfo(buildDietDisplayInfoDto(dietDisplay));
 
+    }
+
+    public Display convertToDisplay(DisplayRequest request) {
+        Preconditions.checkNotNull(request, "displayRequest is null");
+        return new Display()
+                .setDate(request.getDate())
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid());
     }
 
     private DietRecordDto buildDietRecordDto(AddDietRecordFinish dietRecordFinish) {

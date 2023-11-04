@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
+import ru.akvine.fitstats.controllers.rest.dto.diet.DisplayRequest;
 
 import javax.validation.Valid;
 
@@ -15,5 +16,5 @@ public interface DietControllerMeta {
     Response add(@Valid @RequestBody AddRecordRequest request);
 
     @GetMapping(value = "/display")
-    Response display();
+    Response display(@Valid @RequestBody DisplayRequest request);
 }

@@ -14,10 +14,7 @@ import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
-import ru.akvine.fitstats.services.dto.diet.AddDietRecordFinish;
-import ru.akvine.fitstats.services.dto.diet.AddDietRecordStart;
-import ru.akvine.fitstats.services.dto.diet.DietDisplay;
-import ru.akvine.fitstats.services.dto.diet.DietRecordBean;
+import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.utils.DietUtils;
 
@@ -126,14 +123,22 @@ public class DietService {
                 .setCalories(dietRecordBean.getCalories());
     }
 
-    public DietDisplay display(String clientUuid) {
-        Preconditions.checkNotNull(clientUuid, "clientUuid is null");
+    public DietDisplay display(Display display) {
+        Preconditions.checkNotNull(display, "display is null");
+
+        String clientUuid = display.getClientUuid();
         clientRepository
                 .findByUuid(clientUuid)
                 .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
 
-        LocalDate currentDay = LocalDate.now();
-        List<DietRecordEntity> records = dietRecordRepository.findByDate(clientUuid, currentDay);
+        LocalDate date;
+        if (display.getDate() == null) {
+            date = LocalDate.now();
+        } else {
+            date = display.getDate();
+        }
+
+        List<DietRecordEntity> records = dietRecordRepository.findByDate(clientUuid, date);
         DietSettingEntity dietSettingEntity = dietSettingService.verifyExistsAndGet(clientUuid);
 
         double maxCalories = dietSettingEntity.getMaxCalories();
