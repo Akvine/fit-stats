@@ -10,6 +10,7 @@ import ru.akvine.fitstats.controllers.rest.dto.product.ListProductRequest;
 import ru.akvine.fitstats.controllers.rest.meta.ProductControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.ProductValidator;
 import ru.akvine.fitstats.services.ProductService;
+import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 
 import javax.validation.Valid;
@@ -33,7 +34,9 @@ public class ProductController implements ProductControllerMeta {
 
     @Override
     public Response list(@Valid ListProductRequest request) {
-        List<ProductBean> products = productService.findByFilter(request.getFilter());
+        productValidator.verifyListProductRequest(request);
+        Filter filter = productConverter.convertToFilter(request);
+        List<ProductBean> products = productService.findByFilter(filter);
         return productConverter.convertToProductListResponse(products);
     }
 }

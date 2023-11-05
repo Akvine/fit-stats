@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.repositories.ProductRepository;
+import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.utils.DietUtils;
@@ -16,6 +17,7 @@ import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,49 +105,50 @@ public class ProductService {
     }
 
     public List<ProductBean> getAll() {
-        return findByFilter(null);
+        return findByFilter(new Filter());
     }
 
-    public List<ProductBean> findByFilter(String filter) {
-        if (StringUtils.isBlank(filter)) {
-            return productRepository
-                    .findAll()
-                    .stream()
-                    .map(ProductBean::new)
-                    .collect(Collectors.toList());
+    public List<ProductBean> findByFilter(Filter filter) {
+        List<ProductBean> filteredBeans;
+        if (StringUtils.isBlank(filter.getFilterName())) {
+            filteredBeans = findWithoutFilter();
         } else {
-            return productRepository
-                    .findAll()
-                    .stream()
-                    .filter(product -> {
-                        boolean titleContains = false;
-                        boolean producerContains = false;
-
-                        String[] titleWords = product
-                                .getTitle()
-                                .toLowerCase()
-                                .split(EMPTY_SPACE);
-                        String[] productWords = product
-                                .getProducer()
-                                .toLowerCase()
-                                .split(EMPTY_SPACE);
-                        for (String word : titleWords) {
-                            if (word.contains(filter.toLowerCase())) {
-                                titleContains = true;
-                                break;
-                            }
-                        }
-                        for (String word : productWords) {
-                            if (word.contains(filter.toLowerCase())) {
-                                producerContains = true;
-                                break;
-                            }
-                        }
-                        return titleContains || producerContains;
-                    })
-                    .map(ProductBean::new)
-                    .collect(Collectors.toList());
+            filteredBeans = findWithFilter(filter.getFilterName());
         }
+
+        if (filter.getMacronutrientsWithValues() != null && !filter.getMacronutrientsWithValues().isEmpty()) {
+            AtomicReference<List<ProductBean>> superFiltered = new AtomicReference<>();
+            filter
+                    .getMacronutrientsWithValues()
+                    .forEach((macronutrient, value) -> {
+                        if (macronutrient.equals("fats")) {
+                            superFiltered.set(filteredBeans
+                                    .stream()
+                                    .filter(product -> product.getFats() < value)
+                                    .collect(Collectors.toList()));
+                        }
+                        if (macronutrient.equals("proteins")) {
+                            superFiltered.set(filteredBeans
+                                    .stream()
+                                    .filter(product -> product.getProteins() < value)
+                                    .collect(Collectors.toList()));
+                        }
+                        if (macronutrient.equals("carbohydrates")) {
+                            superFiltered.set(filteredBeans
+                                    .stream()
+                                    .filter(product -> product.getCarbohydrates() < value)
+                                    .collect(Collectors.toList()));
+                        }
+                        if (macronutrient.equals("calories")) {
+                            superFiltered.set(filteredBeans
+                                    .stream()
+                                    .filter(product -> product.getCalories() < value)
+                                    .collect(Collectors.toList()));
+                        }
+                    });
+            return superFiltered.get();
+        }
+        return filteredBeans;
     }
 
     public ProductBean getByUuid(String uuid) {
@@ -158,5 +161,47 @@ public class ProductService {
         return productRepository
                 .findByUuid(uuid)
                 .orElseThrow(() -> new ProductNotFoundException("Product with uuid = [" + uuid + "] not found!"));
+    }
+
+    private List<ProductBean> findWithoutFilter() {
+        return productRepository
+                .findAll()
+                .stream()
+                .map(ProductBean::new)
+                .collect(Collectors.toList());
+    }
+
+    private List<ProductBean> findWithFilter(String filter) {
+        return productRepository
+                .findAll()
+                .stream()
+                .filter(product -> {
+                    boolean titleContains = false;
+                    boolean producerContains = false;
+
+                    String[] titleWords = product
+                            .getTitle()
+                            .toLowerCase()
+                            .split(EMPTY_SPACE);
+                    String[] productWords = product
+                            .getProducer()
+                            .toLowerCase()
+                            .split(EMPTY_SPACE);
+                    for (String word : titleWords) {
+                        if (word.contains(filter.toLowerCase())) {
+                            titleContains = true;
+                            break;
+                        }
+                    }
+                    for (String word : productWords) {
+                        if (word.contains(filter.toLowerCase())) {
+                            producerContains = true;
+                            break;
+                        }
+                    }
+                    return titleContains || producerContains;
+                })
+                .map(ProductBean::new)
+                .collect(Collectors.toList());
     }
 }

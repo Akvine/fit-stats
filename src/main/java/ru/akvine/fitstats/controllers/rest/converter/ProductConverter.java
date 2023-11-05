@@ -2,11 +2,9 @@ package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
-import ru.akvine.fitstats.controllers.rest.dto.product.AddProductRequest;
-import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
-import ru.akvine.fitstats.controllers.rest.dto.product.ProductListResponse;
-import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
+import ru.akvine.fitstats.controllers.rest.dto.product.*;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
+import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.utils.MathUtils;
 
@@ -38,6 +36,13 @@ public class ProductConverter {
         Preconditions.checkNotNull(products, "products is null");
         return new ProductListResponse()
                 .setProducts(products.stream().map(this::buildProductDto).collect(Collectors.toList()));
+    }
+
+    public Filter convertToFilter(ListProductRequest request) {
+        Preconditions.checkNotNull(request, "listProductRequest is null");
+        return new Filter()
+                .setFilterName(request.getFilter())
+                .setMacronutrientsWithValues(request.getMacronutrients());
     }
 
     private ProductDto buildProductDto(ProductBean productBean) {

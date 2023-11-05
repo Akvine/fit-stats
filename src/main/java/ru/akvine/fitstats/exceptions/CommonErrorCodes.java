@@ -33,7 +33,8 @@ public class CommonErrorCodes {
         }
 
         interface Product {
-            String MACRONUTRIENT_VALUE_INVALID_ERROR = "macronutrient.invalid.error";
+            String MACRONUTRIENT_VALUE_INVALID_ERROR = "macronutrient.value.invalid.error";
+            String MACRONUTRIENT_NAME_INVALID_ERROR = "macronutrient.name.invalid.error";
             String VOLUME_VALUE_INVALID_ERROR = "volume.invalid.error";
             String VOLUME_MEASUREMENT_BLANK_ERROR = "volume.measurement.blank.error";
             String VOLUME_MEASUREMENT_INVALID_ERROR = "volume.measurement.invalid.error";
