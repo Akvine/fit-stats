@@ -22,8 +22,6 @@ public class AddProductRequest {
 
     private double carbohydrates;
 
-    private double volume;
-
     @NotBlank
     private String volumeMeasurement;
 }

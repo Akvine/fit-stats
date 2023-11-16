@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class ProductConverter {
     private static final int PRODUCT_ROUND_VALUE_ACCURACY = 1;
+    private static final int DEFAULT_PRODUCT_VOLUME = 100;
 
     public ProductBean convertToProductBean(AddProductRequest request) {
         Preconditions.checkNotNull(request, "addProductRequest is null");
@@ -23,7 +24,7 @@ public class ProductConverter {
                 .setCarbohydrates(request.getCarbohydrates())
                 .setTitle(request.getTitle())
                 .setProducer(request.getProducer())
-                .setVolume(request.getVolume())
+                .setVolume(DEFAULT_PRODUCT_VOLUME)
                 .setMeasurement(VolumeMeasurement.valueOf(request.getVolumeMeasurement()));
     }
 
