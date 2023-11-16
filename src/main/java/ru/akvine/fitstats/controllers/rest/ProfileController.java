@@ -8,11 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.akvine.fitstats.controllers.rest.converter.ProfileConverter;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
+import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.rest.meta.ProfileControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.ProfileValidator;
 import ru.akvine.fitstats.services.ProfileService;
+import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
+import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 
 @RestController
@@ -40,5 +44,13 @@ public class ProfileController implements ProfileControllerMeta {
     @Override
     public Response uploadRecords() {
         return null;
+    }
+
+    @Override
+    public Response updateBiometric(@Valid UpdateBiometricRequest request) {
+        profileValidator.verifyUpdateBiometricRequest(request);
+        UpdateBiometric updateBiometric = profileConverter.convertToUpdateBiometric(request);
+        BiometricBean biometricBean = profileService.updateBiometric(updateBiometric);
+        return profileConverter.convertToUpdateBiometricResponse(biometricBean);
     }
 }

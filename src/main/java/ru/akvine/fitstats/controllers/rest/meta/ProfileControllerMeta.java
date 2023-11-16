@@ -2,10 +2,13 @@ package ru.akvine.fitstats.controllers.rest.meta;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
+import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 
 @RequestMapping(value = "/profile")
@@ -18,4 +21,7 @@ public interface ProfileControllerMeta {
 
     @PostMapping(value = "/records/import")
     Response uploadRecords();
+
+    @PostMapping(value = "/biometric/update")
+    Response updateBiometric(@Valid @RequestBody UpdateBiometricRequest request);
 }
