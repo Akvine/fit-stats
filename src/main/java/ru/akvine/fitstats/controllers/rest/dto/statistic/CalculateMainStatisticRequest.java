@@ -9,9 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CalculateStatisticRequest {
+public class CalculateMainStatisticRequest extends DateRangeRequest {
     private List<String> indicators;
     private List<String> macronutrients;
-    private DateRangeInfo dateRangeInfo;
     private Integer roundAccuracy;
 }

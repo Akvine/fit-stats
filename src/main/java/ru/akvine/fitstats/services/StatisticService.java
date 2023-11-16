@@ -8,16 +8,18 @@ import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.DateRange;
-import ru.akvine.fitstats.services.dto.statistic.Statistic;
-import ru.akvine.fitstats.services.dto.statistic.StatisticInfo;
+import ru.akvine.fitstats.services.dto.product.ProductBean;
+import ru.akvine.fitstats.services.dto.statistic.*;
 import ru.akvine.fitstats.services.processors.macronutrient.MacronutrientProcessor;
-import ru.akvine.fitstats.services.processors.statistic.StatisticProcessor;
+import ru.akvine.fitstats.services.processors.statistic.additional.ModeStatisticProcessor;
+import ru.akvine.fitstats.services.processors.statistic.main.StatisticProcessor;
 import ru.akvine.fitstats.utils.MathUtils;
 
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -28,6 +30,7 @@ import static ru.akvine.fitstats.utils.DateUtils.*;
 public class StatisticService {
     private final DietRecordRepository dietRecordRepository;
     private final ClientService clientService;
+    private final ModeStatisticProcessor modeStatisticProcessor;
     private Map<String, StatisticProcessor> availableStatisticProcessors;
     private Map<String, MacronutrientProcessor> availableMacronutrientProcessors;
 
@@ -35,9 +38,11 @@ public class StatisticService {
     public StatisticService(List<StatisticProcessor> statisticProcessors,
                             List<MacronutrientProcessor> macronutrientProcessors,
                             ClientService clientService,
-                            DietRecordRepository dietRecordRepository) {
+                            DietRecordRepository dietRecordRepository,
+                            ModeStatisticProcessor modeStatisticProcessor) {
         this.dietRecordRepository = dietRecordRepository;
         this.clientService = clientService;
+        this.modeStatisticProcessor = modeStatisticProcessor;
         this.availableStatisticProcessors =
                 statisticProcessors
                         .stream()
@@ -48,20 +53,20 @@ public class StatisticService {
                         .collect(toMap(MacronutrientProcessor::getType, identity()));
     }
 
-    public StatisticInfo calculateStatisticInfo(Statistic statistic) {
-        Preconditions.checkNotNull(statistic, "statistic is null");
-        String uuid = statistic.getClientUuid();
-        Integer roundAccuracy = statistic.getRoundAccuracy();
+    public MainStatisticInfo calculateMainStatisticInfo(MainStatistic mainStatistic) {
+        Preconditions.checkNotNull(mainStatistic, "statistic is null");
+        String uuid = mainStatistic.getClientUuid();
+        Integer roundAccuracy = mainStatistic.getRoundAccuracy();
         clientService.verifyExistsByUuidAndGet(uuid);
 
-        DateRange findDateRange = getDateRange(statistic);
+        DateRange findDateRange = getDateRange(mainStatistic);
         List<DietRecordEntity> records = dietRecordRepository.findByDateRange(
                 uuid,
                 findDateRange.getStartDate(),
                 findDateRange.getEndDate());
         Map<String, Map<String, Double>> indicatorStatistics = new LinkedHashMap<>();
 
-        statistic
+        mainStatistic
                 .getIndicatorsWithMacronutrients()
                 .entrySet()
                 .stream()
@@ -82,8 +87,30 @@ public class StatisticService {
                             });
                     indicatorStatistics.put(indicator, statsInfo);
                 });
-        return new StatisticInfo()
+        return new MainStatisticInfo()
                 .setStatisticInfo(indicatorStatistics);
+    }
+
+    public AdditionalStatisticInfo calculateAdditionalStatisticInfo(AdditionalStatistic additionalStatistic) {
+        Preconditions.checkNotNull(additionalStatistic, "additionalStatistic is null");
+
+        String uuid = additionalStatistic.getClientUuid();
+        Integer roundAccuracy = additionalStatistic.getRoundAccuracy();
+        int modeCount = additionalStatistic.getModeCount();
+        clientService.verifyExistsByUuidAndGet(uuid);
+
+        AdditionalStatisticInfo additionalStatisticInfo = new AdditionalStatisticInfo();
+        DateRange findDateRange = getDateRange(additionalStatistic);
+        List<DietRecordEntity> records = dietRecordRepository.findByDateRange(
+                uuid,
+                findDateRange.getStartDate(),
+                findDateRange.getEndDate());
+        List<ProductBean> products = records
+                .stream()
+                .map(record -> new ProductBean(record.getProduct()))
+                .collect(Collectors.toList());
+        return additionalStatisticInfo
+                .setProductCount(modeStatisticProcessor.calculate(products, modeCount));
     }
 
     private DateRange getDateRange(Statistic statistic) {

@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateMainStatisticRequest;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeInfo;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeRequest;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.validators.DurationValidator;
@@ -23,10 +25,12 @@ public class StatisticValidator {
     private List<String> supportedIndicators;
     @Value("${processors.supported.macronutrients}")
     private List<String> supportedMacronutrients;
+    @Value("${product.statistic.mode.count.limit}")
+    private int limit;
 
     private final DurationValidator durationValidator;
 
-    public void verifyCalculateStatisticRequest(CalculateStatisticRequest request) {
+    public void verifyCalculateMainStatisticRequest(CalculateMainStatisticRequest request) {
         Preconditions.checkNotNull(request, "calculateStatisticRequest is null");
 
         request.getIndicators().forEach(indicator -> {
@@ -45,8 +49,39 @@ public class StatisticValidator {
                         "Macronutrient with type = [" + macronutrient + "] not supported!");
             }
         });
+        verifyRoundAccuracy(request.getRoundAccuracy());
+        verifyDateRangeRequest(request);
+    }
 
-        DateRangeInfo dateRangeInfo = request.getDateRangeInfo();
+    public void verifyCalculateAdditionalStatisticRequest(CalculateAdditionalStatisticRequest request) {
+        Preconditions.checkNotNull(request, "calculateAdditionalStatisticRequest is null");
+
+        if (request.getModeCount() != null) {
+            if (request.getModeCount() > limit) {
+                throw new ValidationException(
+                        CommonErrorCodes.Validation.Statistic.MODE_COUNT_INVALID_ERROR,
+                        "Mode count can't be more than limit count. Limit count = [" + limit + "]. Field invalid: modeCount");
+            }
+            if (request.getModeCount() < 0) {
+                throw new ValidationException(
+                        CommonErrorCodes.Validation.Statistic.MODE_COUNT_INVALID_ERROR,
+                        "Mode count can't be less 0. Limit count = [" + limit + "]. Field invalid: modeCount");
+            }
+        }
+        verifyRoundAccuracy(request.getRoundAccuracy());
+        verifyDateRangeRequest(request);
+    }
+
+    private void verifyRoundAccuracy(Integer roundAccuracy) {
+        if (roundAccuracy != null && roundAccuracy < 0) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Statistic.ROUND_ACCURACY_INVALID_ERROR,
+                    "Accuracy round can't be less than 0");
+        }
+    }
+
+    private void verifyDateRangeRequest(DateRangeRequest dateRangeRequest) {
+        DateRangeInfo dateRangeInfo = dateRangeRequest.getDateRangeInfo();
         LocalDate startDate = dateRangeInfo.getStartDate();
         LocalDate endDate = dateRangeInfo.getEndDate();
         String duration = dateRangeInfo.getDuration();
@@ -69,11 +104,6 @@ public class StatisticValidator {
             throw new ValidationException(
                     CommonErrorCodes.Validation.Statistic.ILLEGAL_DATE_RANGE_STATE_ERROR,
                     "Start date, end date and duration is fill! Need to fill duration or startDate with endDate");
-        }
-        if (request.getRoundAccuracy() != null && request.getRoundAccuracy() < 0) {
-            throw new ValidationException(
-                    CommonErrorCodes.Validation.Statistic.ROUND_ACCURACY_INVALID_ERROR,
-                    "Accuracy round can't be less than 0");
         }
         if (StringUtils.isNotBlank(duration)) {
             durationValidator.validate(duration);

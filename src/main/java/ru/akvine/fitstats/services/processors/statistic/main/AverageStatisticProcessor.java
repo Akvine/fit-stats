@@ -1,21 +1,21 @@
-package ru.akvine.fitstats.services.processors.statistic;
+package ru.akvine.fitstats.services.processors.statistic.main;
 
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class SumStatisticProcessor implements StatisticProcessor {
+public class AverageStatisticProcessor implements StatisticProcessor {
     @Override
     public double calculate(List<Double> values) {
         return values
                 .stream()
                 .mapToDouble(Double::doubleValue)
-                .sum();
+                .sum() / values.size();
     }
 
     @Override
     public String getType() {
-        return "sum";
+        return "avg";
     }
 }

@@ -55,6 +55,7 @@ public class CommonErrorCodes {
             String ILLEGAL_DATE_RANGE_STATE_ERROR = "illegal.dateRange.fields.state.error";
             String START_DATE_AFTER_END_DATE_ERROR = "startDate.after.endDate.error";
             String ROUND_ACCURACY_INVALID_ERROR = "round.accuracy.invalid.error";
+            String MODE_COUNT_INVALID_ERROR = "mode.count.invalid.error";
         }
 
         interface Client {

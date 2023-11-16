@@ -9,6 +9,6 @@ import java.util.Map;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class StatisticInfo {
+public class MainStatisticInfo {
     private Map<String, Map<String, Double>> statisticInfo;
 }

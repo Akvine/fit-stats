@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.services.processors.statistic;
+package ru.akvine.fitstats.services.processors.statistic.main;
 
 import org.springframework.stereotype.Component;
 
