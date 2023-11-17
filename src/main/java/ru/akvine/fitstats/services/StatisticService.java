@@ -3,7 +3,6 @@ package ru.akvine.fitstats.services;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.enums.Duration;
@@ -41,9 +40,6 @@ public class StatisticService {
     private final PercentStatisticProcessor percentStatisticProcessor;
     private Map<String, StatisticProcessor> availableStatisticProcessors;
     private Map<String, MacronutrientProcessor> availableMacronutrientProcessors;
-
-    @Value("${round.accuracy}")
-    private int accuracy;
 
     @Autowired
     public StatisticService(List<StatisticProcessor> statisticProcessors,
