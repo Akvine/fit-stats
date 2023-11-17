@@ -8,5 +8,6 @@ import java.util.Map;
 @Data
 @Accessors(chain = true)
 public class AdditionalStatisticInfo {
-    private Map<String, Integer> productCount;
+    private Map<String, Integer> mode;
+    private Map<String, Double> macronutrientsPercent;
 }

@@ -53,12 +53,6 @@ public class ProductValidator {
                     CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
                     "Carbohydrates is less than 0. Field name: carbohydrates");
         }
-        if (request.getVolume() < 0) {
-            throw new ValidationException(
-                    CommonErrorCodes.Validation.Product.VOLUME_VALUE_INVALID_ERROR,
-                    "Volume is less than 0. Field name: volume"
-            );
-        }
         volumeMeasurementValidator.validate(request.getVolumeMeasurement());
     }
 

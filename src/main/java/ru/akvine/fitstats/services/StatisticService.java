@@ -3,6 +3,7 @@ package ru.akvine.fitstats.services;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.enums.Duration;
@@ -12,6 +13,7 @@ import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.statistic.*;
 import ru.akvine.fitstats.services.processors.macronutrient.MacronutrientProcessor;
 import ru.akvine.fitstats.services.processors.statistic.additional.ModeStatisticProcessor;
+import ru.akvine.fitstats.services.processors.statistic.additional.PercentStatisticProcessor;
 import ru.akvine.fitstats.services.processors.statistic.main.StatisticProcessor;
 import ru.akvine.fitstats.utils.MathUtils;
 
@@ -28,21 +30,32 @@ import static ru.akvine.fitstats.utils.DateUtils.*;
 @Service
 @Slf4j
 public class StatisticService {
+    private static final String FATS_MACRONUTRIENT_NAME = "fats";
+    private static final String PROTEINS_MACRONUTRIENT_NAME = "proteins";
+    private static final String CARBOHYDRATES_MACRONUTRIENT_NAME = "carbohydrates";
+    private static final String CALORIES_MACRONUTRIENT_NAME = "calories";
+
     private final DietRecordRepository dietRecordRepository;
     private final ClientService clientService;
     private final ModeStatisticProcessor modeStatisticProcessor;
+    private final PercentStatisticProcessor percentStatisticProcessor;
     private Map<String, StatisticProcessor> availableStatisticProcessors;
     private Map<String, MacronutrientProcessor> availableMacronutrientProcessors;
+
+    @Value("${round.accuracy}")
+    private int accuracy;
 
     @Autowired
     public StatisticService(List<StatisticProcessor> statisticProcessors,
                             List<MacronutrientProcessor> macronutrientProcessors,
                             ClientService clientService,
                             DietRecordRepository dietRecordRepository,
-                            ModeStatisticProcessor modeStatisticProcessor) {
+                            ModeStatisticProcessor modeStatisticProcessor,
+                            PercentStatisticProcessor percentStatisticProcessor) {
         this.dietRecordRepository = dietRecordRepository;
         this.clientService = clientService;
         this.modeStatisticProcessor = modeStatisticProcessor;
+        this.percentStatisticProcessor = percentStatisticProcessor;
         this.availableStatisticProcessors =
                 statisticProcessors
                         .stream()
@@ -95,11 +108,12 @@ public class StatisticService {
         Preconditions.checkNotNull(additionalStatistic, "additionalStatistic is null");
 
         String uuid = additionalStatistic.getClientUuid();
-        Integer roundAccuracy = additionalStatistic.getRoundAccuracy();
+        int roundAccuracy = additionalStatistic.getRoundAccuracy();
         int modeCount = additionalStatistic.getModeCount();
         clientService.verifyExistsByUuidAndGet(uuid);
 
         AdditionalStatisticInfo additionalStatisticInfo = new AdditionalStatisticInfo();
+        Map<String, Double> macronutrientsPercents = new LinkedHashMap<>();
         DateRange findDateRange = getDateRange(additionalStatistic);
         List<DietRecordEntity> records = dietRecordRepository.findByDateRange(
                 uuid,
@@ -109,8 +123,37 @@ public class StatisticService {
                 .stream()
                 .map(record -> new ProductBean(record.getProduct()))
                 .collect(Collectors.toList());
+
+        List<Double> proteinsValues = availableMacronutrientProcessors
+                .get(PROTEINS_MACRONUTRIENT_NAME)
+                .extract(records);
+        List<Double> fatsValues = availableMacronutrientProcessors
+                .get(FATS_MACRONUTRIENT_NAME)
+                .extract(records);
+        List<Double> carbohydrates = availableMacronutrientProcessors
+                .get(CARBOHYDRATES_MACRONUTRIENT_NAME)
+                .extract(records);
+        double totalCalories = availableMacronutrientProcessors
+                .get(CALORIES_MACRONUTRIENT_NAME)
+                .extract(records)
+                .stream()
+                .mapToDouble(value -> value)
+                .sum();
+
+        double proteinsPercent = MathUtils.round(
+                percentStatisticProcessor.calculate(proteinsValues, totalCalories), roundAccuracy);
+        double fatsPercent = MathUtils.round(
+                percentStatisticProcessor.calculate(fatsValues, totalCalories), roundAccuracy);
+        double carbohydratesPercent = MathUtils.round(
+                percentStatisticProcessor.calculate(carbohydrates, totalCalories), roundAccuracy);
+
+        macronutrientsPercents.put(PROTEINS_MACRONUTRIENT_NAME, proteinsPercent);
+        macronutrientsPercents.put(FATS_MACRONUTRIENT_NAME, fatsPercent);
+        macronutrientsPercents.put(CARBOHYDRATES_MACRONUTRIENT_NAME, carbohydratesPercent);
+
         return additionalStatisticInfo
-                .setProductCount(modeStatisticProcessor.calculate(products, modeCount));
+                .setMode(modeStatisticProcessor.calculate(products, modeCount))
+                .setMacronutrientsPercent(macronutrientsPercents);
     }
 
     private DateRange getDateRange(Statistic statistic) {
