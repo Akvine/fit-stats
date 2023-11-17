@@ -24,9 +24,6 @@ public class CommonErrorCodes {
     }
 
     public interface Validation {
-        String FIELD_BLANK_ERROR = "field.blank.error";
-        String FIELD_NULL_ERROR = "field.null.error";
-
         interface Admin {
             String UUID_VALUE_BLANK_ERROR = "uuid.value.blank.error";
             String MACRONUTRIENT_INVALID_ERROR = "macronutrient.invalid.error";
@@ -34,10 +31,6 @@ public class CommonErrorCodes {
 
         interface Product {
             String MACRONUTRIENT_VALUE_INVALID_ERROR = "macronutrient.value.invalid.error";
-            String MACRONUTRIENT_NAME_INVALID_ERROR = "macronutrient.name.invalid.error";
-            String VOLUME_VALUE_INVALID_ERROR = "volume.invalid.error";
-            String VOLUME_MEASUREMENT_BLANK_ERROR = "volume.measurement.blank.error";
-            String VOLUME_MEASUREMENT_INVALID_ERROR = "volume.measurement.invalid.error";
             String TITLE_BLANK_ERROR = "title.blank.error";
             String PRODUCER_BLANK_ERROR = "producer.blank.error";
         }
