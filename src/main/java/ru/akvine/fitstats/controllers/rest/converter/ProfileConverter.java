@@ -2,12 +2,17 @@ package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
+import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricResponse;
+import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.PhysicalActivity;
@@ -17,12 +22,27 @@ import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 public class ProfileConverter {
     private static final String HEADER_PREFIX = "attachment; filename=";
     private static final String DEFAULT_FILE_NAME = "file";
     private static final String POINT = ".";
+
+    private final Map<ConverterType, Parser> availableParsers;
+
+    @Autowired
+    public ProfileConverter(List<Parser> parsers) {
+        this.availableParsers =
+                parsers
+                        .stream()
+                        .collect(toMap(Parser::getType, identity()));
+    }
 
     public ProfileDownload convertToProfileDownload(
             LocalDate startDate,
@@ -47,6 +67,15 @@ public class ProfileConverter {
                 .header(HttpHeaders.CONTENT_DISPOSITION, resolveHeaderType(filename, converterType))
                 .contentType(MediaType.parseMediaType(resolveMediaType(converterType)))
                 .body(file);
+    }
+
+    public ImportRecords convertToImportRecords(String converterType, MultipartFile file) {
+        ConverterType type = ConverterType.valueOf(converterType);
+        return new ImportRecords()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setRecords(availableParsers
+                        .get(type)
+                        .parse(file, resolveClass(type)));
     }
 
     public UpdateBiometric convertToUpdateBiometric(UpdateBiometricRequest request) {
@@ -91,6 +120,15 @@ public class ProfileConverter {
         switch (converterType) {
             case CSV:
                 return "application/csv";
+            default:
+                throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
+        }
+    }
+
+    private Class resolveClass(ConverterType converterType) {
+        switch (converterType) {
+            case CSV:
+                return DietRecordCsvRow.class;
             default:
                 throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
         }

@@ -91,7 +91,7 @@ public class ClientService {
 
     public ClientBean getByUuid(String uuid) {
         Preconditions.checkNotNull(uuid, "uuid is null");
-        return new ClientBean(verifyExistsByEmailAndGet(uuid));
+        return new ClientBean(verifyExistsByUuidAndGet(uuid));
     }
 
     public boolean isExistsByEmail(String email) {

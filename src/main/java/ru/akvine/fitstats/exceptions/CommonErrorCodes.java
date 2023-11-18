@@ -26,6 +26,13 @@ public class CommonErrorCodes {
     public interface Validation {
         String FIELD_NOT_PRESENTED_ERROR = "field.not.presented.error";
 
+        String FILE_SIZE_INVALID_ERROR = "file.size.invalid.error";
+        String FILE_CONTENT_TYPE_INVALID_ERROR = "file.content-type.invalid.error";
+        String FILE_MAX_ROWS_COUNT_INVALID_ERROR = "file.max.rows.count.error";
+
+        String FILE_TYPE_BLANK_ERROR ="file.type.blank.error";
+        String FILE_TYPE_INVALID_ERROR = "file.type.isNot.supported.error";
+
         interface Admin {
             String UUID_VALUE_BLANK_ERROR = "uuid.value.blank.error";
             String MACRONUTRIENT_INVALID_ERROR = "macronutrient.invalid.error";

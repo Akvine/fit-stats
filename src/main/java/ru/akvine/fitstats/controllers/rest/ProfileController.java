@@ -2,12 +2,13 @@ package ru.akvine.fitstats.controllers.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.converter.ProfileConverter;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
+import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
+import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.rest.meta.ProfileControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.ProfileValidator;
@@ -18,6 +19,7 @@ import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -33,7 +35,7 @@ public class ProfileController implements ProfileControllerMeta {
                                         String duration,
                                         String filename,
                                         String converterType) {
-        profileValidator.verifyRecordsDownload(
+        profileValidator.verifyRecordsExport(
                 startDate,
                 endDate,
                 duration,
@@ -44,8 +46,12 @@ public class ProfileController implements ProfileControllerMeta {
     }
 
     @Override
-    public Response importRecords() {
-        return null;
+    public Response importRecords(String converterType, MultipartFile file) {
+        profileValidator.verifyRecordsImport(converterType, file);
+        ImportRecords importRecords = profileConverter.convertToImportRecords(converterType, file);
+        profileValidator.verifyRecordsCount(importRecords);
+        profileService.importRecords(importRecords);
+        return new SuccessfulResponse();
     }
 
     @Override

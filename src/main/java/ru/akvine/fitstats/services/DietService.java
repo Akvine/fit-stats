@@ -125,6 +125,30 @@ public class DietService {
                 .setVolumeMeasurement(dietRecordBean.getProductBean().getMeasurement());
     }
 
+    public DietRecordBean add(DietRecordBean dietRecordBean) {
+        Preconditions.checkNotNull(dietRecordBean, "dietRecordBean is null");
+
+        String clientUuid = dietRecordBean.getClientBean().getUuid();
+        ClientEntity clientEntity = clientRepository
+                .findByUuid(clientUuid)
+                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+        String productUuid = dietRecordBean.getProductBean().getUuid();
+        ProductEntity productEntity = productService.findByUuid(productUuid);
+
+        DietRecordEntity dietRecordEntity = new DietRecordEntity()
+                .setProteins(dietRecordBean.getProteins())
+                .setFats(dietRecordBean.getFats())
+                .setCarbohydrates(dietRecordBean.getCarbohydrates())
+                .setCalories(dietRecordBean.getCalories())
+                .setVolume(dietRecordBean.getVolume())
+                .setDate(dietRecordBean.getDate())
+                .setTime(dietRecordBean.getTime())
+                .setClient(clientEntity)
+                .setProduct(productEntity);
+
+        return new DietRecordBean(dietRecordRepository.save(dietRecordEntity));
+    }
+
     public List<DietRecordBean> list(ListRecord listRecord) {
         Preconditions.checkNotNull(listRecord, "listRecord is null");
 

@@ -7,7 +7,7 @@ import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 
 @Component
-public class GenderValidator implements Validator<String>  {
+public class GenderValidator implements Validator<String> {
     @Override
     public void validate(String gender) {
         if (StringUtils.isBlank(gender)) {

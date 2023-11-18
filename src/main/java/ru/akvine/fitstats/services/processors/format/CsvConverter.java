@@ -16,7 +16,7 @@ import java.util.List;
 
 @Component
 public class CsvConverter implements Converter {
-    @Value("${csv.delimiter}")
+    @Value("${csv.file.converter.separator}")
     private char csvDelimiter;
 
     @Override

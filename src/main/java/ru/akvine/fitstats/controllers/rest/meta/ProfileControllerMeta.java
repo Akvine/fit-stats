@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 
@@ -21,7 +22,8 @@ public interface ProfileControllerMeta {
                                  @RequestParam(value = "converterType", required = false) String converterType);
 
     @PostMapping(value = "/records/import")
-    Response importRecords();
+    Response importRecords(@RequestParam(value = "converterType", defaultValue = "CSV") String converterType,
+                           @RequestParam(value = "file") MultipartFile file);
 
     @PostMapping(value = "/biometric/update")
     Response updateBiometric(@Valid @RequestBody UpdateBiometricRequest request);

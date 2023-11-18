@@ -17,6 +17,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null " +
             "and " +
             "pe.uuid = :uuid")
+    Optional<ProductEntity> findByUuidAndNotDeleted(@Param("uuid") String uuid);
+
+    @Query("from ProductEntity pe where pe.uuid = :uuid")
     Optional<ProductEntity> findByUuid(@Param("uuid") String uuid);
 
     @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null")

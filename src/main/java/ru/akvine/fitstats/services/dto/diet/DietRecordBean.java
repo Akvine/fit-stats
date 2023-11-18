@@ -24,7 +24,6 @@ public class DietRecordBean extends Bean {
     private double fats;
     private double carbohydrates;
     private double calories;
-    private String email;
     private ClientBean clientBean;
     private ProductBean productBean;
     private LocalDate date;

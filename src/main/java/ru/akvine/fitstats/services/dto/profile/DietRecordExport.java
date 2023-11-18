@@ -21,6 +21,7 @@ public class DietRecordExport {
     private double calories;
     private double volume;
     private String product;
+    private String uuid;
     private VolumeMeasurement measurement;
     private LocalDate date;
     @Nullable
@@ -34,6 +35,7 @@ public class DietRecordExport {
         this.volume = dietRecordBean.getVolume();
         this.measurement = dietRecordBean.getProductBean().getMeasurement();
         this.product = dietRecordBean.getProductBean().getTitle();
+        this.uuid = dietRecordBean.getProductBean().getUuid();
         this.date = dietRecordBean.getDate();
         this.time = dietRecordBean.getTime();
     }

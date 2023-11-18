@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
+import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
 import ru.akvine.fitstats.entities.BiometricEntity;
 import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.enums.ConverterType;
@@ -14,10 +16,14 @@ import ru.akvine.fitstats.repositories.DietSettingRepository;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
+import ru.akvine.fitstats.services.dto.client.ClientBean;
+import ru.akvine.fitstats.services.dto.diet.DietRecordBean;
+import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.services.processors.format.Converter;
+import ru.akvine.fitstats.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +43,8 @@ public class ProfileService {
     private final BiometricRepository biometricRepository;
     private final DietSettingService dietSettingService;
     private final DietSettingRepository dietSettingRepository;
+    private final ClientService clientService;
+    private final ProductService productService;
 
     @Autowired
     public ProfileService(List<Converter> converters,
@@ -44,12 +52,16 @@ public class ProfileService {
                           BiometricService biometricService,
                           BiometricRepository biometricRepository,
                           DietSettingService dietSettingService,
-                          DietSettingRepository dietSettingRepository) {
+                          DietSettingRepository dietSettingRepository,
+                          ClientService clientService,
+                          ProductService productService) {
         this.dietService = dietService;
         this.dietSettingService = dietSettingService;
         this.biometricRepository = biometricRepository;
         this.biometricService = biometricService;
         this.dietSettingRepository = dietSettingRepository;
+        this.clientService = clientService;
+        this.productService = productService;
         this.availableConverters = converters
                 .stream()
                 .collect(toMap(Converter::getType, identity()));
@@ -66,6 +78,34 @@ public class ProfileService {
         return availableConverters
                 .get(profileDownload.getConverterType())
                 .convert(dietRecordsExport, DietRecordExport.class);
+    }
+
+    public void importRecords(ImportRecords importRecords) {
+        Preconditions.checkNotNull(importRecords, "importRecords is null");
+
+        String clientUuid = importRecords.getClientUuid();
+        List<?> records = importRecords.getRecords();
+
+        // TODO : получение списка продуктов через цикл - может нагружать БД
+
+        ClientBean clientBean = clientService.getByUuid(clientUuid);
+        records.forEach(record -> {
+            if (record instanceof DietRecordCsvRow) {
+                DietRecordCsvRow csvRow = (DietRecordCsvRow) record;
+                ProductBean productBean = new ProductBean(productService.findByUuid(csvRow.getUuid()));
+                DietRecordBean dietRecordBean = new DietRecordBean()
+                        .setClientBean(clientBean)
+                        .setProductBean(productBean)
+                        .setProteins(Double.parseDouble(csvRow.getProteins()))
+                        .setFats(Double.parseDouble(csvRow.getFats()))
+                        .setCarbohydrates(Double.parseDouble(csvRow.getCarbohydrates()))
+                        .setCalories(Double.parseDouble(csvRow.getCalories()))
+                        .setVolume(Double.parseDouble(csvRow.getVolume()))
+                        .setDate(DateUtils.convertToLocalDate(csvRow.getDate()))
+                        .setTime(DateUtils.convertToLocalTime(csvRow.getTime()));
+                dietService.add(dietRecordBean);
+            }
+        });
     }
 
     public BiometricBean updateBiometric(UpdateBiometric updateBiometric) {
