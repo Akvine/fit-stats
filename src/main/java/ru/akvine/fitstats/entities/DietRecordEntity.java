@@ -21,6 +21,9 @@ public class DietRecordEntity extends BaseEntity {
     @SequenceGenerator(name = "dietRecordEntitySeq", sequenceName = "SEQ_DIET_RECORD_ENTITY", allocationSize = 1000)
     private Long id;
 
+    @Column(name = "UUID", updatable = false, nullable = false)
+    private String uuid;
+
     @JoinColumn(name = "CLIENT_ID", nullable = false)
     @ManyToOne
     private ClientEntity client;

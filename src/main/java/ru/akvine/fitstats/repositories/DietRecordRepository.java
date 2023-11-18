@@ -27,4 +27,7 @@ public interface DietRecordRepository extends JpaRepository<DietRecordEntity, Lo
     List<DietRecordEntity> findByDateRange(@Param("clientUuid") String clientUuid,
                                            @Param("startDate") LocalDate startDate,
                                            @Param("endDate") LocalDate endDate);
+
+    @Query("from DietRecordEntity dre where dre.uuid in :uuids")
+    List<DietRecordEntity> findByUuids(@Param("uuids") List<String> uuids);
 }

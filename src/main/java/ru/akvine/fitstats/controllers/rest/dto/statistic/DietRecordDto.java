@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 public class DietRecordDto {
+    private String uuid;
     private String productUuid;
     private String productTitle;
     private String measurement;

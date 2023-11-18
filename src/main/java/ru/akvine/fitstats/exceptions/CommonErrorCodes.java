@@ -33,6 +33,8 @@ public class CommonErrorCodes {
         String FILE_TYPE_BLANK_ERROR ="file.type.blank.error";
         String FILE_TYPE_INVALID_ERROR = "file.type.isNot.supported.error";
 
+        String ELEMENTS_COUNT_TOO_LARGE_ERROR = "elements.count.too.large.error";
+
         interface Admin {
             String UUID_VALUE_BLANK_ERROR = "uuid.value.blank.error";
             String MACRONUTRIENT_INVALID_ERROR = "macronutrient.invalid.error";

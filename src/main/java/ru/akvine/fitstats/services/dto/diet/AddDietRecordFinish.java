@@ -9,6 +9,7 @@ import ru.akvine.fitstats.enums.VolumeMeasurement;
 @Setter
 @Accessors(chain = true)
 public class AddDietRecordFinish {
+    private String uuid;
     private String productUuid;
     private String productTitle;
     private VolumeMeasurement volumeMeasurement;

@@ -3,6 +3,7 @@ package ru.akvine.fitstats.services;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.DietRecordEntity;
@@ -19,6 +20,7 @@ import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.utils.DietUtils;
+import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -39,6 +41,9 @@ public class DietService {
     private final static double GAIN_PROTEIN_COEFFICIENT = 1.7;
     private final static double GAIN_FATS_COEFFICIENT = 1.2;
     private final static double DRYING_FATS_COEFFICIENT = 0.7;
+
+    @Value("${uuid.length}")
+    private int length;
 
     public Macronutrients calculate(BiometricBean biometricBean, Diet diet) {
         Preconditions.checkNotNull(biometricBean, "biometricBean is null");
@@ -103,6 +108,7 @@ public class DietService {
                 addDietRecordStart.getVolume());
 
         DietRecordEntity dietRecordEntity = new DietRecordEntity()
+                .setUuid(UUIDGenerator.uuidWithoutDashes(length))
                 .setProteins(consumedMacronutrients.getProteins())
                 .setFats(consumedMacronutrients.getFats())
                 .setCarbohydrates(consumedMacronutrients.getCarbohydrates())
@@ -115,6 +121,7 @@ public class DietService {
 
         DietRecordBean dietRecordBean = new DietRecordBean(dietRecordRepository.save(dietRecordEntity));
         return new AddDietRecordFinish()
+                .setUuid(dietRecordBean.getUuid())
                 .setProductTitle(productEntity.getTitle())
                 .setProductUuid(productUuid)
                 .setProteins(dietRecordBean.getProteins())
@@ -136,6 +143,7 @@ public class DietService {
         ProductEntity productEntity = productService.findByUuid(productUuid);
 
         DietRecordEntity dietRecordEntity = new DietRecordEntity()
+                .setUuid(UUIDGenerator.uuidWithoutDashes(length))
                 .setProteins(dietRecordBean.getProteins())
                 .setFats(dietRecordBean.getFats())
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
@@ -169,6 +177,18 @@ public class DietService {
                 .stream()
                 .map(DietRecordBean::new)
                 .collect(Collectors.toList());
+    }
+
+    public void deleteRecords(DeleteRecords deleteRecords) {
+        Preconditions.checkNotNull(deleteRecords, "deleteRecords is null");
+
+        String clientUuid = deleteRecords.getClientUuid();
+        clientRepository
+                .findByUuid(clientUuid)
+                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+
+        List<DietRecordEntity> dietRecordEntities = dietRecordRepository.findByUuids(deleteRecords.getRecordsUuids());
+        dietRecordRepository.deleteAll(dietRecordEntities);
     }
 
     public DietDisplay display(Display display) {

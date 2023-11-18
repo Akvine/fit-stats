@@ -41,6 +41,13 @@ public class DietConverter {
                 .setTime(request.getTime());
     }
 
+    public DeleteRecords convertToDeleteRecords(DeleteRecordsRequest request) {
+        Preconditions.checkNotNull(request, "deleteRecordsRequest is null");
+        return new DeleteRecords()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setRecordsUuids(request.getRecordsUuids());
+    }
+
     public DietRecordListResponse convertToDietRecordListResponse(List<DietRecordBean> records) {
         Preconditions.checkNotNull(records, "records is null");
         return new DietRecordListResponse()
@@ -66,6 +73,7 @@ public class DietConverter {
 
     private DietRecordDto buildDietRecordDto(DietRecordBean dietRecordBean) {
         return new DietRecordDto()
+                .setUuid(dietRecordBean.getUuid())
                 .setProductUuid(dietRecordBean.getProductBean().getUuid())
                 .setProductTitle(dietRecordBean.getProductBean().getTitle())
                 .setProteins(dietRecordBean.getProteins())
@@ -79,6 +87,7 @@ public class DietConverter {
     private DietRecordDto buildDietRecordDto(AddDietRecordFinish dietRecordFinish) {
         Preconditions.checkNotNull(dietRecordFinish, "dietRecordFinish is null");
         return new DietRecordDto()
+                .setUuid(dietRecordFinish.getUuid())
                 .setProductUuid(dietRecordFinish.getProductUuid())
                 .setProductTitle(dietRecordFinish.getProductTitle())
                 .setProteins(dietRecordFinish.getProteins())

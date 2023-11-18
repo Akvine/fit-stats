@@ -19,6 +19,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class DietRecordBean extends Bean {
     private Long id;
+    private String uuid;
     private double volume;
     private double proteins;
     private double fats;
@@ -32,6 +33,7 @@ public class DietRecordBean extends Bean {
 
     public DietRecordBean(DietRecordEntity dietRecordEntity) {
         this.id = dietRecordEntity.getId();
+        this.uuid = dietRecordEntity.getUuid();
         this.clientBean = new ClientBean(dietRecordEntity.getClient());
         this.productBean = new ProductBean(dietRecordEntity.getProduct());
         this.proteins = dietRecordEntity.getProteins();
