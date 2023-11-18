@@ -8,7 +8,9 @@ import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
-import ru.akvine.fitstats.enums.*;
+import ru.akvine.fitstats.enums.Diet;
+import ru.akvine.fitstats.enums.Gender;
+import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
@@ -42,13 +44,11 @@ public class DietService {
         Preconditions.checkNotNull(biometricBean, "biometricBean is null");
         Preconditions.checkNotNull(diet, "diet is null");
 
-        HeightMeasurement heightMeasurement = biometricBean.getHeightMeasurement();
-        WeightMeasurement weightMeasurement = biometricBean.getWeightMeasurement();
         Gender gender = biometricBean.getGender();
         PhysicalActivity physicalActivity = biometricBean.getPhysicalActivity();
         int age = biometricBean.getAge();
-        double height = DietUtils.convertToCm(Double.parseDouble(biometricBean.getHeight()), heightMeasurement);
-        double weight = DietUtils.convertToKg(Double.parseDouble(biometricBean.getWeight()), weightMeasurement);
+        double height = Double.parseDouble(biometricBean.getHeight());
+        double weight = Double.parseDouble(biometricBean.getWeight());
 
         double basicExchange = DietUtils.calculateBasicExchange(gender, age, height, weight);
         double dailyCaloriesIntake = DietUtils.calculateDailyCaloriesIntake(basicExchange, physicalActivity);

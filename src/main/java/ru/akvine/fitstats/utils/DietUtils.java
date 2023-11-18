@@ -1,9 +1,7 @@
 package ru.akvine.fitstats.utils;
 
 import ru.akvine.fitstats.enums.Gender;
-import ru.akvine.fitstats.enums.HeightMeasurement;
 import ru.akvine.fitstats.enums.PhysicalActivity;
-import ru.akvine.fitstats.enums.WeightMeasurement;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 
 import javax.validation.constraints.NotNull;
@@ -12,12 +10,6 @@ public class DietUtils {
     private static final int FATS_CALORIES = 9;
     private static final int PROTEINS_CALORIES = 4;
     private static final int CARBOHYDRATES_CALORIES = 4;
-
-    private static final double IB_COEFFICIENT = 0.45359237;
-    private static final double OZ_COEFFICIENT = 0.0283495;
-
-    private static final double FT_COEFFICIENT = 30.48;
-    private static final double IN_COEFFICIENT = 2.54;
 
     private static final int DEFAULT_VOLUME = 100;
 
@@ -89,31 +81,5 @@ public class DietUtils {
      */
     public static double calculateDailyCaloriesIntake(double basicExchangeCalories, PhysicalActivity physicalActivity) {
         return basicExchangeCalories * physicalActivity.getValue();
-    }
-
-    public static double convertToKg(double weight, WeightMeasurement measurement) {
-        switch (measurement) {
-            case IB:
-                return weight * IB_COEFFICIENT;
-            case OZ:
-                return weight * OZ_COEFFICIENT;
-            case KG:
-                return weight;
-            default:
-                throw new IllegalStateException("Weight type measurement = [" + measurement + "] is not supported!");
-        }
-    }
-
-    public static double convertToCm(double height, HeightMeasurement measurement) {
-        switch (measurement) {
-            case FT:
-                return height * FT_COEFFICIENT;
-            case IN:
-                return height * IN_COEFFICIENT;
-            case CM:
-                return height;
-            default:
-                throw new IllegalStateException("Weight type measurement = [" + measurement + "] is not supported!");
-        }
     }
 }

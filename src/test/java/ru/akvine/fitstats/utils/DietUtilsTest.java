@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.akvine.fitstats.enums.Gender;
-import ru.akvine.fitstats.enums.HeightMeasurement;
-import ru.akvine.fitstats.enums.WeightMeasurement;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,66 +89,6 @@ class DietUtilsTest {
         Gender gender = Gender.FEMALE;
         double result = DietUtils.calculateBasicExchange(gender, age, height, weight);
         double expected = 1256.5;
-
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    @DisplayName("Convert to kg - KG")
-    void convert_to_kg() {
-        double weight = 50;
-        double result = DietUtils.convertToKg(weight, WeightMeasurement.KG);
-        double expected = 50;
-
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    @DisplayName("Convert to kg - IB")
-    void convert_to_ib() {
-        double weight = 50;
-        double result = MathUtils.round(DietUtils.convertToKg(weight, WeightMeasurement.IB), 2);
-        double expected = 22.68;
-
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    @DisplayName("Convert to kg - OZ")
-    void convert_to_oz() {
-        double weight = 50;
-        double result = MathUtils.round(DietUtils.convertToKg(weight, WeightMeasurement.OZ), 2);
-        double expected = 1.42;
-
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    @DisplayName("Convert to cm - CM")
-    void convert_to_cm() {
-        double height = 175;
-        double result = DietUtils.convertToCm(height, HeightMeasurement.CM);
-        double expected = 175;
-
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    @DisplayName("Convert to cm - FT")
-    void convert_to_ft() {
-        double height = 175;
-        double result = MathUtils.round(DietUtils.convertToCm(height, HeightMeasurement.FT), 2);
-        double expected = 5334;
-
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
-    @DisplayName("Convert to cm - IN")
-    void convert_to_in() {
-        double height = 175;
-        double result = MathUtils.round(DietUtils.convertToCm(height, HeightMeasurement.IN), 2);
-        double expected = 444.5;
 
         assertThat(result).isEqualTo(expected);
     }
