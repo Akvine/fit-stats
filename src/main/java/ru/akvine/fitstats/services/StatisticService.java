@@ -62,29 +62,24 @@ public class StatisticService {
                         .collect(toMap(MacronutrientProcessor::getType, identity()));
     }
 
-    public MainStatisticInfo calculateMainStatisticInfo(MainStatistic mainStatistic) {
-        Preconditions.checkNotNull(mainStatistic, "statistic is null");
-        String uuid = mainStatistic.getClientUuid();
-        Integer roundAccuracy = mainStatistic.getRoundAccuracy();
+    public DescriptiveStatisticInfo calculateDescriptiveStatisticInfo(DescriptiveStatistic descriptiveStatistic) {
+        Preconditions.checkNotNull(descriptiveStatistic, "descriptiveStatistic is null");
+        String uuid = descriptiveStatistic.getClientUuid();
+        int roundAccuracy = descriptiveStatistic.getRoundAccuracy();
         clientService.verifyExistsByUuidAndGet(uuid);
 
-        DateRange findDateRange = getDateRange(mainStatistic);
+        DateRange findDateRange = getDateRange(descriptiveStatistic);
         List<DietRecordEntity> records = dietRecordRepository.findByDateRange(
                 uuid,
                 findDateRange.getStartDate(),
                 findDateRange.getEndDate());
         Map<String, Map<String, Double>> indicatorStatistics = new LinkedHashMap<>();
 
-        mainStatistic
+        descriptiveStatistic
                 .getIndicatorsWithMacronutrients()
-                .entrySet()
-                .stream()
-                .forEach(entry -> {
-                    String indicator = entry.getKey();
-                    List<String> macronutrients = entry.getValue();
+                .forEach((indicator, macronutrients) -> {
                     Map<String, Double> statsInfo = new LinkedHashMap<>();
                     macronutrients
-                            .stream()
                             .forEach(macronutrient -> {
                                 List<Double> macronutrientsValues = availableMacronutrientProcessors
                                         .get(macronutrient)
@@ -96,7 +91,7 @@ public class StatisticService {
                             });
                     indicatorStatistics.put(indicator, statsInfo);
                 });
-        return new MainStatisticInfo()
+        return new DescriptiveStatisticInfo()
                 .setStatisticInfo(indicatorStatistics);
     }
 

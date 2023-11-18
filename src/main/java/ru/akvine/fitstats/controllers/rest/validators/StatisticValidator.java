@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateMainStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveStatisticRequest;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeInfo;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeRequest;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
@@ -30,7 +30,7 @@ public class StatisticValidator {
 
     private final DurationValidator durationValidator;
 
-    public void verifyCalculateMainStatisticRequest(CalculateMainStatisticRequest request) {
+    public void verifyCalculateDescriptiveStatisticRequest(CalculateDescriptiveStatisticRequest request) {
         Preconditions.checkNotNull(request, "calculateStatisticRequest is null");
 
         request.getIndicators().forEach(indicator -> {

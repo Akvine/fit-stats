@@ -6,14 +6,14 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.akvine.fitstats.controllers.rest.converter.StatisticConverter;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateMainStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveStatisticRequest;
 import ru.akvine.fitstats.controllers.rest.meta.StatisticControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.StatisticValidator;
 import ru.akvine.fitstats.services.StatisticService;
 import ru.akvine.fitstats.services.dto.statistic.AdditionalStatistic;
 import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
-import ru.akvine.fitstats.services.dto.statistic.MainStatistic;
-import ru.akvine.fitstats.services.dto.statistic.MainStatisticInfo;
+import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatistic;
+import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatisticInfo;
 
 import javax.validation.Valid;
 
@@ -26,11 +26,11 @@ public class StatisticController implements StatisticControllerMeta {
     private final StatisticConverter statisticConverter;
 
     @Override
-    public Response main(@Valid CalculateMainStatisticRequest request) {
-        statisticValidator.verifyCalculateMainStatisticRequest(request);
-        MainStatistic mainStatistic = statisticConverter.convertToMainStatistic(request);
-        MainStatisticInfo mainStatisticInfo = statisticService.calculateMainStatisticInfo(mainStatistic);
-        return statisticConverter.convertToMainStatisticResponse(mainStatisticInfo);
+    public Response descriptive(@Valid CalculateDescriptiveStatisticRequest request) {
+        statisticValidator.verifyCalculateDescriptiveStatisticRequest(request);
+        DescriptiveStatistic descriptiveStatistic = statisticConverter.convertToDescriptiveStatistic(request);
+        DescriptiveStatisticInfo descriptiveStatisticInfo = statisticService.calculateDescriptiveStatisticInfo(descriptiveStatistic);
+        return statisticConverter.convertToDescriptiveStatisticResponse(descriptiveStatisticInfo);
     }
 
     @Override

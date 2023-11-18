@@ -7,6 +7,6 @@ import java.util.Map;
 
 @Data
 @Accessors(chain = true)
-public class MainStatisticInfo {
+public class DescriptiveStatisticInfo {
     private Map<String, Map<String, Double>> statisticInfo;
 }

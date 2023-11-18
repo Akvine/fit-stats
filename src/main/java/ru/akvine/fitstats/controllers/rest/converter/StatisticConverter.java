@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.AdditionalStatisticResponse;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateMainStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.MainStatisticResponse;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.DescriptiveStatisticResponse;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.statistic.AdditionalStatistic;
 import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
-import ru.akvine.fitstats.services.dto.statistic.MainStatistic;
-import ru.akvine.fitstats.services.dto.statistic.MainStatisticInfo;
+import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatistic;
+import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatisticInfo;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.util.LinkedHashMap;
@@ -27,8 +27,8 @@ public class StatisticConverter {
     @Value("${product.statistic.mode.count.limit}")
     private int limit;
 
-    public MainStatistic convertToMainStatistic(CalculateMainStatisticRequest request) {
-        Preconditions.checkNotNull("calculateStatisticRequest is null");
+    public DescriptiveStatistic convertToDescriptiveStatistic(CalculateDescriptiveStatisticRequest request) {
+        Preconditions.checkNotNull("calculateDescriptiveStatisticRequest is null");
 
         String duration = request
                 .getDateRangeInfo()
@@ -37,7 +37,7 @@ public class StatisticConverter {
         request
                 .getIndicators()
                 .forEach(indicator -> indicatorsWithMacronutrients.put(indicator, request.getMacronutrients()));
-        return MainStatistic
+        return DescriptiveStatistic
                 .builder()
                 .clientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .dateRange(new DateRange()
@@ -49,10 +49,10 @@ public class StatisticConverter {
                 .build();
     }
 
-    public MainStatisticResponse convertToMainStatisticResponse(MainStatisticInfo mainStatisticInfo) {
-        Preconditions.checkNotNull(mainStatisticInfo, "statisticMainInfo is null");
-        return new MainStatisticResponse()
-                .setInfo(mainStatisticInfo);
+    public DescriptiveStatisticResponse convertToDescriptiveStatisticResponse(DescriptiveStatisticInfo descriptiveStatisticInfo) {
+        Preconditions.checkNotNull(descriptiveStatisticInfo, "descriptiveStatisticInfo is null");
+        return new DescriptiveStatisticResponse()
+                .setInfo(descriptiveStatisticInfo);
     }
 
     public AdditionalStatistic convertToAdditionalStatistic(CalculateAdditionalStatisticRequest request) {

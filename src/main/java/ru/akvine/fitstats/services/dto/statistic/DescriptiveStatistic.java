@@ -8,6 +8,6 @@ import java.util.Map;
 
 @Data
 @SuperBuilder
-public class MainStatistic extends Statistic {
+public class DescriptiveStatistic extends Statistic {
     private Map<String, List<String>> indicatorsWithMacronutrients;
 }

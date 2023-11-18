@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Accessors(chain = true)
-public class CalculateMainStatisticRequest extends DateRangeRequest {
+public class CalculateDescriptiveStatisticRequest extends DateRangeRequest {
     private List<String> indicators;
     private List<String> macronutrients;
     private Integer roundAccuracy;
