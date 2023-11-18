@@ -3,12 +3,15 @@ package ru.akvine.fitstats.controllers.rest.dto.admin;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import ru.akvine.fitstats.controllers.rest.dto.common.UuidRequest;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public class UpdateProductRequest extends UuidRequest {
+public class UpdateProductRequest extends SecretRequest {
+    @NotBlank
+    private String uuid;
 
     private String title;
 

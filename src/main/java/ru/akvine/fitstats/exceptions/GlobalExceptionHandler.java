@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.akvine.fitstats.controllers.rest.dto.common.ErrorResponse;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
@@ -71,6 +73,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException exception) {
         logger.info("Product not found error occurred", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(Product.PRODUCT_NOT_FOUND_ERROR, exception.getMessage());
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.info("Method argument is not presented", exception);
+        ErrorResponse errorResponse = errorResponseBuilder.build(Validation.FIELD_NOT_PRESENTED_ERROR, "Field is not presented!");
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 }

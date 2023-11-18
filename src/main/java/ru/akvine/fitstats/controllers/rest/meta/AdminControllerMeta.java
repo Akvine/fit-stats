@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.akvine.fitstats.controllers.rest.dto.admin.DeleteProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.SecretRequest;
 import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 
@@ -20,5 +21,5 @@ public interface AdminControllerMeta {
     Response productDelete(@Valid @RequestBody DeleteProductRequest request);
 
     @GetMapping(value = "/products/export")
-    ResponseEntity productExport();
+    ResponseEntity productExport(@Valid @RequestBody SecretRequest request);
 }

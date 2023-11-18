@@ -3,7 +3,11 @@ package ru.akvine.fitstats.controllers.rest.validators;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
+import ru.akvine.fitstats.controllers.rest.dto.admin.DeleteProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.SecretRequest;
 import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
@@ -12,10 +16,15 @@ import ru.akvine.fitstats.validators.VolumeMeasurementValidator;
 @Component
 @RequiredArgsConstructor
 public class AdminValidator {
+    @Value("${admin.secret}")
+    private String secret;
+
     private final VolumeMeasurementValidator volumeMeasurementValidator;
 
     public void verifyUpdateProductRequest(UpdateProductRequest updateProductRequest) {
         Preconditions.checkNotNull(updateProductRequest, "updateProductRequest is null");
+
+        verifySecret(updateProductRequest);
 
         if (StringUtils.isBlank(updateProductRequest.getUuid())) {
             throw new ValidationException(
@@ -49,6 +58,17 @@ public class AdminValidator {
 
         if (StringUtils.isNotBlank(updateProductRequest.getMeasurement())) {
             volumeMeasurementValidator.validate(updateProductRequest.getMeasurement());
+        }
+    }
+
+    public void verifyDeleteProductRequest(DeleteProductRequest request) {
+        Preconditions.checkNotNull(request, "deleteProductRequest is null");
+        verifySecret(request);
+    }
+
+    public void verifySecret(SecretRequest secretRequest) {
+        if (!secret.equals(secretRequest.getSecret())) {
+            throw new BadCredentialsException("Bad credentials!");
         }
     }
 }

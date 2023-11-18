@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.akvine.fitstats.controllers.rest.converter.AdminConverter;
 import ru.akvine.fitstats.controllers.rest.dto.admin.DeleteProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.SecretRequest;
 import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
@@ -39,12 +40,14 @@ public class AdminController implements AdminControllerMeta {
 
     @Override
     public Response productDelete(@Valid DeleteProductRequest request) {
+        adminValidator.verifyDeleteProductRequest(request);
         adminService.deleteProduct(request.getUuid());
         return new SuccessfulResponse();
     }
 
     @Override
-    public ResponseEntity productExport() {
+    public ResponseEntity productExport(@Valid SecretRequest request) {
+        adminValidator.verifySecret(request);
         byte[] file = adminService.export();
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=file.csv")

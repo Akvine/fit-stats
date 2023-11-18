@@ -24,6 +24,8 @@ public class CommonErrorCodes {
     }
 
     public interface Validation {
+        String FIELD_NOT_PRESENTED_ERROR = "field.not.presented.error";
+
         interface Admin {
             String UUID_VALUE_BLANK_ERROR = "uuid.value.blank.error";
             String MACRONUTRIENT_INVALID_ERROR = "macronutrient.invalid.error";

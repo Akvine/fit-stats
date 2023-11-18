@@ -1,15 +1,15 @@
 package ru.akvine.fitstats.controllers.rest.dto.admin;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
-public class DeleteProductRequest extends SecretRequest {
+@ToString(exclude = "secret")
+public class SecretRequest {
     @NotBlank
-    private String uuid;
+    private String secret;
 }
