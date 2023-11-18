@@ -1,12 +1,10 @@
 package ru.akvine.fitstats.controllers.rest.dto.profile;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class UpdateBiometricResponse extends SuccessfulResponse {
     private int age;

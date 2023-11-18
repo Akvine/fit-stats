@@ -1,14 +1,12 @@
 package ru.akvine.fitstats.services.dto.client;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.enums.*;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 @NoArgsConstructor
 public class ClientRegister {

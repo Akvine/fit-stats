@@ -1,7 +1,6 @@
 package ru.akvine.fitstats.services.dto.client;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.BiometricEntity;
 import ru.akvine.fitstats.enums.Gender;
@@ -10,8 +9,7 @@ import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.enums.WeightMeasurement;
 import ru.akvine.fitstats.services.dto.base.Bean;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class BiometricBean extends Bean {
     private Long id;

@@ -1,16 +1,14 @@
 package ru.akvine.fitstats.services.dto.client;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.services.dto.base.SoftBean;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 @NoArgsConstructor
 public class ClientBean extends SoftBean {

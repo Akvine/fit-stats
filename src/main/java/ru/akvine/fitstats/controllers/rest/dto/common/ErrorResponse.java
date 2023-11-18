@@ -1,5 +1,6 @@
 package ru.akvine.fitstats.controllers.rest.dto.common;
 
+import lombok.Data;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
@@ -7,7 +8,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Error response status
  */
-@Getter
+@Data
 public class ErrorResponse implements Response {
     /**
      * Result response status

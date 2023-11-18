@@ -1,7 +1,6 @@
 package ru.akvine.fitstats.entities.base;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
@@ -9,8 +8,7 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public abstract class SoftBaseEntity extends BaseEntity {
     @Column(name = "DELETED_DATE")

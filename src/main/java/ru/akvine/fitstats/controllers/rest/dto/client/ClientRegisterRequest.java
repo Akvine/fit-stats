@@ -1,12 +1,9 @@
 package ru.akvine.fitstats.controllers.rest.dto.client;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.akvine.fitstats.enums.PhysicalActivity;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class ClientRegisterRequest {
     private String email;

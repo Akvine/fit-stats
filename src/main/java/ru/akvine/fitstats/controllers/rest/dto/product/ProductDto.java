@@ -1,13 +1,11 @@
 package ru.akvine.fitstats.controllers.rest.dto.product;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class ProductDto {
     @NotBlank

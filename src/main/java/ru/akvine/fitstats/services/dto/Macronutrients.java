@@ -1,10 +1,10 @@
 package ru.akvine.fitstats.services.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 @AllArgsConstructor
-@Getter
+@Data
 public class Macronutrients {
     private final double proteins;
     private final double fats;

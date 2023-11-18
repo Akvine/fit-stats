@@ -1,8 +1,7 @@
 package ru.akvine.fitstats.services.dto.diet;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.entities.DietRecordEntity;
@@ -13,8 +12,7 @@ import ru.akvine.fitstats.services.dto.product.ProductBean;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 @NoArgsConstructor
 public class DietRecordBean extends Bean {

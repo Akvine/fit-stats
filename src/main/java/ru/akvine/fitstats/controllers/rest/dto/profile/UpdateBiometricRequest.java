@@ -1,11 +1,9 @@
 package ru.akvine.fitstats.controllers.rest.dto.profile;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class UpdateBiometricRequest {
     private Integer age;

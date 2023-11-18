@@ -1,7 +1,6 @@
 package ru.akvine.fitstats.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.base.BaseEntity;
 
@@ -9,10 +8,9 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
-@javax.persistence.Entity
+@Entity
 @Table(name = "DIET_RECORD_ENTITY")
 public class DietRecordEntity extends BaseEntity {
     @Id

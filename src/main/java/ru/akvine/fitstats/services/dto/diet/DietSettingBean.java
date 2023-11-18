@@ -1,15 +1,13 @@
 package ru.akvine.fitstats.services.dto.diet;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.services.dto.base.SoftBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class DietSettingBean extends SoftBean {
     private Long id;

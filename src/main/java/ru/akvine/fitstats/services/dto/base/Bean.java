@@ -1,14 +1,12 @@
 package ru.akvine.fitstats.services.dto.base;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public abstract class Bean {
     protected LocalDateTime createdDate;

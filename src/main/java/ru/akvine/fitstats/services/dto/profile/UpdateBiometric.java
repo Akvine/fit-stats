@@ -1,13 +1,11 @@
 package ru.akvine.fitstats.services.dto.profile;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.enums.PhysicalActivity;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class UpdateBiometric {
     private String clientUuid;

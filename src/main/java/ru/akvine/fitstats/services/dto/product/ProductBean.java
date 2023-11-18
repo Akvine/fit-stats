@@ -1,15 +1,13 @@
 package ru.akvine.fitstats.services.dto.product;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.services.dto.base.SoftBean;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 @NoArgsConstructor
 public class ProductBean extends SoftBean {

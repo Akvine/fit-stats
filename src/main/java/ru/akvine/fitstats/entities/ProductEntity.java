@@ -1,15 +1,13 @@
 package ru.akvine.fitstats.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.base.SoftBaseEntity;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 @Entity
 @Table(name = "PRODUCT_ENTITY")

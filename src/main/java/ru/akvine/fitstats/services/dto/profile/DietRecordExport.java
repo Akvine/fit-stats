@@ -1,7 +1,6 @@
 package ru.akvine.fitstats.services.dto.profile;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
@@ -11,8 +10,7 @@ import ru.akvine.fitstats.utils.MathUtils;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class DietRecordExport {
     private double proteins;
