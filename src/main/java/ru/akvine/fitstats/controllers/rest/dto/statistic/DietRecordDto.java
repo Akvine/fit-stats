@@ -10,8 +10,10 @@ import lombok.experimental.Accessors;
 public class DietRecordDto {
     private String productUuid;
     private String productTitle;
+    private String measurement;
     private double proteins;
     private double fats;
     private double carbohydrates;
     private double calories;
+    private double volume;
 }

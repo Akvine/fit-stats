@@ -3,6 +3,7 @@ package ru.akvine.fitstats.services.dto.diet;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import ru.akvine.fitstats.enums.VolumeMeasurement;
 
 @Getter
 @Setter
@@ -10,8 +11,10 @@ import lombok.experimental.Accessors;
 public class AddDietRecordFinish {
     private String productUuid;
     private String productTitle;
+    private VolumeMeasurement volumeMeasurement;
     private double proteins;
     private double fats;
     private double carbohydrates;
     private double calories;
+    private double volume;
 }

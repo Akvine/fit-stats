@@ -7,13 +7,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DisplayRequest;
+import ru.akvine.fitstats.controllers.rest.dto.diet.ListRecordRequest;
 
 import javax.validation.Valid;
 
 @RequestMapping(value = "/diet")
 public interface DietControllerMeta {
-    @PostMapping(value = "/record/add")
+    @PostMapping(value = "/records/add")
     Response add(@Valid @RequestBody AddRecordRequest request);
+
+    @GetMapping(value = "/records/list")
+    Response list(@Valid @RequestBody ListRecordRequest request);
 
     @GetMapping(value = "/display")
     Response display(@Valid @RequestBody DisplayRequest request);

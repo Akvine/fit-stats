@@ -120,7 +120,31 @@ public class DietService {
                 .setProteins(dietRecordBean.getProteins())
                 .setFats(dietRecordBean.getFats())
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
-                .setCalories(dietRecordBean.getCalories());
+                .setCalories(dietRecordBean.getCalories())
+                .setVolume(dietRecordBean.getVolume())
+                .setVolumeMeasurement(dietRecordBean.getProductBean().getMeasurement());
+    }
+
+    public List<DietRecordBean> list(ListRecord listRecord) {
+        Preconditions.checkNotNull(listRecord, "listRecord is null");
+
+        String clientUuid = listRecord.getClientUuid();
+        clientRepository
+                .findByUuid(clientUuid)
+                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+
+        LocalDate date;
+        if (listRecord.getDate() == null) {
+            date = LocalDate.now();
+        } else {
+            date = listRecord.getDate();
+        }
+
+        return dietRecordRepository
+                .findByDate(clientUuid, date)
+                .stream()
+                .map(DietRecordBean::new)
+                .collect(Collectors.toList());
     }
 
     public DietDisplay display(Display display) {

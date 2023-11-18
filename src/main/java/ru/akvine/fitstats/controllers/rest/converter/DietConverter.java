@@ -4,14 +4,13 @@ import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.diet.*;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DietRecordDto;
-import ru.akvine.fitstats.services.dto.diet.AddDietRecordFinish;
-import ru.akvine.fitstats.services.dto.diet.AddDietRecordStart;
-import ru.akvine.fitstats.services.dto.diet.DietDisplay;
-import ru.akvine.fitstats.services.dto.diet.Display;
+import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.akvine.fitstats.utils.MathUtils.round;
 
@@ -34,6 +33,23 @@ public class DietConverter {
 
     }
 
+    public ListRecord convertToListRecord(ListRecordRequest request) {
+        Preconditions.checkNotNull(request, "listRecordRequest is null");
+        return new ListRecord()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setDate(request.getDate())
+                .setTime(request.getTime());
+    }
+
+    public DietRecordListResponse convertToDietRecordListResponse(List<DietRecordBean> records) {
+        Preconditions.checkNotNull(records, "records is null");
+        return new DietRecordListResponse()
+                .setRecords(records
+                        .stream()
+                        .map(this::buildDietRecordDto)
+                        .collect(Collectors.toList()));
+    }
+
     public DietDisplayResponse convertToDietDisplayResponse(DietDisplay dietDisplay) {
         Preconditions.checkNotNull(dietDisplay, "dietDisplay is null");
         return new DietDisplayResponse()
@@ -48,6 +64,18 @@ public class DietConverter {
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid());
     }
 
+    private DietRecordDto buildDietRecordDto(DietRecordBean dietRecordBean) {
+        return new DietRecordDto()
+                .setProductUuid(dietRecordBean.getProductBean().getUuid())
+                .setProductTitle(dietRecordBean.getProductBean().getTitle())
+                .setProteins(dietRecordBean.getProteins())
+                .setFats(dietRecordBean.getFats())
+                .setCarbohydrates(dietRecordBean.getCarbohydrates())
+                .setCalories(dietRecordBean.getCalories())
+                .setVolume(dietRecordBean.getVolume())
+                .setMeasurement(dietRecordBean.getProductBean().getMeasurement().toString());
+    }
+
     private DietRecordDto buildDietRecordDto(AddDietRecordFinish dietRecordFinish) {
         Preconditions.checkNotNull(dietRecordFinish, "dietRecordFinish is null");
         return new DietRecordDto()
@@ -56,7 +84,9 @@ public class DietConverter {
                 .setProteins(dietRecordFinish.getProteins())
                 .setFats(dietRecordFinish.getFats())
                 .setCarbohydrates(dietRecordFinish.getCarbohydrates())
-                .setCalories(dietRecordFinish.getCalories());
+                .setCalories(dietRecordFinish.getCalories())
+                .setVolume(dietRecordFinish.getVolume())
+                .setMeasurement(dietRecordFinish.getVolumeMeasurement().toString());
     }
 
     private DietDisplayInfoDto buildDietDisplayInfoDto(DietDisplay dietDisplay) {
