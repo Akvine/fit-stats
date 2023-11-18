@@ -14,13 +14,13 @@ import java.time.LocalDate;
 @RequestMapping(value = "/profile")
 public interface ProfileControllerMeta {
     @PostMapping(value = "/records/export")
-    ResponseEntity downloadRecords(@RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                   @RequestParam(value = "endDate", required = false) LocalDate endDate,
-                                   @RequestParam(value = "duration", required = false) String duration,
-                                   @RequestParam(value = "converterType", required = false) String converterType);
+    ResponseEntity exportRecords(@RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                 @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                                 @RequestParam(value = "duration", required = false) String duration,
+                                 @RequestParam(value = "converterType", required = false) String converterType);
 
     @PostMapping(value = "/records/import")
-    Response uploadRecords();
+    Response importRecords();
 
     @PostMapping(value = "/biometric/update")
     Response updateBiometric(@Valid @RequestBody UpdateBiometricRequest request);

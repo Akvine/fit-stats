@@ -28,10 +28,10 @@ public class ProfileController implements ProfileControllerMeta {
     private final ProfileService profileService;
 
     @Override
-    public ResponseEntity downloadRecords(LocalDate startDate,
-                                          LocalDate endDate,
-                                          String duration,
-                                          String converterType) {
+    public ResponseEntity exportRecords(LocalDate startDate,
+                                        LocalDate endDate,
+                                        String duration,
+                                        String converterType) {
         profileValidator.verifyRecordsDownload(startDate, endDate, duration, converterType);
         ProfileDownload profileDownload = profileConverter.convertToProfileDownload(startDate, endDate, duration, converterType);
         byte[] file = profileService.exportRecords(profileDownload);
@@ -42,7 +42,7 @@ public class ProfileController implements ProfileControllerMeta {
     }
 
     @Override
-    public Response uploadRecords() {
+    public Response importRecords() {
         return null;
     }
 
