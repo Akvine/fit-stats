@@ -31,14 +31,16 @@ public class ProfileController implements ProfileControllerMeta {
     public ResponseEntity exportRecords(LocalDate startDate,
                                         LocalDate endDate,
                                         String duration,
+                                        String filename,
                                         String converterType) {
-        profileValidator.verifyRecordsDownload(startDate, endDate, duration, converterType);
+        profileValidator.verifyRecordsDownload(
+                startDate,
+                endDate,
+                duration,
+                converterType);
         ProfileDownload profileDownload = profileConverter.convertToProfileDownload(startDate, endDate, duration, converterType);
         byte[] file = profileService.exportRecords(profileDownload);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=file.csv")
-                .contentType(MediaType.parseMediaType("application/csv"))
-                .body(file);
+        return profileConverter.convertToExportResponse(file, filename, profileDownload.getConverterType());
     }
 
     @Override
