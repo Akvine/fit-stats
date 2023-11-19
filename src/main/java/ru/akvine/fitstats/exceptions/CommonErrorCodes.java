@@ -20,7 +20,13 @@ public class CommonErrorCodes {
     }
 
     public interface Security {
+        String INVALID_ATTEMPT_ERROR = "invalid.attempt.error";
+        String INVALID_SESSION_ERROR = "invalid.session.error";
+        String ACTION_NOT_STARTED_ERROR = "action.not.started.error";
+        String INVALID_STATE_ERROR = "invalid.state.error";
+        String OTP_EXPIRED_ERROR = "otp.expired.error";
         String AUTHENTICATE_ERROR = "authenticate.error";
+        String LIMIT_REACHED_ERROR = "otp.no.more.new.codes.error";
     }
 
     public interface Validation {
@@ -34,6 +40,11 @@ public class CommonErrorCodes {
         String FILE_TYPE_INVALID_ERROR = "file.type.isNot.supported.error";
 
         String ELEMENTS_COUNT_TOO_LARGE_ERROR = "elements.count.too.large.error";
+
+        interface Security {
+            String REGISTRATION_PASSWORD_BLANK_ERROR = "registration.password.blank.error";
+            String REGISTRATION_PASSWORD_INVALID_ERROR = "registration.password.invalid.error";
+        }
 
         interface Admin {
             String UUID_VALUE_BLANK_ERROR = "uuid.value.blank.error";

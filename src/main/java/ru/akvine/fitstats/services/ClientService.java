@@ -94,6 +94,11 @@ public class ClientService {
         return new ClientBean(verifyExistsByUuidAndGet(uuid));
     }
 
+    public ClientBean getByEmail(String email) {
+        Preconditions.checkNotNull(email, "email is null");
+        return new ClientBean(verifyExistsByEmailAndGet(email));
+    }
+
     public boolean isExistsByEmail(String email) {
         Preconditions.checkNotNull(email, "email is null");
         return clientRepository.findByEmail(email).isPresent();

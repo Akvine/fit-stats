@@ -1,0 +1,28 @@
+package ru.akvine.fitstats.entities.security;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "BLOCKED_CREDENTIALS_ENTITY")
+@Data
+@Accessors(chain = true)
+public class BlockedCredentialsEntity {
+    @Id
+    @Column(name = "ID", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "blockedCredentialsEntitySequence")
+    @SequenceGenerator(name = "blockedCredentialsEntitySequence", sequenceName = "SEQ_BLOCKED_CREDENTIALS_ENTITY", allocationSize = 1000)
+    private Long id;
+
+    @Column(name = "LOGIN", nullable = false)
+    private String login;
+
+    @Column(name = "BLOCK_START_DATE", nullable = false)
+    private LocalDateTime blockStartDate;
+
+    @Column(name = "BLOCK_END_DATE", nullable = false)
+    private LocalDateTime blockEndDate;
+}

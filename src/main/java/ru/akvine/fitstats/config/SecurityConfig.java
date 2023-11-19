@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.akvine.fitstats.config.security.RestAuthenticationEntryPoint;
 import ru.akvine.fitstats.config.security.RestSuccessLogoutHandler;
+import ru.akvine.fitstats.services.notification.NotificationProvider;
 
 @Configuration
 @EnableWebSecurity
