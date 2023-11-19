@@ -34,6 +34,10 @@ public class StatisticService {
     private static final String CARBOHYDRATES_MACRONUTRIENT_NAME = "carbohydrates";
     private static final String CALORIES_MACRONUTRIENT_NAME = "calories";
 
+    private static final int FATS_MACRONUTRIENT_CALORIES_COEFFICIENT = 9;
+    private static final int PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT = 4;
+    private static final int CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT = 4;
+
     private final DietRecordRepository dietRecordRepository;
     private final ClientService clientService;
     private final ModeStatisticProcessor modeStatisticProcessor;
@@ -117,13 +121,22 @@ public class StatisticService {
 
         List<Double> proteinsValues = availableMacronutrientProcessors
                 .get(PROTEINS_MACRONUTRIENT_NAME)
-                .extract(records);
+                .extract(records)
+                .stream()
+                .map(value -> value * PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT)
+                .collect(Collectors.toList());
         List<Double> fatsValues = availableMacronutrientProcessors
                 .get(FATS_MACRONUTRIENT_NAME)
-                .extract(records);
+                .extract(records)
+                .stream()
+                .map(value -> value * FATS_MACRONUTRIENT_CALORIES_COEFFICIENT)
+                .collect(Collectors.toList());
         List<Double> carbohydrates = availableMacronutrientProcessors
                 .get(CARBOHYDRATES_MACRONUTRIENT_NAME)
-                .extract(records);
+                .extract(records)
+                .stream()
+                .map(value -> value * CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT)
+                .collect(Collectors.toList());
         double totalCalories = availableMacronutrientProcessors
                 .get(CALORIES_MACRONUTRIENT_NAME)
                 .extract(records)
