@@ -64,35 +64,4 @@ public class DateUtils {
         LocalDate lastDayOfYear = today.with(TemporalAdjusters.lastDayOfYear());
         return new DateRange(firstDayOfYear, lastDayOfYear);
     }
-
-    public static DateRange getPastDaysInMonth() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate start = currentDate.with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate end = currentDate.minusDays(1);
-        return new DateRange(start, end);
-    }
-
-    public static DateRange getPastWeeksInMonths() {
-        return getPastWeeksInMonths(HALF_YEAR_MONTH_COUNT);
-    }
-    public static DateRange getPastWeeksInMonths(int monthCount) {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate start = currentDate.minusMonths(monthCount).with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate end = currentDate.minusDays(1);
-        return new DateRange(start, end);
-    }
-
-    public static DateRange getPastMonthsInYear() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate start = currentDate.minusYears(1).with(TemporalAdjusters.firstDayOfYear());
-        LocalDate end = currentDate.minusDays(1);
-        return new DateRange(start, end);
-    }
-
-    public static DateRange getPastYears() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate start = currentDate.minusYears(5).with(TemporalAdjusters.firstDayOfYear());
-        LocalDate end = currentDate.minusDays(1);
-        return new DateRange(start, end);
-    }
 }
