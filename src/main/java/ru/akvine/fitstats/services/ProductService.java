@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.entities.CategoryEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
+import ru.akvine.fitstats.repositories.CategoryRepository;
 import ru.akvine.fitstats.repositories.ProductRepository;
 import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
@@ -17,6 +19,7 @@ import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     private static final String EMPTY_SPACE = " ";
 
@@ -34,6 +38,7 @@ public class ProductService {
     public ProductBean add(ProductBean productBean) {
         Preconditions.checkNotNull(productBean, "productBean is null");
 
+        Set<CategoryEntity> categories = categoryRepository.findByTitles(productBean.getCategoriesTitles());
         ProductEntity productEntity = new ProductEntity()
                 .setUuid(UUIDGenerator.uuidWithoutDashes(uuidLength))
                 .setTitle(productBean.getTitle())
@@ -47,7 +52,8 @@ public class ProductService {
                 .setCalories(DietUtils.calculateCalories(
                         productBean.getProteins(),
                         productBean.getFats(),
-                        productBean.getCarbohydrates()));
+                        productBean.getCarbohydrates()))
+                .setCategories(categories);
         return new ProductBean(productRepository.save(productEntity));
     }
 

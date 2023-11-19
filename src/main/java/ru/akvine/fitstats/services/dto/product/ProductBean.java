@@ -6,6 +6,10 @@ import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.services.dto.base.SoftBean;
+import ru.akvine.fitstats.services.dto.category.CategoryBean;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Accessors(chain = true)
@@ -21,6 +25,8 @@ public class ProductBean extends SoftBean {
     private double calories;
     private double volume;
     private VolumeMeasurement measurement;
+    private Set<CategoryBean> categories;
+    private Set<String> categoriesTitles;
 
     public ProductBean(ProductEntity productEntity) {
         this.id = productEntity.getId();
@@ -33,5 +39,10 @@ public class ProductBean extends SoftBean {
         this.calories = productEntity.getCalories();
         this.volume = productEntity.getVolume();
         this.measurement = productEntity.getMeasurement();
+        this.categories = productEntity
+                .getCategories()
+                .stream()
+                .map(CategoryBean::new)
+                .collect(Collectors.toSet());
     }
 }

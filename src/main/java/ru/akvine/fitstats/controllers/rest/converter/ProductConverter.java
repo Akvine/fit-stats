@@ -25,7 +25,8 @@ public class ProductConverter {
                 .setTitle(request.getTitle())
                 .setProducer(request.getProducer())
                 .setVolume(DEFAULT_PRODUCT_VOLUME)
-                .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()));
+                .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()))
+                .setCategoriesTitles(request.getCategories());
     }
 
     public ProductResponse convertToProductResponse(ProductBean productBean) {
