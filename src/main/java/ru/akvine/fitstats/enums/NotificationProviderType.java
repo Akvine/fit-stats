@@ -2,5 +2,6 @@ package ru.akvine.fitstats.enums;
 
 public enum NotificationProviderType {
     CONSTANT,
-    LOG
+    LOG,
+    SYSTEM_OUT
 }
