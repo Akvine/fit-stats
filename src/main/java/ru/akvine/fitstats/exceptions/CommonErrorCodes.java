@@ -72,6 +72,8 @@ public class CommonErrorCodes {
             String START_DATE_AFTER_END_DATE_ERROR = "startDate.after.endDate.error";
             String ROUND_ACCURACY_INVALID_ERROR = "round.accuracy.invalid.error";
             String MODE_COUNT_INVALID_ERROR = "mode.count.invalid.error";
+            String MACRONUTRIENT_BLANK_ERROR = "macronutrient.blank.error";
+            String MACRONUTRIENT_INVALID_ERROR = "macronutrient.blank.error";
         }
 
         interface Client {

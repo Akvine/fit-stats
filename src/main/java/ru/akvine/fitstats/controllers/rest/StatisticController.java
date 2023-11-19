@@ -7,13 +7,11 @@ import ru.akvine.fitstats.controllers.rest.converter.StatisticConverter;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.StatisticHistoryRequest;
 import ru.akvine.fitstats.controllers.rest.meta.StatisticControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.StatisticValidator;
 import ru.akvine.fitstats.services.StatisticService;
-import ru.akvine.fitstats.services.dto.statistic.AdditionalStatistic;
-import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
-import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatistic;
-import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatisticInfo;
+import ru.akvine.fitstats.services.dto.statistic.*;
 
 import javax.validation.Valid;
 
@@ -39,5 +37,13 @@ public class StatisticController implements StatisticControllerMeta {
         AdditionalStatistic additionalStatistic = statisticConverter.convertToAdditionalStatistic(request);
         AdditionalStatisticInfo additionalStatisticInfo = statisticService.calculateAdditionalStatisticInfo(additionalStatistic);
         return statisticConverter.convertAdditionalStatisticResponse(additionalStatisticInfo);
+    }
+
+    @Override
+    public Response history(@Valid StatisticHistoryRequest request) {
+        statisticValidator.verifyStatisticHistoryRequest(request);
+        StatisticHistory statisticHistory = statisticConverter.convertToStatisticHistory(request);
+        StatisticHistoryResult statisticHistoryResult = statisticService.statisticHistoryInfo(statisticHistory);
+        return statisticConverter.convertToStatisticHistoryResponse(statisticHistoryResult);
     }
 }

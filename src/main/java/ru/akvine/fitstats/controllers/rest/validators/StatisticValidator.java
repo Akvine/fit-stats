@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeInfo;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.*;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.validators.DurationValidator;
+import ru.akvine.fitstats.validators.MacronutrientValidator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +27,7 @@ public class StatisticValidator {
     private int limit;
 
     private final DurationValidator durationValidator;
+    private final MacronutrientValidator macronutrientValidator;
 
     public void verifyCalculateDescriptiveStatisticRequest(CalculateDescriptiveStatisticRequest request) {
         Preconditions.checkNotNull(request, "calculateStatisticRequest is null");
@@ -70,6 +69,12 @@ public class StatisticValidator {
         }
         verifyRoundAccuracy(request.getRoundAccuracy());
         verifyDateRangeRequest(request);
+    }
+
+    public void verifyStatisticHistoryRequest(StatisticHistoryRequest request) {
+        Preconditions.checkNotNull(request, "statisticHistoryRequest is null");
+        durationValidator.validate(request.getDuration());
+        macronutrientValidator.validate(request.getMacronutrient());
     }
 
     private void verifyRoundAccuracy(Integer roundAccuracy) {

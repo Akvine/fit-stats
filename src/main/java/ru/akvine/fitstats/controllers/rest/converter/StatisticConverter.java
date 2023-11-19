@@ -4,16 +4,12 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.AdditionalStatisticResponse;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveStatisticRequest;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.DescriptiveStatisticResponse;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.*;
 import ru.akvine.fitstats.enums.Duration;
+import ru.akvine.fitstats.enums.Macronutrient;
 import ru.akvine.fitstats.services.dto.DateRange;
-import ru.akvine.fitstats.services.dto.statistic.AdditionalStatistic;
-import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
-import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatistic;
-import ru.akvine.fitstats.services.dto.statistic.DescriptiveStatisticInfo;
+import ru.akvine.fitstats.services.dto.statistic.*;
+import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.util.LinkedHashMap;
@@ -78,5 +74,23 @@ public class StatisticConverter {
         Preconditions.checkNotNull(additionalStatisticInfo, "additionalStatisticInfo is null");
         return new AdditionalStatisticResponse()
                 .setInfo(additionalStatisticInfo);
+    }
+
+    public StatisticHistory convertToStatisticHistory(StatisticHistoryRequest request) {
+        Preconditions.checkNotNull(request, "statisticHistoryRequest is null");
+        return new StatisticHistory()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setMacronutrient(Macronutrient.valueOf(request.getMacronutrient()))
+                .setDuration(Duration.valueOf(request.getDuration()));
+    }
+
+    public StatisticHistoryResponse convertToStatisticHistoryResponse(StatisticHistoryResult statisticHistoryResult) {
+        Preconditions.checkNotNull(statisticHistoryResult, "statisticHistoryResult is null");
+        return new StatisticHistoryResponse()
+                .setInfo(new StatisticHistoryInfo()
+                        .setDuration(statisticHistoryResult.getDuration().toString())
+                        .setMacronutrient(statisticHistoryResult.getMacronutrient().toString())
+                        .setHistory(statisticHistoryResult.getHistory())
+                        .setAverage(statisticHistoryResult.getAverage()));
     }
 }

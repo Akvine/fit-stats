@@ -14,6 +14,8 @@ public class DateUtils {
     private static final DateTimeFormatter DATE_FORMATTER_DEFAULT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIME_FORMATTER_DEFAULT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+    private static final int HALF_YEAR_MONTH_COUNT = 6;
+
     public static LocalTime convertToLocalTime(@NotNull String time) {
         return convertToLocalTime(time, TIME_FORMATTER_DEFAULT);
     }
@@ -61,5 +63,36 @@ public class DateUtils {
         LocalDate firstDayOfYear = today.with(TemporalAdjusters.firstDayOfYear());
         LocalDate lastDayOfYear = today.with(TemporalAdjusters.lastDayOfYear());
         return new DateRange(firstDayOfYear, lastDayOfYear);
+    }
+
+    public static DateRange getPastDaysInMonth() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate start = currentDate.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate end = currentDate.minusDays(1);
+        return new DateRange(start, end);
+    }
+
+    public static DateRange getPastWeeksInMonths() {
+        return getPastWeeksInMonths(HALF_YEAR_MONTH_COUNT);
+    }
+    public static DateRange getPastWeeksInMonths(int monthCount) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate start = currentDate.minusMonths(monthCount).with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate end = currentDate.minusDays(1);
+        return new DateRange(start, end);
+    }
+
+    public static DateRange getPastMonthsInYear() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate start = currentDate.minusYears(1).with(TemporalAdjusters.firstDayOfYear());
+        LocalDate end = currentDate.minusDays(1);
+        return new DateRange(start, end);
+    }
+
+    public static DateRange getPastYears() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate start = currentDate.minusYears(5).with(TemporalAdjusters.firstDayOfYear());
+        LocalDate end = currentDate.minusDays(1);
+        return new DateRange(start, end);
     }
 }
