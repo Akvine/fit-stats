@@ -81,7 +81,7 @@ public class AuthActionService extends PasswordRequiredActionService<AuthActionE
 
         String login = request.getLogin();
         String otp = request.getOtp();
-        String sessionId = request.getOtp();
+        String sessionId = request.getSessionId();
 
         verifyNotBlocked(login);
         ClientBean clientBean = clientService.getByEmail(login);

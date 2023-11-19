@@ -20,7 +20,6 @@ public class RegistrationFinishRequest extends LoginRequest {
     @NotBlank
     private String secondName;
 
-    @NotBlank
     private String thirdName;
 
     private int age;

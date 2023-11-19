@@ -27,6 +27,8 @@ public class SecurityConfig {
                         .antMatchers("/clients/register").permitAll()
                         .antMatchers("/clients/login").permitAll()
                         .antMatchers("/clients/logout").permitAll()
+                        .antMatchers("/registration/**").permitAll()
+                        .antMatchers("/auth/**").permitAll()
                         .antMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -27,6 +27,7 @@ public class CommonErrorCodes {
         String OTP_EXPIRED_ERROR = "otp.expired.error";
         String AUTHENTICATE_ERROR = "authenticate.error";
         String LIMIT_REACHED_ERROR = "otp.no.more.new.codes.error";
+        String BAD_CREDENTIALS_ERROR = "bad.credentials.error";
     }
 
     public interface Validation {

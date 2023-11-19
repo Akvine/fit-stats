@@ -131,6 +131,7 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
                 .setGender(request.getGender())
                 .setHeight(request.getHeight())
                 .setWeight(request.getWeight())
+                .setDiet(request.getDiet())
                 .setPhysicalActivity(request.getPhysicalActivity())
                 .setHeightMeasurement(request.getHeightMeasurement())
                 .setWeightMeasurement(request.getWeightMeasurement());
