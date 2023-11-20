@@ -23,6 +23,6 @@ public class OtpCounterEntity {
     @Column(name = "VALUE", nullable = false)
     private long value = 1L;
 
-    @Column(name = "LAST_UPDATE", nullable = false)
+    @Column(name = "LAST_UPDATED", nullable = false)
     private LocalDateTime lastUpdated;
 }
