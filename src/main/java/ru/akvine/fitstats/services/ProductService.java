@@ -42,7 +42,7 @@ public class ProductService {
 
         Set<String> categoriesTitles = productBean.getCategoriesTitles();
         Set<CategoryEntity> categories = categoryRepository.findByTitles(categoriesTitles);
-        if (CollectionUtils.isNotEmpty(categories)) {
+        if (CollectionUtils.isEmpty(categories)) {
             String errorMessage = String.format("No one of the presented categories = %s were found", categoriesTitles);
             throw new CategoryNotFoundException(errorMessage);
         }
