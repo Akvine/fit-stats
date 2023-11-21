@@ -266,10 +266,10 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        agg1.getProteins() + agg2.getProteins(),
-                                        agg1.getFats() + agg2.getFats(),
-                                        agg1.getCarbohydrates() + agg2.getCarbohydrates(),
-                                        agg1.getCalories() + agg2.getCalories()
+                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), roundAccuracy),
+                                        MathUtils.round(agg1.getFats() + agg2.getFats(), roundAccuracy),
+                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), roundAccuracy),
+                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), roundAccuracy)
                                 )
                         )
                 ));
@@ -291,10 +291,10 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        agg1.getProteins() + agg2.getProteins(),
-                                        agg1.getFats() + agg2.getFats(),
-                                        agg1.getCarbohydrates() + agg2.getCarbohydrates(),
-                                        agg1.getCalories() + agg2.getCalories()
+                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), roundAccuracy),
+                                        MathUtils.round(agg1.getFats() + agg2.getFats(), roundAccuracy),
+                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), roundAccuracy),
+                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), roundAccuracy)
                                 )
                         )
                 ));
@@ -316,10 +316,10 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        agg1.getProteins() + agg2.getProteins(),
-                                        agg1.getFats() + agg2.getFats(),
-                                        agg1.getCarbohydrates() + agg2.getCarbohydrates(),
-                                        agg1.getCalories() + agg2.getCalories()
+                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), roundAccuracy),
+                                        MathUtils.round(agg1.getFats() + agg2.getFats(), roundAccuracy),
+                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), roundAccuracy),
+                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), roundAccuracy)
                                 )
                         )
                 ));
@@ -341,10 +341,10 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        agg1.getProteins() + agg2.getProteins(),
-                                        agg1.getFats() + agg2.getFats(),
-                                        agg1.getCarbohydrates() + agg2.getCarbohydrates(),
-                                        agg1.getCalories() + agg2.getCalories()
+                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), roundAccuracy),
+                                        MathUtils.round(agg1.getFats() + agg2.getFats(), roundAccuracy),
+                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), roundAccuracy),
+                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), roundAccuracy)
                                 )
                         )
                 ));
