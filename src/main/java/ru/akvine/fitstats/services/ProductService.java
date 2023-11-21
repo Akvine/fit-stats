@@ -3,11 +3,13 @@ package ru.akvine.fitstats.services;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.CategoryEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
+import ru.akvine.fitstats.exceptions.category.CategoryNotFoundException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.repositories.CategoryRepository;
 import ru.akvine.fitstats.repositories.ProductRepository;
@@ -38,7 +40,12 @@ public class ProductService {
     public ProductBean add(ProductBean productBean) {
         Preconditions.checkNotNull(productBean, "productBean is null");
 
-        Set<CategoryEntity> categories = categoryRepository.findByTitles(productBean.getCategoriesTitles());
+        Set<String> categoriesTitles = productBean.getCategoriesTitles();
+        Set<CategoryEntity> categories = categoryRepository.findByTitles(categoriesTitles);
+        if (CollectionUtils.isNotEmpty(categories)) {
+            String errorMessage = String.format("No one of the presented categories = %s were found", categoriesTitles);
+            throw new CategoryNotFoundException(errorMessage);
+        }
         ProductEntity productEntity = new ProductEntity()
                 .setUuid(UUIDGenerator.uuidWithoutDashes(uuidLength))
                 .setTitle(productBean.getTitle())

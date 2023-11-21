@@ -12,6 +12,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     @Query("from CategoryEntity ce where ce.deletedDate is null and ce.deleted = false and ce.title = :title")
     Optional<CategoryEntity> findByTitleAndNotDeleted(@Param("title") String title);
 
-    @Query("from CategoryEntity ce where ce.deleted is null and ce.deleted = false and ce.title in :titles")
+    @Query("from CategoryEntity ce where ce.deletedDate is null and ce.deleted = false and ce.title in :titles")
     Set<CategoryEntity> findByTitles(@Param("titles") Set<String> titles);
 }

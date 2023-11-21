@@ -30,6 +30,10 @@ public class CommonErrorCodes {
         String BAD_CREDENTIALS_ERROR = "bad.credentials.error";
     }
 
+    public interface Category {
+        String CATEGORY_NOT_FOUND_ERROR = "category.not.found.error";
+    }
+
     public interface Validation {
         String FIELD_NOT_PRESENTED_ERROR = "field.not.presented.error";
 
