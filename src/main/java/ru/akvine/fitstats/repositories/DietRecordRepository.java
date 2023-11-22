@@ -7,6 +7,7 @@ import ru.akvine.fitstats.entities.DietRecordEntity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface DietRecordRepository extends JpaRepository<DietRecordEntity, Long> {
     @Query("from DietRecordEntity dre where " +
@@ -28,6 +29,6 @@ public interface DietRecordRepository extends JpaRepository<DietRecordEntity, Lo
                                            @Param("startDate") LocalDate startDate,
                                            @Param("endDate") LocalDate endDate);
 
-    @Query("from DietRecordEntity dre where dre.uuid in :uuids")
-    List<DietRecordEntity> findByUuids(@Param("uuids") List<String> uuids);
+    @Query("from DietRecordEntity dre where dre.uuid = :uuid")
+    Optional<DietRecordEntity> findByUuid(@Param("uuid") String uuid);
 }

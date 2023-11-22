@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
-import ru.akvine.fitstats.controllers.rest.dto.diet.DeleteRecordsRequest;
+import ru.akvine.fitstats.controllers.rest.dto.diet.DeleteRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DisplayRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.ListRecordRequest;
 
@@ -21,7 +21,7 @@ public interface DietControllerMeta {
     Response list(@Valid @RequestBody ListRecordRequest request);
 
     @PostMapping(value = "/records/delete")
-    Response delete(@Valid @RequestBody DeleteRecordsRequest request);
+    Response delete(@Valid @RequestBody DeleteRecordRequest request);
 
     @GetMapping(value = "/display")
     Response display(@Valid @RequestBody DisplayRequest request);

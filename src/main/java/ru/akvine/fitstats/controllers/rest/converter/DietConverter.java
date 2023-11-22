@@ -41,11 +41,11 @@ public class DietConverter {
                 .setTime(request.getTime());
     }
 
-    public DeleteRecords convertToDeleteRecords(DeleteRecordsRequest request) {
-        Preconditions.checkNotNull(request, "deleteRecordsRequest is null");
-        return new DeleteRecords()
+    public DeleteRecord convertToDeleteRecord(DeleteRecordRequest request) {
+        Preconditions.checkNotNull(request, "deleteRecordRequest is null");
+        return new DeleteRecord()
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
-                .setRecordsUuids(request.getRecordsUuids());
+                .setRecordUuid(request.getUuid());
     }
 
     public DietRecordListResponse convertToDietRecordListResponse(List<DietRecordBean> records) {

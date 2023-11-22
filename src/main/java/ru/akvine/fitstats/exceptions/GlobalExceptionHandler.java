@@ -15,6 +15,7 @@ import ru.akvine.fitstats.controllers.rest.dto.common.ErrorResponse;
 import ru.akvine.fitstats.exceptions.category.CategoryNotFoundException;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
+import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietSettingNotFoundException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.exceptions.security.*;
@@ -189,6 +190,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.info("Categories not found exception", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Category.CATEGORY_NOT_FOUND_ERROR,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({DietRecordNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleDietRecordNotFoundException(DietRecordNotFoundException exception) {
+        logger.info("Diet record not found exception", exception);
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                Diet.DIET_RECORD_NOT_FOUND_ERROR,
                 exception.getMessage()
         );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);

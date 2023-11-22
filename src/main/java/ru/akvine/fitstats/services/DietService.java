@@ -13,6 +13,7 @@ import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.enums.Gender;
 import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
+import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
@@ -179,16 +180,19 @@ public class DietService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteRecords(DeleteRecords deleteRecords) {
-        Preconditions.checkNotNull(deleteRecords, "deleteRecords is null");
+    public void deleteRecords(DeleteRecord deleteRecord) {
+        Preconditions.checkNotNull(deleteRecord, "deleteRecords is null");
 
-        String clientUuid = deleteRecords.getClientUuid();
+        String clientUuid = deleteRecord.getClientUuid();
         clientRepository
                 .findByUuid(clientUuid)
                 .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
 
-        List<DietRecordEntity> dietRecordEntities = dietRecordRepository.findByUuids(deleteRecords.getRecordsUuids());
-        dietRecordRepository.deleteAll(dietRecordEntities);
+        String dietRecordUuid = deleteRecord.getRecordUuid();
+        DietRecordEntity dietRecordEntity = dietRecordRepository
+                .findByUuid(dietRecordUuid)
+                .orElseThrow(() -> new DietRecordNotFoundException("Diet with uuid = [" + dietRecordUuid + "] not found!"));
+        dietRecordRepository.delete(dietRecordEntity);
     }
 
     public DietDisplay display(Display display) {

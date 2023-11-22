@@ -17,6 +17,7 @@ public class CommonErrorCodes {
 
     public interface Diet {
         String DIET_SETTING_NOT_FOUND_ERROR = "diet.setting.notFound.error";
+        String DIET_RECORD_NOT_FOUND_ERROR = "diet.record.notFound.error";
     }
 
     public interface Security {

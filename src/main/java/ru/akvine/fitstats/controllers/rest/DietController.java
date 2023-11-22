@@ -7,11 +7,10 @@ import ru.akvine.fitstats.controllers.rest.converter.DietConverter;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
-import ru.akvine.fitstats.controllers.rest.dto.diet.DeleteRecordsRequest;
+import ru.akvine.fitstats.controllers.rest.dto.diet.DeleteRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DisplayRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.ListRecordRequest;
 import ru.akvine.fitstats.controllers.rest.meta.DietControllerMeta;
-import ru.akvine.fitstats.controllers.rest.validators.DietValidator;
 import ru.akvine.fitstats.services.DietService;
 import ru.akvine.fitstats.services.dto.diet.*;
 
@@ -24,7 +23,6 @@ import java.util.List;
 public class DietController implements DietControllerMeta {
     private final DietConverter dietConverter;
     private final DietService dietService;
-    private final DietValidator dietValidator;
 
     @Override
     public Response add(@Valid AddRecordRequest request) {
@@ -41,10 +39,9 @@ public class DietController implements DietControllerMeta {
     }
 
     @Override
-    public Response delete(@Valid DeleteRecordsRequest request) {
-        dietValidator.verifyDeleteRecordsRequest(request);
-        DeleteRecords deleteRecords = dietConverter.convertToDeleteRecords(request);
-        dietService.deleteRecords(deleteRecords);
+    public Response delete(@Valid DeleteRecordRequest request) {
+        DeleteRecord deleteRecord = dietConverter.convertToDeleteRecord(request);
+        dietService.deleteRecords(deleteRecord);
         return new SuccessfulResponse();
     }
 
