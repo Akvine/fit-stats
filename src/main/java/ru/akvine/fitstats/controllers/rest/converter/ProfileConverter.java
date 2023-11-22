@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
+import ru.akvine.fitstats.controllers.rest.dto.profile.DisplayBiometricResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricResponse;
@@ -92,6 +93,17 @@ public class ProfileConverter {
     public UpdateBiometricResponse convertToUpdateBiometricResponse(BiometricBean biometricBean) {
         Preconditions.checkNotNull(biometricBean, "biometricBean is null");
         return new UpdateBiometricResponse()
+                .setAge(biometricBean.getAge())
+                .setHeight(biometricBean.getHeight())
+                .setWeight(biometricBean.getWeight())
+                .setPhysicalActivity(biometricBean.getPhysicalActivity().name())
+                .setHeightMeasurement(biometricBean.getHeightMeasurement().name())
+                .setWeightMeasurement(biometricBean.getWeightMeasurement().name());
+    }
+
+    public DisplayBiometricResponse convertToDisplayBiometricResponse(BiometricBean biometricBean) {
+        Preconditions.checkNotNull(biometricBean, "biometricBean is null");
+        return new DisplayBiometricResponse()
                 .setAge(biometricBean.getAge())
                 .setHeight(biometricBean.getHeight())
                 .setWeight(biometricBean.getWeight())

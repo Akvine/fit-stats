@@ -1,10 +1,7 @@
 package ru.akvine.fitstats.controllers.rest.meta;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
@@ -27,4 +24,7 @@ public interface ProfileControllerMeta {
 
     @PostMapping(value = "/biometric/update")
     Response updateBiometric(@Valid @RequestBody UpdateBiometricRequest request);
+
+    @GetMapping(value = "/biometric/display")
+    Response displayBiometric();
 }

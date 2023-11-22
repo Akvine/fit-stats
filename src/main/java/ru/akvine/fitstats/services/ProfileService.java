@@ -140,6 +140,11 @@ public class ProfileService {
         return savedBiometricBean;
     }
 
+    public BiometricBean display(String clientUuid) {
+        Preconditions.checkNotNull(clientUuid, "clientUuid is null");
+        return new BiometricBean(biometricService.verifyExistsAndGet(clientUuid));
+    }
+
     private DateRange getDateRange(ProfileDownload profileDownload) {
         LocalDate startDate = profileDownload.getStartDate();
         LocalDate endDate = profileDownload.getEndDate();

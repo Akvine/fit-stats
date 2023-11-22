@@ -16,6 +16,7 @@ import ru.akvine.fitstats.services.ProfileService;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
+import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -60,5 +61,12 @@ public class ProfileController implements ProfileControllerMeta {
         UpdateBiometric updateBiometric = profileConverter.convertToUpdateBiometric(request);
         BiometricBean biometricBean = profileService.updateBiometric(updateBiometric);
         return profileConverter.convertToUpdateBiometricResponse(biometricBean);
+    }
+
+    @Override
+    public Response displayBiometric() {
+        String clientUuid = SecurityUtils.getCurrentUser().getUuid();
+        BiometricBean biometricBean = profileService.display(clientUuid);
+        return profileConverter.convertToDisplayBiometricResponse(biometricBean);
     }
 }
