@@ -1,10 +1,12 @@
 package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.diet.*;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DietRecordDto;
 import ru.akvine.fitstats.services.dto.diet.*;
+import ru.akvine.fitstats.utils.MathUtils;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
@@ -16,6 +18,9 @@ import static ru.akvine.fitstats.utils.MathUtils.round;
 
 @Component
 public class DietConverter {
+    @Value("${round.accuracy}")
+    private int roundAccuracy;
+
     public AddDietRecordStart convertToDietRecordBean(AddRecordRequest request) {
         Preconditions.checkNotNull(request, "addRecordRequest is null");
         return new AddDietRecordStart()
@@ -77,9 +82,9 @@ public class DietConverter {
                 .setProductUuid(dietRecordBean.getProductBean().getUuid())
                 .setProductTitle(dietRecordBean.getProductBean().getTitle())
                 .setProteins(dietRecordBean.getProteins())
-                .setFats(dietRecordBean.getFats())
-                .setCarbohydrates(dietRecordBean.getCarbohydrates())
-                .setCalories(dietRecordBean.getCalories())
+                .setFats(round(dietRecordBean.getFats(), roundAccuracy))
+                .setCarbohydrates(round(dietRecordBean.getCarbohydrates(), roundAccuracy))
+                .setCalories(round(dietRecordBean.getCalories(), roundAccuracy))
                 .setVolume(dietRecordBean.getVolume())
                 .setMeasurement(dietRecordBean.getProductBean().getMeasurement().toString());
     }
@@ -90,10 +95,10 @@ public class DietConverter {
                 .setUuid(dietRecordFinish.getUuid())
                 .setProductUuid(dietRecordFinish.getProductUuid())
                 .setProductTitle(dietRecordFinish.getProductTitle())
-                .setProteins(dietRecordFinish.getProteins())
-                .setFats(dietRecordFinish.getFats())
-                .setCarbohydrates(dietRecordFinish.getCarbohydrates())
-                .setCalories(dietRecordFinish.getCalories())
+                .setProteins(round(dietRecordFinish.getProteins(), roundAccuracy))
+                .setFats(round(dietRecordFinish.getFats(), roundAccuracy))
+                .setCarbohydrates(round(dietRecordFinish.getCarbohydrates(), roundAccuracy))
+                .setCalories(round(dietRecordFinish.getCalories(), roundAccuracy))
                 .setVolume(dietRecordFinish.getVolume())
                 .setMeasurement(dietRecordFinish.getVolumeMeasurement().toString());
     }
