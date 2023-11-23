@@ -38,4 +38,4 @@ build/
 *.log.*
 /tdumps
 *.tdump
-/fit-stats/src/main/resources/application-*.properties
+application-*.properties
