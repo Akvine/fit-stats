@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### Custom excludes ###
+*.log
+*.log.*
+/tdumps
+*.tdump
+/fit-stats/src/main/resources/application-*.properties
