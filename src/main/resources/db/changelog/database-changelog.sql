@@ -321,3 +321,13 @@ INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
 VALUES (42, 'Газированные напитки', 'CARBONATED_DRINKS', '2023-11-19', false);
 INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
 VALUES (43, 'Энергетики', 'ENERGETICS', '2023-11-19', false);
+
+--changeset lymar-sa:FIT-STATS-1-15
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'PRODUCT_ENTITY' and upper(column_name) = 'VOL' AND table_schema = 'public'
+ALTER TABLE PRODUCT_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;
+
+--changeset lymar-sa:FIT-STATS-1-16
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'DIET_RECORD_ENTITY' and upper(column_name) = 'VOL' AND table_schema = 'public'
+ALTER TABLE DIET_RECORD_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;

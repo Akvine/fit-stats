@@ -10,6 +10,7 @@ public class DietUtils {
     private static final int FATS_CALORIES = 9;
     private static final int PROTEINS_CALORIES = 4;
     private static final int CARBOHYDRATES_CALORIES = 4;
+    private static final double ALCOHOL_CALORIES = 5.6;
 
     private static final int DEFAULT_VOLUME = 100;
 
@@ -17,8 +18,9 @@ public class DietUtils {
     public static Macronutrients calculateMacronutrients(
             double proteinsPer100,
             double fatsPer100,
-            double carbohydratesPer100) {
-        return calculateMacronutrients(proteinsPer100, fatsPer100, carbohydratesPer100, DEFAULT_VOLUME);
+            double carbohydratesPer100,
+            double volPer100) {
+        return calculateMacronutrients(proteinsPer100, fatsPer100, carbohydratesPer100, volPer100, DEFAULT_VOLUME);
     }
 
     @NotNull
@@ -26,27 +28,31 @@ public class DietUtils {
             double proteinsPer100,
             double fatsPer100,
             double carbohydratesPer100,
+            double volPer100,
             double grams) {
         double proteins = proteinsPer100 * grams / DEFAULT_VOLUME;
         double fats = fatsPer100 * grams / DEFAULT_VOLUME;
         double carbohydrates = carbohydratesPer100 * grams / DEFAULT_VOLUME;
-        double calories = calculateCalories(proteins, fats, carbohydrates);
+        double vol = volPer100 * grams / DEFAULT_VOLUME;
+        double calories = calculateCalories(proteins, fats, carbohydrates, vol);
         return new Macronutrients(proteins, fats, carbohydrates, calories);
     }
 
     public static Macronutrients transformPer100(double proteins,
                                                  double fats,
                                                  double carbohydrates,
+                                                 double vol,
                                                  double volume) {
         double proteinsPer100 = proteins * DEFAULT_VOLUME / volume;
         double fatsPer100 = fats * DEFAULT_VOLUME / volume;
         double carbohydratesPer100 = carbohydrates * DEFAULT_VOLUME / volume;
-        double caloriesPer100 = calculateCalories(proteinsPer100, fatsPer100, carbohydratesPer100);
+        double volPer100 = vol * DEFAULT_VOLUME / volume;
+        double caloriesPer100 = calculateCalories(proteinsPer100, fatsPer100, carbohydratesPer100, volPer100);
         return new Macronutrients(proteinsPer100, fatsPer100, carbohydratesPer100, caloriesPer100);
     }
 
-    public static double calculateCalories(double proteins, double fats, double carbohydrates) {
-        return fats * FATS_CALORIES + proteins * PROTEINS_CALORIES + carbohydrates * CARBOHYDRATES_CALORIES;
+    public static double calculateCalories(double proteins, double fats, double carbohydrates, double vol) {
+        return fats * FATS_CALORIES + proteins * PROTEINS_CALORIES + carbohydrates * CARBOHYDRATES_CALORIES + vol * ALCOHOL_CALORIES;
     }
 
     /**

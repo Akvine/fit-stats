@@ -53,13 +53,15 @@ public class ProductService {
                 .setProteins(productBean.getProteins())
                 .setFats(productBean.getFats())
                 .setCarbohydrates(productBean.getCarbohydrates())
+                .setVol(productBean.getVol())
                 .setCalories(productBean.getCalories())
                 .setVolume(productBean.getVolume())
                 .setMeasurement(productBean.getMeasurement())
                 .setCalories(DietUtils.calculateCalories(
                         productBean.getProteins(),
                         productBean.getFats(),
-                        productBean.getCarbohydrates()))
+                        productBean.getCarbohydrates(),
+                        productBean.getVol()))
                 .setCategories(categories);
         return new ProductBean(productRepository.save(productEntity));
     }
@@ -99,7 +101,8 @@ public class ProductService {
                     DietUtils.calculateCalories(
                             productEntity.getProteins(),
                             productEntity.getFats(),
-                            productEntity.getCarbohydrates())
+                            productEntity.getCarbohydrates(),
+                            productEntity.getVol())
             );
         }
 

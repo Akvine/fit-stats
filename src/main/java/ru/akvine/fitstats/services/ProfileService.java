@@ -99,6 +99,7 @@ public class ProfileService {
                         .setProteins(Double.parseDouble(csvRow.getProteins()))
                         .setFats(Double.parseDouble(csvRow.getFats()))
                         .setCarbohydrates(Double.parseDouble(csvRow.getCarbohydrates()))
+                        .setVol(Double.parseDouble(csvRow.getVol()))
                         .setCalories(Double.parseDouble(csvRow.getCalories()))
                         .setVolume(Double.parseDouble(csvRow.getVolume()))
                         .setDate(DateUtils.convertToLocalDate(csvRow.getDate()))

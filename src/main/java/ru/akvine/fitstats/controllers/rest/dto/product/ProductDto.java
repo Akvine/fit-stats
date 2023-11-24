@@ -23,6 +23,8 @@ public class ProductDto {
 
     private double carbohydrates;
 
+    private double vol;
+
     private double calories;
 
     private double volume;

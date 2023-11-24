@@ -101,6 +101,7 @@ public class DietService {
                 productEntity.getProteins(),
                 productEntity.getFats(),
                 productEntity.getCarbohydrates(),
+                productEntity.getVol(),
                 productEntity.getVolume());
         Macronutrients consumedMacronutrients = calculateMacronutrients(
                 macronutrientsPer100.getProteins(),
@@ -148,6 +149,7 @@ public class DietService {
                 .setProteins(dietRecordBean.getProteins())
                 .setFats(dietRecordBean.getFats())
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
+                .setVol(dietRecordBean.getVol())
                 .setCalories(dietRecordBean.getCalories())
                 .setVolume(dietRecordBean.getVolume())
                 .setDate(dietRecordBean.getDate())

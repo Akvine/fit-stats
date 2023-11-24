@@ -22,6 +22,7 @@ public class DietRecordBean extends Bean {
     private double proteins;
     private double fats;
     private double carbohydrates;
+    private double vol;
     private double calories;
     private ClientBean clientBean;
     private ProductBean productBean;
@@ -37,6 +38,7 @@ public class DietRecordBean extends Bean {
         this.proteins = dietRecordEntity.getProteins();
         this.fats = dietRecordEntity.getFats();
         this.carbohydrates = dietRecordEntity.getCarbohydrates();
+        this.vol = dietRecordEntity.getVol();
         this.calories = dietRecordEntity.getCalories();
         this.volume = dietRecordEntity.getVolume();
         this.date = dietRecordEntity.getDate();

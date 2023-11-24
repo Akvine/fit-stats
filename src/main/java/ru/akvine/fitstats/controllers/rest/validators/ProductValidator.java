@@ -53,6 +53,17 @@ public class ProductValidator {
                     CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
                     "Carbohydrates is less than 0. Field name: carbohydrates");
         }
+        if (request.getVol() > 100) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
+                    "VOL is greater than 100. Field name: vol");
+        }
+        if (request.getVol() < 0) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
+                    "VOL is less than 0. Field name: vol");
+        }
+
         volumeMeasurementValidator.validate(request.getVolumeMeasurement());
     }
 

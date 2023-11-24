@@ -17,6 +17,7 @@ public class DietRecordExport {
     private double fats;
     private double carbohydrates;
     private double calories;
+    private double vol;
     private double volume;
     private String product;
     private String uuid;
@@ -30,6 +31,7 @@ public class DietRecordExport {
         this.fats = MathUtils.round(dietRecordBean.getFats(), 2);
         this.carbohydrates = MathUtils.round(dietRecordBean.getCarbohydrates(), 2);
         this.calories = MathUtils.round(dietRecordBean.getCalories(), 2);
+        this.vol = MathUtils.round(dietRecordBean.getVol(), 2);
         this.volume = dietRecordBean.getVolume();
         this.measurement = dietRecordBean.getProductBean().getMeasurement();
         this.product = dietRecordBean.getProductBean().getTitle();

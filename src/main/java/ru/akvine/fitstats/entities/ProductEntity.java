@@ -40,6 +40,9 @@ public class ProductEntity extends SoftBaseEntity {
     @Column(name = "CALORIES", nullable = false)
     private double calories;
 
+    @Column(name = "VOL", nullable = false)
+    private double vol;
+
     @Column(name = "VOLUME", nullable = false)
     private double volume;
 

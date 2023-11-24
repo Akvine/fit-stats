@@ -21,7 +21,7 @@ class DietUtilsTest {
         double fats = 5;
         double carbohydrates = 10;
 
-        Macronutrients result = DietUtils.transformPer100(proteins, fats, carbohydrates, volume);
+        Macronutrients result = DietUtils.transformPer100(proteins, fats, carbohydrates, 0, volume);
         assertThat(result).isNotNull();
         assertThat(result.getProteins()).isEqualTo(proteins);
         assertThat(result.getFats()).isEqualTo(fats);
@@ -36,7 +36,7 @@ class DietUtilsTest {
         double fats = 5;
         double carbohydrates = 10;
 
-        Macronutrients result = DietUtils.transformPer100(proteins, fats, carbohydrates, volume);
+        Macronutrients result = DietUtils.transformPer100(proteins, fats, carbohydrates, 0, volume);
         assertThat(result).isNotNull();
         assertThat(MathUtils.round(result.getProteins(), 2)).isEqualTo(3.33);
         assertThat(MathUtils.round(result.getFats(), 2)).isEqualTo(3.33);
@@ -49,7 +49,7 @@ class DietUtilsTest {
         double proteins = 5;
         double fats = 5;
         double carbohydrates = 10;
-        double result = DietUtils.calculateCalories(proteins, fats, carbohydrates);
+        double result = DietUtils.calculateCalories(proteins, fats, carbohydrates, 0);
         double expected = 105;
 
         assertThat(result).isEqualTo(expected);
@@ -61,7 +61,7 @@ class DietUtilsTest {
         double proteins = 100;
         double fats = 35;
         double carbohydrates = 45;
-        double result = DietUtils.calculateCalories(proteins, fats, carbohydrates);
+        double result = DietUtils.calculateCalories(proteins, fats, carbohydrates, 0);
         double expected = 895;
 
         assertThat(result).isEqualTo(expected);

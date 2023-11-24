@@ -23,6 +23,7 @@ public class ProductBean extends SoftBean {
     private double fats;
     private double carbohydrates;
     private double calories;
+    private double vol;
     private double volume;
     private VolumeMeasurement measurement;
     private Set<CategoryBean> categories;

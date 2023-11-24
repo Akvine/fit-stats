@@ -84,6 +84,7 @@ public class DietConverter {
                 .setProteins(dietRecordBean.getProteins())
                 .setFats(round(dietRecordBean.getFats(), roundAccuracy))
                 .setCarbohydrates(round(dietRecordBean.getCarbohydrates(), roundAccuracy))
+                .setVol(round(dietRecordBean.getVol(), roundAccuracy))
                 .setCalories(round(dietRecordBean.getCalories(), roundAccuracy))
                 .setVolume(dietRecordBean.getVolume())
                 .setMeasurement(dietRecordBean.getProductBean().getMeasurement().toString());
@@ -98,6 +99,7 @@ public class DietConverter {
                 .setProteins(round(dietRecordFinish.getProteins(), roundAccuracy))
                 .setFats(round(dietRecordFinish.getFats(), roundAccuracy))
                 .setCarbohydrates(round(dietRecordFinish.getCarbohydrates(), roundAccuracy))
+                .setVol(round(dietRecordFinish.getVol(), roundAccuracy))
                 .setCalories(round(dietRecordFinish.getCalories(), roundAccuracy))
                 .setVolume(dietRecordFinish.getVolume())
                 .setMeasurement(dietRecordFinish.getVolumeMeasurement().toString());

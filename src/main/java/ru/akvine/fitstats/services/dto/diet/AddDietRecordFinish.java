@@ -14,6 +14,7 @@ public class AddDietRecordFinish {
     private double proteins;
     private double fats;
     private double carbohydrates;
+    private double vol;
     private double calories;
     private double volume;
 }

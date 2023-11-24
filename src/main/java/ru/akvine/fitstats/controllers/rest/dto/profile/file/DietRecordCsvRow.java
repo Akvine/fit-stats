@@ -20,20 +20,23 @@ public class DietRecordCsvRow {
     private String calories;
 
     @CsvBindByPosition(position = 4)
-    private String volume;
+    private String vol;
 
     @CsvBindByPosition(position = 5)
-    private String product;
+    private String volume;
 
     @CsvBindByPosition(position = 6)
-    private String uuid;
+    private String product;
 
     @CsvBindByPosition(position = 7)
-    private String measurement;
+    private String uuid;
 
     @CsvBindByPosition(position = 8)
-    private String date;
+    private String measurement;
 
     @CsvBindByPosition(position = 9)
+    private String date;
+
+    @CsvBindByPosition(position = 10)
     private String time;
 }
