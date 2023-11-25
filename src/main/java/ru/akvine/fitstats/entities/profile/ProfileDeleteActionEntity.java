@@ -17,7 +17,7 @@ public class ProfileDeleteActionEntity implements OneTimePasswordable, AccountPa
     @Id
     @Column(name = "ID", nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profileDeleteEntitySequence")
-    @SequenceGenerator(name = "profileDeleteSequence", sequenceName = "SEQ_PROFILE_DELETE_ACTION_ENTITY", allocationSize = 1000)
+    @SequenceGenerator(name = "profileDeleteEntitySequence", sequenceName = "SEQ_PROFILE_DELETE_ACTION_ENTITY", allocationSize = 1000)
     private Long id;
 
     @Column(name = "SESSION_ID", nullable = false)
