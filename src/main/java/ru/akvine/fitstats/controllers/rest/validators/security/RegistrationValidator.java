@@ -29,7 +29,7 @@ public class RegistrationValidator {
     public void verifyRegistrationLogin(LoginRequest request) {
         String login = request.getLogin();
         emailValidator.validate(login);
-        verifyExistsByLogin(request.getLogin());
+        verifyNotExistsByLogin(request.getLogin());
     }
 
     public void verifyRegistrationPassword(RegistrationPasswordValidateRequest request) {
@@ -68,10 +68,10 @@ public class RegistrationValidator {
         weightMeasurementValidator.validate(request.getWeightMeasurement());
         dietBaseValidator.validate(request.getDiet());
         physicalActivitiesValidator.validate(request.getPhysicalActivity());
-        verifyExistsByLogin(request.getLogin());
+        verifyNotExistsByLogin(request.getLogin());
     }
 
-    public void verifyExistsByLogin(String login) {
+    public void verifyNotExistsByLogin(String login) {
         boolean exists = clientService.isExistsByEmail(login);
         if (exists) {
             throw new ClientAlreadyExistsException("Client with email = [" + login + "] already exists!");

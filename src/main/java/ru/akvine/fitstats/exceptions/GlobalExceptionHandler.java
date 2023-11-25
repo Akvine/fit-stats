@@ -49,13 +49,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({AuthenticationException.class})
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException exception) {
-        logger.error("Authentication error occurred", exception);
-        ErrorResponse errorResponse = errorResponseBuilder.build(Security.AUTHENTICATE_ERROR, exception.getMessage());
-        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler({ClientAlreadyExistsException.class})
     public ResponseEntity<ErrorResponse> handleClientAlreadyExistsException(ClientAlreadyExistsException exception) {
         logger.info("Client already exists error occurred", exception);
@@ -200,6 +193,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.info("Diet record not found exception", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Diet.DIET_RECORD_NOT_FOUND_ERROR,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({OtpAuthRequiredException.class})
+    public ResponseEntity<ErrorResponse> handleOtpAuthRequiredException(OtpAuthRequiredException exception) {
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                Security.OTP_AUTH_REQUIRED,
                 exception.getMessage()
         );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);

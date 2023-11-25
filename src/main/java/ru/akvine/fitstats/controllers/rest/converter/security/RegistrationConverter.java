@@ -73,6 +73,7 @@ public class RegistrationConverter {
 
         OtpActionResponse otpActionResponse = new OtpActionResponse()
                 .setActionExpiredAt(result.getOtp().getExpiredAt().toString())
+                .setOtpCountLeft(result.getOtp().getOtpCountLeft())
                 .setOtpNumber(result.getOtp().getOtpNumber())
                 .setOtpLastUpdate(result.getOtp().getOtpLastUpdate() != null ? result.getOtp().getOtpLastUpdate().toString() : null)
                 .setNewOtpDelay(otpNewDelaySeconds)

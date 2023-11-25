@@ -20,6 +20,12 @@ public class LogNotificationService implements DummyNotificationProvider {
     }
 
     @Override
+    public boolean sendAccessRestoreCode(String login, String code) {
+        logger.info("Successful send access restore code = [" + code + "] to login = [" + login + "]");
+        return true;
+    }
+
+    @Override
     public NotificationProviderType getType() {
         return NotificationProviderType.LOG;
     }

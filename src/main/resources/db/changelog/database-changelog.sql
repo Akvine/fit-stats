@@ -331,3 +331,24 @@ ALTER TABLE PRODUCT_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'DIET_RECORD_ENTITY' and upper(column_name) = 'VOL' AND table_schema = 'public'
 ALTER TABLE DIET_RECORD_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;
+
+--changeset lymar-sa:FIT-STATS-1-17
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'ACCESS_RESTORE_ACTION_ENTITY' and table_schema = 'public';
+CREATE TABLE ACCESS_RESTORE_ACTION_ENTITY
+(
+    ID                        BIGINT                              NOT NULL,
+    SESSION_ID                VARCHAR(144)                        NOT NULL,
+    LOGIN                     VARCHAR(64)                         NOT NULL,
+    STARTED_DATE              TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    ACTION_EXPIRED_AT         TIMESTAMP                           NOT NULL,
+    STATE                     VARCHAR(32)                         NOT NULL,
+    OTP_COUNT_LEFT            INTEGER                             NOT NULL,
+    OTP_NUMBER                INTEGER,
+    OTP_LAST_UPDATE           TIMESTAMP,
+    OTP_EXPIRED_AT            TIMESTAMP,
+    OTP_INVALID_ATTEMPTS_LEFT INTEGER                             NOT NULL,
+    OTP_VALUE                 VARCHAR(32),
+    CONSTRAINT ACCESS_RESTORE_ACTION_PK PRIMARY KEY (ID)
+);
+CREATE SEQUENCE SEQ_ACCESS_RESTORE_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;

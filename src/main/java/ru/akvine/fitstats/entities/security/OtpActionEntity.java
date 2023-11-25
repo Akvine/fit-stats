@@ -74,6 +74,13 @@ public class OtpActionEntity {
     }
 
     @Transient
+    public OtpActionEntity setNewOtpValue(OtpInfo newOtpInfo, LocalDateTime now) {
+        setOtpValue(newOtpInfo, now);
+        this.decrementOtpCountLeft();
+        return this;
+    }
+
+    @Transient
     public OtpActionEntity setNewOtpValue(OtpInfo newOtpInfo) {
         this.setOtpValue(newOtpInfo, LocalDateTime.now());
         this.decrementOtpCountLeft();

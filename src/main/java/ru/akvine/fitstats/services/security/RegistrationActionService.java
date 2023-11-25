@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.entities.security.RegistrationActionEntity;
-import ru.akvine.fitstats.enums.RegistrationState;
+import ru.akvine.fitstats.enums.ActionState;
 import ru.akvine.fitstats.exceptions.security.NoMoreNewOtpAvailableException;
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationNotStartedException;
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationWrongStateException;
@@ -85,7 +85,7 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
         verifyNotBlocked(login);
 
         RegistrationActionEntity registrationAction = checkOtpInput(login, otp, sessionId);
-        registrationAction.setState(RegistrationState.OTP_PASSED);
+        registrationAction.setState(ActionState.OTP_PASSED);
         registrationAction.getOtpAction().setOtpValueToNull();
 
         RegistrationActionEntity savedRegistrationAction = getRepository().save(registrationAction);
@@ -117,7 +117,7 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
         }
 
         verifySession(registrationAction, request.getSessionId());
-        verifyState(RegistrationState.OTP_PASSED, registrationAction);
+        verifyState(ActionState.OTP_PASSED, registrationAction);
 
         getRepository().delete(registrationAction);
 
@@ -177,7 +177,7 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
         return new RegistrationActionResult(action);
     }
 
-    private void verifyState(RegistrationState expectedState, RegistrationActionEntity registrationActionEntity) {
+    private void verifyState(ActionState expectedState, RegistrationActionEntity registrationActionEntity) {
         if (registrationActionEntity.getState() == expectedState) {
             return;
         }

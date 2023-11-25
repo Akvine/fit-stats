@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .antMatchers("/clients/logout").permitAll()
                         .antMatchers("/registration/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
+                        .antMatchers("/access/restore/**").permitAll()
                         .antMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )

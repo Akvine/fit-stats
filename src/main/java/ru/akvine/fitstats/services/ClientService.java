@@ -11,16 +11,16 @@ import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
-import ru.akvine.fitstats.exceptions.security.AuthenticationException;
 import ru.akvine.fitstats.repositories.BiometricRepository;
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietSettingRepository;
-import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.Macronutrients;
+import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
-import ru.akvine.fitstats.utils.SecurityUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
+
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -76,17 +76,16 @@ public class ClientService {
         return new ClientBean(savedClientEntity);
     }
 
-    public void login(ClientBean loginClientBean) {
-        Preconditions.checkNotNull(loginClientBean, "loginClientBean is null");
+    public ClientBean updatePassword(String login, String newPassword) {
+        String newHash = passwordService.encodePassword(newPassword);
+        return updatePasswordInternal(login, newHash);
+    }
 
-        ClientBean clientBean = new ClientBean(verifyExistsByEmailAndGet(loginClientBean.getEmail()));
-        String password = loginClientBean.getPassword();
-
-        if (passwordService.isValidPassword(clientBean, password)) {
-            SecurityUtils.authenticate(clientBean);
-        } else {
-            throw new AuthenticationException("Authentication failed. Email or password is invalid");
-        }
+    public ClientBean updatePasswordInternal(String login, String newHash) {
+        ClientEntity client = verifyExistsByEmailAndGet(login);
+        client.setHash(newHash);
+        client.setUpdatedDate(LocalDateTime.now());
+        return new ClientBean(clientRepository.save(client));
     }
 
     public ClientBean getByUuid(String uuid) {

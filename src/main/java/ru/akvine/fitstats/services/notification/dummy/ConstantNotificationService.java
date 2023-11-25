@@ -16,6 +16,11 @@ public class ConstantNotificationService implements DummyNotificationProvider {
     }
 
     @Override
+    public boolean sendAccessRestoreCode(String login, String code) {
+        return true;
+    }
+
+    @Override
     public NotificationProviderType getType() {
         return NotificationProviderType.CONSTANT;
     }
