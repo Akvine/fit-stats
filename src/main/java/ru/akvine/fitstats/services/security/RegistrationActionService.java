@@ -17,14 +17,12 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
 import ru.akvine.fitstats.services.dto.security.registration.RegistrationActionRequest;
 import ru.akvine.fitstats.services.dto.security.registration.RegistrationActionResult;
-import ru.akvine.fitstats.services.notification.NotificationProvider;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class RegistrationActionService extends OtpActionService<RegistrationActionEntity> {
-    private final NotificationProvider notificationProvider;
     private final RegistrationActionRepository registrationActionRepository;
     private final ClientService clientService;
 

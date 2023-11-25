@@ -27,6 +27,13 @@ public class SystemOutNotificationService implements DummyNotificationProvider {
     }
 
     @Override
+    public boolean sendProfileDeleteCode(String login, String code) {
+        String message = String.format("Successful send profile delete code = [%s] to login = [%s]", code, login);
+        System.out.println(message);
+        return true;
+    }
+
+    @Override
     public NotificationProviderType getType() {
         return NotificationProviderType.SYSTEM_OUT;
     }

@@ -5,7 +5,6 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.exceptions.profile.CsvParseException;
 

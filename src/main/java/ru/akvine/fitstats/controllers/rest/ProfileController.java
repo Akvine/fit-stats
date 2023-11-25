@@ -3,6 +3,7 @@ package ru.akvine.fitstats.controllers.rest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.converter.ProfileConverter;
@@ -10,25 +11,32 @@ import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
-import ru.akvine.fitstats.controllers.rest.meta.ProfileControllerMeta;
+import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteFinishRequest;
+import ru.akvine.fitstats.controllers.rest.meta.profile.ProfileControllerMeta;
+import ru.akvine.fitstats.controllers.rest.meta.profile.ProfileDeleteControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.ProfileValidator;
-import ru.akvine.fitstats.services.ProfileService;
+import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
+import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
+import ru.akvine.fitstats.services.profile.ProfileDeleteActionService;
+import ru.akvine.fitstats.services.profile.ProfileService;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class ProfileController implements ProfileControllerMeta {
+public class ProfileController implements ProfileControllerMeta, ProfileDeleteControllerMeta {
     private final ProfileConverter profileConverter;
     private final ProfileValidator profileValidator;
     private final ProfileService profileService;
+
+    private final ProfileDeleteActionService profileDeleteActionService;
 
     @Override
     public ResponseEntity exportRecords(LocalDate startDate,
@@ -68,5 +76,27 @@ public class ProfileController implements ProfileControllerMeta {
         String clientUuid = SecurityUtils.getCurrentUser().getUuid();
         BiometricBean biometricBean = profileService.display(clientUuid);
         return profileConverter.convertToDisplayBiometricResponse(biometricBean);
+    }
+
+    @Override
+    public Response deleteStart(HttpServletRequest httpServletRequest) {
+        ProfileDeleteActionRequest request = profileConverter.convertToProfileDeleteActionRequest(httpServletRequest);
+        ProfileDeleteActionResult result = profileDeleteActionService.startDelete(request);
+        return profileConverter.convertToProfileDeleteResponse(result);
+    }
+
+    @Override
+    public Response deleteNewOtp() {
+        String clientUuid = SecurityUtils.getCurrentUser().getUuid();
+        ProfileDeleteActionResult result = profileDeleteActionService.newOtpProfileDelete(clientUuid);
+        return profileConverter.convertToProfileDeleteResponse(result);
+    }
+
+    @Override
+    public Response deleteFinish(@Valid @RequestBody ProfileDeleteFinishRequest request, HttpServletRequest httpServletRequest) {
+        ProfileDeleteActionRequest deleteActionRequest = profileConverter.convertToProfileDeleteActionRequest(request, httpServletRequest);
+        profileDeleteActionService.finishDelete(deleteActionRequest);
+        SecurityUtils.doLogout(httpServletRequest);
+        return new SuccessfulResponse();
     }
 }

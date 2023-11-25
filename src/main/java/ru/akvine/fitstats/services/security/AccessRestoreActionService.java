@@ -15,7 +15,6 @@ import ru.akvine.fitstats.services.ClientService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionRequest;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionResult;
-import ru.akvine.fitstats.services.notification.NotificationProvider;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +30,6 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
 
     private final AccessRestoreActionRepository accessRestoreActionRepository;
     private final ClientService clientService;
-    private final NotificationProvider notificationProvider;
 
     public AccessRestoreActionResult startAccessRestore(AccessRestoreActionRequest accessRestoreActionRequest) {
         Preconditions.checkNotNull(accessRestoreActionRequest, "accessRestoreActionRequest is null");

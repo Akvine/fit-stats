@@ -84,7 +84,7 @@ public class DietService {
                 throw new IllegalStateException("Diet type = [" + diet + "] is not supported!");
         }
         maxCarbohydrates = (maxCalories - (maxProteins * 4 + maxFats * 9)) / 4;
-        return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, maxCalories);
+        return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, 0, maxCalories);
     }
 
     public AddDietRecordFinish add(AddDietRecordStart addDietRecordStart) {
@@ -107,6 +107,7 @@ public class DietService {
                 macronutrientsPer100.getProteins(),
                 macronutrientsPer100.getFats(),
                 macronutrientsPer100.getCarbohydrates(),
+                macronutrientsPer100.getVol(),
                 addDietRecordStart.getVolume());
 
         DietRecordEntity dietRecordEntity = new DietRecordEntity()

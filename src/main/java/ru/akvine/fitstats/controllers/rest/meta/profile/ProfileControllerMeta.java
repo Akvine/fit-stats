@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.controllers.rest.meta;
+package ru.akvine.fitstats.controllers.rest.meta.profile;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
 

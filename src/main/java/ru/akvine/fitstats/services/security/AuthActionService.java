@@ -14,7 +14,6 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.security.OtpCreateNewAction;
 import ru.akvine.fitstats.services.dto.security.auth.AuthActionRequest;
 import ru.akvine.fitstats.services.dto.security.auth.AuthActionResult;
-import ru.akvine.fitstats.services.notification.NotificationProvider;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuthActionService extends PasswordRequiredActionService<AuthActionEntity> {
     private final AuthActionRepository authActionRepository;
-    private final NotificationProvider notificationProvider;
 
     @Value("${security.otp.action.lifetime.seconds}")
     private int otpActionLifetimeSeconds;

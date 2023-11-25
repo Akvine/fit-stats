@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.services;
+package ru.akvine.fitstats.services.profile;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.repositories.BiometricRepository;
 import ru.akvine.fitstats.repositories.DietSettingRepository;
+import ru.akvine.fitstats.services.*;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;

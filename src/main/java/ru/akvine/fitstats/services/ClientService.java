@@ -76,6 +76,17 @@ public class ClientService {
         return new ClientBean(savedClientEntity);
     }
 
+    public ClientBean delete(String email) {
+        Preconditions.checkNotNull(email, "email is null");
+
+        ClientEntity clientEntity = (ClientEntity) verifyExistsByEmailAndGet(email)
+                .setDeleted(true)
+                .setDeletedDate(LocalDateTime.now());
+
+        // TODO : сделать удаление всех записей (DietRecordEntity), биометрии (BiometricEntity) и т.д.
+        return new ClientBean(clientEntity);
+    }
+
     public ClientBean updatePassword(String login, String newPassword) {
         String newHash = passwordService.encodePassword(newPassword);
         return updatePasswordInternal(login, newHash);
@@ -113,10 +124,10 @@ public class ClientService {
 
 
     public ClientEntity verifyExistsByEmailAndGet(String email) {
-         Preconditions.checkNotNull(email, "email is null");
-         return clientRepository
-                 .findByEmail(email)
-                 .orElseThrow(() -> new ClientNotFoundException("Client with email = [" + email + "] not found!"));
+        Preconditions.checkNotNull(email, "email is null");
+        return clientRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new ClientNotFoundException("Client with email = [" + email + "] not found!"));
     }
 
     private void throwExceptionIfExists(String email) {

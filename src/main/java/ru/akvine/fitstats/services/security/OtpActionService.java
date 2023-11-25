@@ -11,6 +11,7 @@ import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.entities.security.OtpInfo;
 import ru.akvine.fitstats.exceptions.security.*;
 import ru.akvine.fitstats.repositories.security.ActionRepository;
+import ru.akvine.fitstats.services.notification.NotificationProvider;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +22,8 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
     protected BlockingService blockingService;
     @Autowired
     protected OtpService otpService;
+    @Autowired
+    protected NotificationProvider notificationProvider;
 
     @Value("${security.otp.new.delay.seconds}")
     private long otpDelaySeconds;

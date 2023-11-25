@@ -26,6 +26,12 @@ public class LogNotificationService implements DummyNotificationProvider {
     }
 
     @Override
+    public boolean sendProfileDeleteCode(String login, String code) {
+        logger.info("Successful send delete profile code = [" + code + "] to login = [" + login + "]");
+        return true;
+    }
+
+    @Override
     public NotificationProviderType getType() {
         return NotificationProviderType.LOG;
     }
