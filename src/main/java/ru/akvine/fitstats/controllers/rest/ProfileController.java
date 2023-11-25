@@ -11,17 +11,23 @@ import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailFinishRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteFinishRequest;
+import ru.akvine.fitstats.controllers.rest.meta.profile.ProfileChangeEmailControllerMeta;
 import ru.akvine.fitstats.controllers.rest.meta.profile.ProfileControllerMeta;
 import ru.akvine.fitstats.controllers.rest.meta.profile.ProfileDeleteControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.ProfileValidator;
-import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
-import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
-import ru.akvine.fitstats.services.profile.ProfileDeleteActionService;
-import ru.akvine.fitstats.services.profile.ProfileService;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
+import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionRequest;
+import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionResult;
+import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
+import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
+import ru.akvine.fitstats.services.profile.ProfileChangeEmailActionService;
+import ru.akvine.fitstats.services.profile.ProfileDeleteActionService;
+import ru.akvine.fitstats.services.profile.ProfileService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,12 +37,13 @@ import java.time.LocalDate;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class ProfileController implements ProfileControllerMeta, ProfileDeleteControllerMeta {
+public class ProfileController implements ProfileControllerMeta, ProfileDeleteControllerMeta, ProfileChangeEmailControllerMeta {
     private final ProfileConverter profileConverter;
     private final ProfileValidator profileValidator;
     private final ProfileService profileService;
 
     private final ProfileDeleteActionService profileDeleteActionService;
+    private final ProfileChangeEmailActionService profileChangeEmailActionService;
 
     @Override
     public ResponseEntity exportRecords(LocalDate startDate,
@@ -97,6 +104,28 @@ public class ProfileController implements ProfileControllerMeta, ProfileDeleteCo
         ProfileDeleteActionRequest deleteActionRequest = profileConverter.convertToProfileDeleteActionRequest(request, httpServletRequest);
         profileDeleteActionService.finishDelete(deleteActionRequest);
         SecurityUtils.doLogout(httpServletRequest);
+        return new SuccessfulResponse();
+    }
+
+    @Override
+    public Response changeEmailStart(@Valid @RequestBody ProfileChangeEmailStartRequest request, HttpServletRequest httpServletRequest) {
+        profileValidator.verifyProfileChangeEmailStartRequest(request);
+        ProfileChangeEmailActionRequest start = profileConverter.convertToProfileChangeEmailActionRequest(request, httpServletRequest);
+        ProfileChangeEmailActionResult result = profileChangeEmailActionService.startChangeEmail(start);
+        return profileConverter.convertToProfileChangeEmailResponse(result);
+    }
+
+    @Override
+    public Response changeEmailNewOtp() {
+        String clientUuid = SecurityUtils.getCurrentUser().getUuid();
+        ProfileChangeEmailActionResult result = profileChangeEmailActionService.newOtpEmailChange(clientUuid);
+        return profileConverter.convertToProfileChangeEmailResponse(result);
+    }
+
+    @Override
+    public Response changeEmailFinish(@Valid ProfileChangeEmailFinishRequest request, HttpServletRequest httpServletRequest) {
+        ProfileChangeEmailActionRequest profileChangeEmailActionRequest = profileConverter.convertToProfileChangeEmailActionRequest(request, httpServletRequest);
+        profileChangeEmailActionService.finishEmailChange(profileChangeEmailActionRequest);
         return new SuccessfulResponse();
     }
 }

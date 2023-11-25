@@ -7,6 +7,7 @@ public interface NotificationProvider {
     boolean sendAuthenticationCode(String login, String code);
     boolean sendAccessRestoreCode(String login, String code);
     boolean sendProfileDeleteCode(String login, String code);
+    boolean sendProfileChangeEmailCode(String login, String code);
 
     NotificationProviderType getType();
 }

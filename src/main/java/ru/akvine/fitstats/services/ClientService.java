@@ -89,14 +89,17 @@ public class ClientService {
 
     public ClientBean updatePassword(String login, String newPassword) {
         String newHash = passwordService.encodePassword(newPassword);
-        return updatePasswordInternal(login, newHash);
-    }
-
-    public ClientBean updatePasswordInternal(String login, String newHash) {
         ClientEntity client = verifyExistsByEmailAndGet(login);
         client.setHash(newHash);
         client.setUpdatedDate(LocalDateTime.now());
         return new ClientBean(clientRepository.save(client));
+    }
+
+    public ClientBean updateEmail(String login, String newEmail) {
+        ClientEntity clientEntity = verifyExistsByEmailAndGet(login);
+        clientEntity.setEmail(newEmail);
+        clientEntity.setUpdatedDate(LocalDateTime.now());
+        return new ClientBean(clientRepository.save(clientEntity));
     }
 
     public ClientBean getByUuid(String uuid) {

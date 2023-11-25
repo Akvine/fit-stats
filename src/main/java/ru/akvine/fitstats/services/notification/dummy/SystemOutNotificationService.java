@@ -34,6 +34,13 @@ public class SystemOutNotificationService implements DummyNotificationProvider {
     }
 
     @Override
+    public boolean sendProfileChangeEmailCode(String login, String code) {
+        String message = String.format("Successful send profile change email code = [%s] to login = [%s]", code, login);
+        System.out.println(message);
+        return true;
+    }
+
+    @Override
     public NotificationProviderType getType() {
         return NotificationProviderType.SYSTEM_OUT;
     }

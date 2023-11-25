@@ -10,7 +10,4 @@ import javax.validation.constraints.NotBlank;
 public class ProfileChangeEmailStartRequest {
     @NotBlank
     private String newEmail;
-
-    @NotBlank
-    private String password;
 }

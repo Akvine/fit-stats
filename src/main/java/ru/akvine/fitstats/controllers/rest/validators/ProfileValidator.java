@@ -8,9 +8,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
+import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
+import ru.akvine.fitstats.services.ClientService;
 import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.DurationValidator;
 import ru.akvine.fitstats.validators.PhysicalActivitiesValidator;
@@ -29,6 +32,7 @@ public class ProfileValidator {
     private final ConverterTypeValidator converterTypeValidator;
     private final PhysicalActivitiesValidator physicalActivitiesValidator;
     private final Map<FileType, FileValidator> availableFileValidators;
+    private final ClientService clientService;
 
     @Value("${file.converter.max-rows.limit}")
     private int maxRowsLimit;
@@ -37,7 +41,9 @@ public class ProfileValidator {
     public ProfileValidator(DurationValidator durationValidator,
                             ConverterTypeValidator converterTypeValidator,
                             PhysicalActivitiesValidator physicalActivitiesValidator,
-                            List<FileValidator> fileValidators) {
+                            List<FileValidator> fileValidators,
+                            ClientService clientService) {
+        this.clientService = clientService;
         this.durationValidator = durationValidator;
         this.converterTypeValidator = converterTypeValidator;
         this.physicalActivitiesValidator = physicalActivitiesValidator;
@@ -126,6 +132,17 @@ public class ProfileValidator {
 
         if (StringUtils.isNotBlank(request.getPhysicalActivity())) {
             physicalActivitiesValidator.validate(request.getPhysicalActivity());
+        }
+    }
+
+    public void verifyProfileChangeEmailStartRequest(ProfileChangeEmailStartRequest request) {
+        verifyNotExistsByLogin(request.getNewEmail());
+    }
+
+    private void verifyNotExistsByLogin(String login) {
+        boolean exists = clientService.isExistsByEmail(login);
+        if (exists) {
+            throw new ClientAlreadyExistsException("Client with email = [" + login + "] already exists!");
         }
     }
 }

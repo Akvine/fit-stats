@@ -14,6 +14,8 @@ import ru.akvine.fitstats.controllers.rest.dto.profile.DisplayBiometricResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricResponse;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailFinishRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
@@ -24,6 +26,9 @@ import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
+import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionRequest;
+import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionResult;
+import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailResponse;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
 import ru.akvine.fitstats.utils.SecurityUtils;
@@ -156,6 +161,42 @@ public class ProfileConverter {
                 .setPwdInvalidAttemptsLeft(result.getPwdInvalidAttemptsLeft());
     }
 
+    public ProfileChangeEmailActionRequest convertToProfileChangeEmailActionRequest(ProfileChangeEmailStartRequest request,
+                                                                                    HttpServletRequest httpServletRequest) {
+        Preconditions.checkNotNull(request, "profileChangeEmailStartRequest is null");
+        Preconditions.checkNotNull(httpServletRequest, "httpServletRequest is null");
+        return new ProfileChangeEmailActionRequest()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setNewEmail(request.getNewEmail().trim())
+                .setSessionId(SecurityUtils.getSession(httpServletRequest).getId());
+    }
+
+    public ProfileChangeEmailActionRequest convertToProfileChangeEmailActionRequest(ProfileChangeEmailFinishRequest request,
+                                                                                    HttpServletRequest httpServletRequest) {
+        Preconditions.checkNotNull(request, "profileChangeEmailFinishRequest is null");
+        Preconditions.checkNotNull(httpServletRequest, "httpServletRequest is null");
+        return new ProfileChangeEmailActionRequest()
+                .setSessionId(SecurityUtils.getSession(httpServletRequest).getId())
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setOtp(request.getOtp());
+    }
+
+    public ProfileChangeEmailResponse convertToProfileChangeEmailResponse(ProfileChangeEmailActionResult result) {
+        Preconditions.checkNotNull(result, "profileChangeEmailActionResult is null");
+        Preconditions.checkNotNull(result.getOtp(), "profileChangeEmailActionResult.otp is null");
+
+        OtpActionResponse otpActionResponse = new OtpActionResponse()
+                .setActionExpiredAt(result.getOtp().getExpiredAt().toString())
+                .setOtpNumber(result.getOtp().getOtpNumber())
+                .setOtpCountLeft(result.getOtp().getOtpCountLeft())
+                .setOtpLastUpdate(result.getOtp().getOtpLastUpdate().toString())
+                .setNewOtpDelay(otpNewDelaySeconds)
+                .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
+
+        return new ProfileChangeEmailResponse()
+                .setOtp(otpActionResponse)
+                .setPwdInvalidAttemptsLeft(result.getPwdInvalidAttemptsLeft());
+    }
 
     private String resolveHeaderType(String filename, ConverterType converterType) {
         StringBuilder builder = new StringBuilder();

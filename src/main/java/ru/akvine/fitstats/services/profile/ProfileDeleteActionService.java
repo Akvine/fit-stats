@@ -110,6 +110,7 @@ public class ProfileDeleteActionService extends PasswordRequiredActionService<Pr
         if (deleteActionEntity.getOtpAction().isOtpValid(otp)) {
             clientService.delete(login);
             getRepository().delete(deleteActionEntity);
+            return;
         }
 
         int otpInvalidAttemptsLeft = deleteActionEntity.getOtpAction().decrementInvalidAttemptsLeft();

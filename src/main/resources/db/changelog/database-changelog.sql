@@ -373,3 +373,25 @@ CREATE TABLE PROFILE_DELETE_ACTION_ENTITY
     CONSTRAINT PROFILE_DELETE_ACTION_PK PRIMARY KEY (ID)
 );
 CREATE SEQUENCE SEQ_PROFILE_DELETE_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;
+
+--changeset lymar-sa:FIT-STATS-1-19
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PROFILE_CHANGE_EMAIL_ACTION_ENTITY' and table_schema = 'public';
+CREATE TABLE PROFILE_CHANGE_EMAIL_ACTION_ENTITY
+(
+    ID                        BIGINT                              NOT NULL,
+    SESSION_ID                VARCHAR(144)                        NOT NULL,
+    LOGIN                     VARCHAR(64)                         NOT NULL,
+    NEW_EMAIL                 VARCHAR(64)                         NOT NULL,
+    STARTED_DATE              TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    ACTION_EXPIRED_AT         TIMESTAMP                           NOT NULL,
+    PWD_INVALID_ATTEMPTS_LEFT INTEGER                             NOT NULL,
+    OTP_COUNT_LEFT            INTEGER                             NOT NULL,
+    OTP_NUMBER                INTEGER,
+    OTP_LAST_UPDATE           TIMESTAMP,
+    OTP_EXPIRED_AT            TIMESTAMP,
+    OTP_INVALID_ATTEMPTS_LEFT INTEGER                             NOT NULL,
+    OTP_VALUE                 VARCHAR(32),
+    CONSTRAINT PROFILE_CHANGE_EMAIL_ACTION_PK PRIMARY KEY (ID)
+);
+CREATE SEQUENCE SEQ_PROFILE_CHANGE_EMAIL_ENTITY_ACTION START WITH 1 INCREMENT BY 1000;
