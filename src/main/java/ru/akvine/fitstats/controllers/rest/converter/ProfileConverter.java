@@ -16,6 +16,8 @@ import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_password.ProfileChangePasswordFinishRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_password.ProfileChangePasswordStartRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
@@ -29,6 +31,9 @@ import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionRequest;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionResult;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailResponse;
+import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionResult;
+import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordResponse;
+import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
 import ru.akvine.fitstats.utils.SecurityUtils;
@@ -194,6 +199,46 @@ public class ProfileConverter {
                 .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
 
         return new ProfileChangeEmailResponse()
+                .setOtp(otpActionResponse)
+                .setPwdInvalidAttemptsLeft(result.getPwdInvalidAttemptsLeft());
+    }
+
+    public ProfileChangePasswordActionRequest convertToProfileChangePasswordActionRequest(ProfileChangePasswordStartRequest request,
+                                                                                          HttpServletRequest httpReqeust) {
+        Preconditions.checkNotNull(request, "profileChangePasswordStartRequest is null!");
+        Preconditions.checkNotNull(httpReqeust, "httpReqeust is null!");
+
+        return new ProfileChangePasswordActionRequest()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setSessionId(SecurityUtils.getSession(httpReqeust).getId())
+                .setNewPassword(request.getNewPassword())
+                .setCurrentPassword(request.getCurrentPassword());
+    }
+
+    public ProfileChangePasswordActionRequest convertToProfileChangePasswordActionRequest(ProfileChangePasswordFinishRequest request,
+                                                                                          HttpServletRequest httpRequest) {
+        Preconditions.checkNotNull(request, "profileChangePasswordActionResult is null!");
+        Preconditions.checkNotNull(httpRequest, "httpRequest is null!");
+
+        return new ProfileChangePasswordActionRequest()
+                .setSessionId(SecurityUtils.getSession(httpRequest).getId())
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setOtp(request.getOtp());
+    }
+
+    public ProfileChangePasswordResponse convertToProfileChangePasswordResponse(ProfileChangePasswordActionResult result) {
+        Preconditions.checkNotNull(result, "profileChangePasswordActionResult is null");
+        Preconditions.checkNotNull(result.getOtp(), "profileChangePasswordActionResult.otp is null");
+
+        OtpActionResponse otpActionResponse = new OtpActionResponse()
+                .setActionExpiredAt(result.getOtp().getExpiredAt().toString())
+                .setOtpNumber(result.getOtp().getOtpNumber())
+                .setOtpCountLeft(result.getOtp().getOtpCountLeft())
+                .setOtpLastUpdate(result.getOtp().getOtpLastUpdate().toString())
+                .setNewOtpDelay(otpNewDelaySeconds)
+                .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
+
+        return new ProfileChangePasswordResponse()
                 .setOtp(otpActionResponse)
                 .setPwdInvalidAttemptsLeft(result.getPwdInvalidAttemptsLeft());
     }

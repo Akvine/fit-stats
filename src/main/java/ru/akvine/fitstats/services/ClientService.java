@@ -87,8 +87,7 @@ public class ClientService {
         return new ClientBean(clientEntity);
     }
 
-    public ClientBean updatePassword(String login, String newPassword) {
-        String newHash = passwordService.encodePassword(newPassword);
+    public ClientBean updatePassword(String login, String newHash) {
         ClientEntity client = verifyExistsByEmailAndGet(login);
         client.setHash(newHash);
         client.setUpdatedDate(LocalDateTime.now());

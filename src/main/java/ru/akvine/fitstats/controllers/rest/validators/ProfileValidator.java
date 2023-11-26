@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.change_password.ProfileChangePasswordStartRequest;
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
@@ -16,6 +17,7 @@ import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.services.ClientService;
 import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.DurationValidator;
+import ru.akvine.fitstats.validators.PasswordValidator;
 import ru.akvine.fitstats.validators.PhysicalActivitiesValidator;
 import ru.akvine.fitstats.validators.file.FileValidator;
 
@@ -33,6 +35,7 @@ public class ProfileValidator {
     private final PhysicalActivitiesValidator physicalActivitiesValidator;
     private final Map<FileType, FileValidator> availableFileValidators;
     private final ClientService clientService;
+    private final PasswordValidator passwordValidator;
 
     @Value("${file.converter.max-rows.limit}")
     private int maxRowsLimit;
@@ -42,8 +45,10 @@ public class ProfileValidator {
                             ConverterTypeValidator converterTypeValidator,
                             PhysicalActivitiesValidator physicalActivitiesValidator,
                             List<FileValidator> fileValidators,
-                            ClientService clientService) {
+                            ClientService clientService,
+                            PasswordValidator passwordValidator) {
         this.clientService = clientService;
+        this.passwordValidator = passwordValidator;
         this.durationValidator = durationValidator;
         this.converterTypeValidator = converterTypeValidator;
         this.physicalActivitiesValidator = physicalActivitiesValidator;
@@ -137,6 +142,16 @@ public class ProfileValidator {
 
     public void verifyProfileChangeEmailStartRequest(ProfileChangeEmailStartRequest request) {
         verifyNotExistsByLogin(request.getNewEmail());
+    }
+
+    public void verifyProfileChangePasswordStartRequest(ProfileChangePasswordStartRequest request) {
+        if (request.getNewPassword().equals(request.getCurrentPassword())) {
+            throw new ValidationException(
+                    CommonErrorCodes.Security.PASSWORDS_EQUAL_ERROR,
+                    "Passwords are equal. Fields: currentPassword, newPassword"
+            );
+        }
+        passwordValidator.validate(request.getNewPassword());
     }
 
     private void verifyNotExistsByLogin(String login) {

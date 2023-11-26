@@ -28,7 +28,9 @@ public class CommonErrorCodes {
         String OTP_EXPIRED_ERROR = "otp.expired.error";
         String LIMIT_REACHED_ERROR = "otp.no.more.new.codes.error";
         String BAD_CREDENTIALS_ERROR = "bad.credentials.error";
+        String BLOCKED_ERROR = "blocked.error";
         String OTP_AUTH_REQUIRED = "otp.auth.required";
+        String PASSWORDS_EQUAL_ERROR = "passwords.equal.error";
     }
 
     public interface Category {

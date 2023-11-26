@@ -38,6 +38,12 @@ public class LogNotificationService implements DummyNotificationProvider {
     }
 
     @Override
+    public boolean sendProfileChangePasswordCode(String login, String code) {
+        logger.info("Successful send profile change password code = [" + code + "] to login = [" + login + "]");
+        return true;
+    }
+
+    @Override
     public NotificationProviderType getType() {
         return NotificationProviderType.LOG;
     }
