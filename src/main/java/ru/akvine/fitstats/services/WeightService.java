@@ -9,12 +9,16 @@ import ru.akvine.fitstats.exceptions.weight.WeightRecordNotFoundException;
 import ru.akvine.fitstats.repositories.WeightRecordRepository;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.services.dto.weight.ChangeWeight;
+import ru.akvine.fitstats.services.dto.weight.ListWeightResult;
 import ru.akvine.fitstats.services.profile.ProfileService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,14 @@ public class WeightService {
     private final ProfileService profileService;
     private final WeightRecordRepository weightRecordRepository;
     private final ClientService clientService;
+
+    public ListWeightResult list() {
+        Map<String, String> weights = weightRecordRepository
+                .findAll()
+                .stream()
+                .collect(toMap(weight -> weight.getDate().toString(), WeightRecordEntity::getValue));
+        return new ListWeightResult(weights);
+    }
 
     public void change(ChangeWeight changeWeight) {
         Preconditions.checkNotNull(changeWeight, "changeWeight is null");

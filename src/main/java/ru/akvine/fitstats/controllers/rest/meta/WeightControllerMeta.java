@@ -11,6 +11,9 @@ import javax.validation.Valid;
 
 @RequestMapping(value = "/weight")
 public interface WeightControllerMeta {
+    @PostMapping(value = "/record/list")
+    Response list();
+
     @PostMapping(value = "/record/change")
     Response change(@Valid @RequestBody ChangeWeightRequest request);
 
