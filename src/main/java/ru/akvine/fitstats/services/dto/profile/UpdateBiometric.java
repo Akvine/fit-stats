@@ -17,4 +17,5 @@ public class UpdateBiometric {
     private String height;
     @Nullable
     private PhysicalActivity physicalActivity;
+    private boolean updateDietSetting;
 }

@@ -103,6 +103,7 @@ public class ProfileConverter {
         Preconditions.checkNotNull(request, "updateBiometricRequest is null");
         return new UpdateBiometric()
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setUpdateDietSetting(request.isUpdateDietSetting())
                 .setAge(request.getAge())
                 .setHeight(request.getHeight())
                 .setWeight(request.getWeight())

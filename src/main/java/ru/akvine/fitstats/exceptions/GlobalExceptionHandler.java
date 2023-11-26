@@ -22,6 +22,7 @@ import ru.akvine.fitstats.exceptions.security.*;
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationNotStartedException;
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationWrongStateException;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
+import ru.akvine.fitstats.exceptions.weight.WeightRecordNotFoundException;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -211,6 +212,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBlockedCredentialsException(BlockedCredentialsException exception) {
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Security.BLOCKED_ERROR,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({WeightRecordNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleWeightRecordNotFoundException(WeightRecordNotFoundException exception) {
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                Weight.WEIGHT_RECORD_NOT_FOUND_ERROR,
                 exception.getMessage()
         );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);

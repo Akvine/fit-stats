@@ -128,16 +128,19 @@ public class ProfileService {
             biometricEntity.setPhysicalActivity(updateBiometric.getPhysicalActivity());
         }
         biometricEntity.setUpdatedDate(LocalDateTime.now());
-        DietSettingEntity dietSettingEntity = dietSettingService.verifyExistsAndGet(clientUuid);
         BiometricBean savedBiometricBean = new BiometricBean(biometricRepository.save(biometricEntity));
-        Macronutrients macronutrients = dietService.calculate(savedBiometricBean, dietSettingEntity.getDiet());
 
-        dietSettingEntity.setMaxProteins(macronutrients.getProteins());
-        dietSettingEntity.setMaxFats(macronutrients.getFats());
-        dietSettingEntity.setMaxCarbohydrates(macronutrients.getCarbohydrates());
-        dietSettingEntity.setMaxCalories(macronutrients.getCalories());
-        dietSettingEntity.setUpdatedDate(LocalDateTime.now());
-        dietSettingRepository.save(dietSettingEntity);
+        if (updateBiometric.isUpdateDietSetting()) {
+            DietSettingEntity dietSettingEntity = dietSettingService.verifyExistsAndGet(clientUuid);
+            Macronutrients macronutrients = dietService.calculate(savedBiometricBean, dietSettingEntity.getDiet());
+
+            dietSettingEntity.setMaxProteins(macronutrients.getProteins());
+            dietSettingEntity.setMaxFats(macronutrients.getFats());
+            dietSettingEntity.setMaxCarbohydrates(macronutrients.getCarbohydrates());
+            dietSettingEntity.setMaxCalories(macronutrients.getCalories());
+            dietSettingEntity.setUpdatedDate(LocalDateTime.now());
+            dietSettingRepository.save(dietSettingEntity);
+        }
 
         return savedBiometricBean;
     }

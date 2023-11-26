@@ -11,4 +11,5 @@ public class UpdateBiometricRequest {
     private String height;
     private String physicalActivity;
     private String diet;
+    private boolean updateDietSetting;
 }

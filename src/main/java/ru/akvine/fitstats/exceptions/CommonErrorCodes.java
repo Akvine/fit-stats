@@ -11,6 +11,10 @@ public class CommonErrorCodes {
         String CLIENT_NOT_FOUND_ERROR = "client.notFound.error";
     }
 
+    public interface Weight {
+        String WEIGHT_RECORD_NOT_FOUND_ERROR = "weight.record.notFound.error";
+    }
+
     public interface Product {
         String PRODUCT_NOT_FOUND_ERROR = "product.notFound.error";
     }
@@ -46,8 +50,6 @@ public class CommonErrorCodes {
 
         String FILE_TYPE_BLANK_ERROR ="file.type.blank.error";
         String FILE_TYPE_INVALID_ERROR = "file.type.isNot.supported.error";
-
-        String ELEMENTS_COUNT_TOO_LARGE_ERROR = "elements.count.too.large.error";
 
         interface Security {
             String REGISTRATION_PASSWORD_BLANK_ERROR = "registration.password.blank.error";
@@ -103,6 +105,11 @@ public class CommonErrorCodes {
             String FIELD_NUMBER_INVALID = "field.number.error";
             String PHYSICAL_ACTIVITY_BLANK_ERROR = "physical.activity.blank.error";
             String PHYSICAL_ACTIVITY_INVALID_ERROR = "physical.activity.invalid.error";
+        }
+
+        interface Weight {
+            String WEIGHT_CHANGE_ERROR = "weight.change.error";
+            String WEIGHT_INVALID_ERROR = "weight.invalid.error";
         }
     }
 }
