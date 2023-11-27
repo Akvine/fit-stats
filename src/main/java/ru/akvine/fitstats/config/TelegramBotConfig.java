@@ -15,6 +15,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.meta.generics.TelegramBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import ru.akvine.fitstats.controllers.telegram.bot.DummyTelegramBot;
+import ru.akvine.fitstats.controllers.telegram.bot.TelegramAppWebhookBot;
 import ru.akvine.fitstats.controllers.telegram.bot.TelegramLongPoolingBot;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.GetWebhookInfoResponse;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.GetWebhookRequest;
@@ -22,8 +24,6 @@ import ru.akvine.fitstats.controllers.telegram.dto.webhook.SetWebhookRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.SetWebhookResponse;
 import ru.akvine.fitstats.exceptions.telegram.TelegramConfigurationException;
 import ru.akvine.fitstats.services.telegram.MessageHandler;
-import ru.akvine.fitstats.controllers.telegram.bot.DummyTelegramBot;
-import ru.akvine.fitstats.controllers.telegram.bot.TelegramAppWebhookBot;
 import ru.akvine.fitstats.services.telegram.MessageProcessor;
 import ru.akvine.fitstats.services.telegram.TelegramLongPoolingMessageProcessor;
 import ru.akvine.fitstats.services.telegram.TelegramWebhookMessageProcessor;
@@ -35,10 +35,18 @@ import java.util.List;
 @Slf4j
 public class TelegramBotConfig {
     private static final String TELEGRAM_API_URL = "https://api.telegram.org/bot";
+    private static final String BOT_TYPE_LONGPOOLING = "longpooling";
+    private static final String BOT_TYPE_WEBHOOK = "webhook";
+
+    private static final String HTTPS_PROXY_PORT_PROPERTY_NAME = "https.proxyPort";
+    private static final String HTTPS_PROXY_HOST_PROPERTY_NAME = "https.proxyHost";
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${telegram.bot.enabled}")
     private boolean isEnabled;
+    @Value("${telegram.bot.type}")
+    private String botType;
     @Value("${telegram.bot.token}")
     private String botToken;
     @Value("${telegram.bot.username}")
@@ -47,8 +55,6 @@ public class TelegramBotConfig {
     private List<String> allowedUpdates;
     @Value("${telegram.bot.webhook-path}")
     private String botWebhookPath;
-    @Value("${telegram.bot.webhook-type}")
-    private String botWebhookType;
 
     private final Environment environment;
 
@@ -56,11 +62,11 @@ public class TelegramBotConfig {
     public DefaultBotOptions defaultBotOptions() {
         DefaultBotOptions defaultBotOptions = new DefaultBotOptions();
 
-        if (environment.getProperty("https.proxyPort") == null || environment.getProperty("https.proxyHost") == null) {
+        if (environment.getProperty(HTTPS_PROXY_PORT_PROPERTY_NAME) == null || environment.getProperty(HTTPS_PROXY_HOST_PROPERTY_NAME) == null) {
             return defaultBotOptions;
         }
-        String proxyHost = environment.getProperty("https.proxyHost");
-        int proxyPort = Integer.parseInt(environment.getProperty("https.proxyPort"));
+        String proxyHost = environment.getProperty(HTTPS_PROXY_HOST_PROPERTY_NAME);
+        int proxyPort = Integer.parseInt(environment.getProperty(HTTPS_PROXY_PORT_PROPERTY_NAME));
         DefaultBotOptions.ProxyType proxyType = DefaultBotOptions.ProxyType.HTTP;
 
         defaultBotOptions.setProxyType(proxyType);
@@ -76,23 +82,27 @@ public class TelegramBotConfig {
         }
 
         TelegramBot bot;
-        if (botWebhookType.toLowerCase().equals("controller")) {
-            bot = new TelegramAppWebhookBot(defaultBotOptions, messageHandler, botToken);
-            setWebhook(botToken);
-        } else {
+        if (BOT_TYPE_LONGPOOLING.equals(botType)) {
             bot = new TelegramLongPoolingBot(defaultBotOptions, botToken, botUsername, messageHandler);
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot((LongPollingBot) bot);
+        } else if (BOT_TYPE_WEBHOOK.equals(botType)) {
+            bot = new TelegramAppWebhookBot(defaultBotOptions, messageHandler, botToken);
+            setWebhook(botToken);
+        } else {
+            throw new TelegramConfigurationException("Telegram bot with type = [" + botType + "] is not supported!");
         }
         return bot;
     }
 
     @Bean
     public MessageProcessor messageProcessor(TelegramBot telegramBot) {
-        if (botWebhookType.toLowerCase().equals("controller")) {
+        if (BOT_TYPE_LONGPOOLING.equals(botType)) {
+            return new TelegramLongPoolingMessageProcessor((TelegramLongPollingBot) telegramBot);
+        } else if (BOT_TYPE_WEBHOOK.equals(botType)) {
             return new TelegramWebhookMessageProcessor((TelegramWebhookBot) telegramBot);
         } else {
-            return new TelegramLongPoolingMessageProcessor((TelegramLongPollingBot) telegramBot);
+            throw new TelegramConfigurationException("Telegram bot with type = [" + botType + "] is not supported!");
         }
     }
 
