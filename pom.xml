@@ -112,6 +112,11 @@
 			<artifactId>opencsv</artifactId>
 			<version>5.8</version>
 		</dependency>
+		<dependency>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots</artifactId>
+			<version>6.8.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
