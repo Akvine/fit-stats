@@ -39,6 +39,7 @@ public class ProductBean extends SoftBean {
         this.carbohydrates = productEntity.getCarbohydrates();
         this.calories = productEntity.getCalories();
         this.volume = productEntity.getVolume();
+        this.vol = productEntity.getVol();
         this.measurement = productEntity.getMeasurement();
         this.categories = productEntity
                 .getCategories()
