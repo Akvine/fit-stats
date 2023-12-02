@@ -118,6 +118,7 @@ public class DietService {
                 .setFats(consumedMacronutrients.getFats())
                 .setCarbohydrates(consumedMacronutrients.getCarbohydrates())
                 .setCalories(consumedMacronutrients.getCalories())
+                .setVol(consumedMacronutrients.getVol())
                 .setVolume(addDietRecordStart.getVolume())
                 .setDate(addDietRecordStart.getDate())
                 .setTime(addDietRecordStart.getTime())
@@ -133,6 +134,7 @@ public class DietService {
                 .setFats(dietRecordBean.getFats())
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
                 .setCalories(dietRecordBean.getCalories())
+                .setVol(dietRecordBean.getVol())
                 .setVolume(dietRecordBean.getVolume())
                 .setVolumeMeasurement(dietRecordBean.getProductBean().getMeasurement());
     }
