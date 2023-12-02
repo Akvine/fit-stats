@@ -7,6 +7,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.CategoryEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.exceptions.category.CategoryNotFoundException;
@@ -124,6 +125,7 @@ public class ProductService {
         return findByFilter(new Filter());
     }
 
+    @Transactional
     public List<ProductBean> findByFilter(Filter filter) {
         List<ProductBean> filteredBeans;
         if (StringUtils.isBlank(filter.getFilterName())) {

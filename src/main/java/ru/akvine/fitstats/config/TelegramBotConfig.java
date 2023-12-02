@@ -9,14 +9,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.meta.generics.TelegramBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.akvine.fitstats.controllers.telegram.bot.DummyTelegramBot;
-import ru.akvine.fitstats.controllers.telegram.bot.TelegramAppWebhookBot;
 import ru.akvine.fitstats.controllers.telegram.bot.TelegramLongPoolingBot;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.GetWebhookInfoResponse;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.GetWebhookRequest;
@@ -26,7 +24,6 @@ import ru.akvine.fitstats.exceptions.telegram.TelegramConfigurationException;
 import ru.akvine.fitstats.services.telegram.MessageHandler;
 import ru.akvine.fitstats.services.telegram.MessageProcessor;
 import ru.akvine.fitstats.services.telegram.TelegramLongPoolingMessageProcessor;
-import ru.akvine.fitstats.services.telegram.TelegramWebhookMessageProcessor;
 
 import java.util.List;
 
@@ -86,10 +83,7 @@ public class TelegramBotConfig {
             bot = new TelegramLongPoolingBot(defaultBotOptions, botToken, botUsername, messageHandler);
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot((LongPollingBot) bot);
-        } else if (BOT_TYPE_WEBHOOK.equals(botType)) {
-            bot = new TelegramAppWebhookBot(defaultBotOptions, messageHandler, botToken);
-            setWebhook(botToken);
-        } else {
+        }  else {
             throw new TelegramConfigurationException("Telegram bot with type = [" + botType + "] is not supported!");
         }
         return bot;
@@ -99,8 +93,6 @@ public class TelegramBotConfig {
     public MessageProcessor messageProcessor(TelegramBot telegramBot) {
         if (BOT_TYPE_LONGPOOLING.equals(botType)) {
             return new TelegramLongPoolingMessageProcessor((TelegramLongPollingBot) telegramBot);
-        } else if (BOT_TYPE_WEBHOOK.equals(botType)) {
-            return new TelegramWebhookMessageProcessor((TelegramWebhookBot) telegramBot);
         } else {
             throw new TelegramConfigurationException("Telegram bot with type = [" + botType + "] is not supported!");
         }

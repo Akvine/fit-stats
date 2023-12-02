@@ -21,6 +21,7 @@ import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.exceptions.security.*;
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationNotStartedException;
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationWrongStateException;
+import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.exceptions.weight.WeightRecordNotFoundException;
 import ru.akvine.fitstats.utils.SecurityUtils;
@@ -221,6 +222,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleWeightRecordNotFoundException(WeightRecordNotFoundException exception) {
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Weight.WEIGHT_RECORD_NOT_FOUND_ERROR,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({TelegramAuthCodeNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleTelegramAuthCodeNotFoundException(TelegramAuthCodeNotFoundException exception) {
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                Telegram.TELEGRAM_AUTH_CODE_NOT_FOUND_ERROR,
                 exception.getMessage()
         );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);

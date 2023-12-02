@@ -11,6 +11,10 @@ public class CommonErrorCodes {
         String CLIENT_NOT_FOUND_ERROR = "client.notFound.error";
     }
 
+    public interface Telegram {
+        String TELEGRAM_AUTH_CODE_NOT_FOUND_ERROR = "telegram.authcode.notFound.error";
+    }
+
     public interface Weight {
         String WEIGHT_RECORD_NOT_FOUND_ERROR = "weight.record.notFound.error";
     }
@@ -50,6 +54,12 @@ public class CommonErrorCodes {
 
         String FILE_TYPE_BLANK_ERROR ="file.type.blank.error";
         String FILE_TYPE_INVALID_ERROR = "file.type.isNot.supported.error";
+
+        interface Telegram {
+            String TEXT_MESSAGE_LENGTH_ERROR = "text.message.length.error";
+            String VOLUME_INVALID_ERROR = "volume.invalid.error";
+            String DIET_ADD_RECORD_MESSAGE_INVALID_ERROR = "diet.record.message.invalid.error";
+        }
 
         interface Security {
             String REGISTRATION_PASSWORD_BLANK_ERROR = "registration.password.blank.error";

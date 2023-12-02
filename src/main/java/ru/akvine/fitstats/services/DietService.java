@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.entities.DietSettingEntity;
@@ -87,6 +88,7 @@ public class DietService {
         return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, 0, maxCalories);
     }
 
+    @Transactional
     public AddDietRecordFinish add(AddDietRecordStart addDietRecordStart) {
         Preconditions.checkNotNull(addDietRecordStart, "addDietRecordStart is null");
 

@@ -1,10 +1,8 @@
 package ru.akvine.fitstats.controllers.telegram.bot;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.akvine.fitstats.services.telegram.MessageHandler;
 
@@ -21,8 +19,7 @@ public class TelegramLongPoolingBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        SendMessage sendMessage = (SendMessage) messageHandler.processUpdate(update);
-        sendMessage(sendMessage.getChatId(), sendMessage);
+        sendMessage(messageHandler.processUpdate(update));
     }
 
     @Override
@@ -30,7 +27,7 @@ public class TelegramLongPoolingBot extends TelegramLongPollingBot {
         return botUsername;
     }
 
-    private void sendMessage(String chatId, SendMessage message) {
+    private void sendMessage(BotApiMethod<?> message) {
         try {
             execute(message);
         } catch (Exception exception) {
