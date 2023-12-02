@@ -2,14 +2,19 @@ package ru.akvine.fitstats.controllers.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.converter.AdminConverter;
 import ru.akvine.fitstats.controllers.rest.dto.admin.DeleteProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.ExportProductsRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
 import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 import ru.akvine.fitstats.controllers.rest.meta.AdminControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.AdminValidator;
+import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.services.AdminService;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
@@ -25,6 +30,23 @@ public class AdminController implements AdminControllerMeta {
     private final AdminService adminService;
 
     // TODO: Надо ограничить права с помощью ролей, чтобы мог только саппорт использовать
+
+    @Override
+    public ResponseEntity productsExport(@Valid ExportProductsRequest exportProductsRequest) {
+        adminValidator.verifyExportProductsRequest(exportProductsRequest);
+        ConverterType converterType = adminConverter.convertToConverterType(exportProductsRequest);
+        byte[] file = adminService.exportProducts(converterType);
+        return adminConverter.convertToExportResponse(exportProductsRequest.getFilename(), file, converterType);
+    }
+
+    @Override
+    public Response productsImport(String secret, String converterType, MultipartFile file) {
+        adminValidator.verifyImportProducts(secret, converterType, file);
+        ImportProducts importProducts = adminConverter.convertToImportProduct(converterType, file);
+        adminValidator.verifyImportProducts(importProducts);
+        adminService.importProducts(importProducts);
+        return new SuccessfulResponse();
+    }
 
     @Override
     public Response productUpdate(@Valid UpdateProductRequest request) {

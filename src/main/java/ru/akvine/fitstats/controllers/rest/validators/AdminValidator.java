@@ -1,30 +1,81 @@
 package ru.akvine.fitstats.controllers.rest.validators;
 
 import com.google.common.base.Preconditions;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
-import ru.akvine.fitstats.controllers.rest.dto.admin.DeleteProductRequest;
-import ru.akvine.fitstats.controllers.rest.dto.admin.SecretRequest;
-import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
+import org.springframework.web.multipart.MultipartFile;
+import ru.akvine.fitstats.controllers.rest.dto.admin.*;
+import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
+import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.VolumeMeasurementValidator;
+import ru.akvine.fitstats.validators.file.FileValidator;
+
+import java.util.List;
+import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Component
-@RequiredArgsConstructor
 public class AdminValidator {
     @Value("${admin.secret}")
     private String secret;
+    @Value("${file.converter.max-rows.limit}")
+    private int maxRowsLimit;
 
     private final VolumeMeasurementValidator volumeMeasurementValidator;
+    private final ConverterTypeValidator converterTypeValidator;
+    private final Map<FileType, FileValidator> availableFileValidators;
+
+    public AdminValidator(VolumeMeasurementValidator volumeMeasurementValidator,
+                          ConverterTypeValidator converterTypeValidator,
+                          List<FileValidator> fileValidators) {
+        this.volumeMeasurementValidator = volumeMeasurementValidator;
+        this.converterTypeValidator = converterTypeValidator;
+        this.availableFileValidators = fileValidators
+                .stream()
+                .collect(toMap(FileValidator::getType, identity()));
+    }
+
+    public void verifyExportProductsRequest(ExportProductsRequest exportProductsRequest) {
+        Preconditions.checkNotNull(exportProductsRequest, "exportProductsRequest is null");
+
+        verifySecret(exportProductsRequest.getSecret());
+        if (StringUtils.isNotBlank(exportProductsRequest.getConverterType())) {
+            converterTypeValidator.validate(exportProductsRequest.getConverterType());
+        }
+    }
+
+    public void verifyImportProducts(String secret, String converterType, MultipartFile file) {
+        verifySecret(secret);
+        converterTypeValidator.validate(converterType);
+        FileType type = FileType.valueOf(converterType);
+        availableFileValidators
+                .get(type)
+                .validate(file);
+    }
+
+    public void verifyImportProducts(ImportProducts importProducts) {
+        // TODO : добавить валидацию записей
+
+        int rowsCount = importProducts.getRecords().size();
+        if (rowsCount > maxRowsLimit) {
+            String message = String.format("File rows count = [%s] greater than limit [%s]!", rowsCount, maxRowsLimit);
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.FILE_MAX_ROWS_COUNT_INVALID_ERROR,
+                    message
+            );
+        }
+    }
 
     public void verifyUpdateProductRequest(UpdateProductRequest updateProductRequest) {
         Preconditions.checkNotNull(updateProductRequest, "updateProductRequest is null");
 
-        verifySecret(updateProductRequest);
+        verifySecret(updateProductRequest.getSecret());
 
         if (StringUtils.isBlank(updateProductRequest.getUuid())) {
             throw new ValidationException(
@@ -63,11 +114,11 @@ public class AdminValidator {
 
     public void verifyDeleteProductRequest(DeleteProductRequest request) {
         Preconditions.checkNotNull(request, "deleteProductRequest is null");
-        verifySecret(request);
+        verifySecret(request.getSecret());
     }
 
-    public void verifySecret(SecretRequest secretRequest) {
-        if (!secret.equals(secretRequest.getSecret())) {
+    public void verifySecret(String secret) {
+        if (!this.secret.equals(secret)) {
             throw new BadCredentialsException("Bad credentials!");
         }
     }

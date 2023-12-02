@@ -48,7 +48,7 @@ public class ProductService {
             throw new CategoryNotFoundException(errorMessage);
         }
         ProductEntity productEntity = new ProductEntity()
-                .setUuid(UUIDGenerator.uuidWithoutDashes(uuidLength))
+                .setUuid(StringUtils.isBlank(productBean.getUuid()) ? UUIDGenerator.uuidWithoutDashes(uuidLength) : productBean.getUuid())
                 .setTitle(productBean.getTitle())
                 .setProducer(productBean.getProducer())
                 .setProteins(productBean.getProteins())

@@ -2,18 +2,76 @@ package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
+import ru.akvine.fitstats.controllers.rest.dto.admin.ExportProductsRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
 import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
+import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.utils.MathUtils;
+import ru.akvine.fitstats.utils.SecurityUtils;
+
+import java.util.List;
+import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 public class AdminConverter {
     private static final int PRODUCT_ROUND_VALUE_ACCURACY = 1;
+    private static final String HEADER_PREFIX = "attachment; filename=";
+    private static final String DEFAULT_FILE_NAME = "file";
+    private static final String POINT = ".";
+
+    private final Map<ConverterType, Parser> availableParsers;
+
+    @Autowired
+    public AdminConverter(List<Parser> parsers) {
+        this.availableParsers =
+                parsers
+                        .stream()
+                        .collect(toMap(Parser::getType, identity()));
+    }
+
+    public ConverterType convertToConverterType(ExportProductsRequest request) {
+        String converterType = request.getConverterType();
+        if (StringUtils.isBlank(converterType)) {
+            return ConverterType.CSV;
+        }
+        return ConverterType.valueOf(converterType);
+    }
+
+    public ResponseEntity convertToExportResponse(String filename, byte[] file, ConverterType converterType) {
+        Preconditions.checkNotNull(file, "products is null");
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, resolveHeaderType(filename, converterType))
+                .contentType(MediaType.parseMediaType(resolveMediaType(converterType)))
+                .body(file);
+    }
+
+    public ImportProducts convertToImportProduct(String converterType, MultipartFile file) {
+        Preconditions.checkNotNull(converterType, "convertType is null");
+        Preconditions.checkNotNull(file, "file is null");
+
+        ConverterType type = ConverterType.valueOf(converterType);
+        return new ImportProducts()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setRecords(availableParsers
+                        .get(type)
+                        .parse(file, resolveClass(type)));
+    }
 
     public UpdateProduct convertToUpdateProduct(UpdateProductRequest request) {
         return new UpdateProduct()
@@ -43,5 +101,39 @@ public class AdminConverter {
                 .setCarbohydrates(MathUtils.round(productBean.getCarbohydrates(), PRODUCT_ROUND_VALUE_ACCURACY))
                 .setMeasurement(productBean.getMeasurement().toString())
                 .setVolume(productBean.getVolume());
+    }
+
+    private String resolveHeaderType(String filename, ConverterType converterType) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(HEADER_PREFIX);
+
+        if (StringUtils.isBlank(filename)) {
+            builder
+                    .append(DEFAULT_FILE_NAME);
+        } else {
+            builder
+                    .append(filename);
+        }
+        builder.append(POINT);
+        builder.append(converterType.getValue());
+        return builder.toString();
+    }
+
+    private String resolveMediaType(ConverterType converterType) {
+        switch (converterType) {
+            case CSV:
+                return "application/csv";
+            default:
+                throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
+        }
+    }
+
+    private Class resolveClass(ConverterType converterType) {
+        switch (converterType) {
+            case CSV:
+                return ProductCsvRow.class;
+            default:
+                throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
+        }
     }
 }
