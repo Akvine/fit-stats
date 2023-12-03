@@ -14,8 +14,6 @@ public class DateUtils {
     private static final DateTimeFormatter DATE_FORMATTER_DEFAULT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIME_FORMATTER_DEFAULT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    private static final int HALF_YEAR_MONTH_COUNT = 6;
-
     public static LocalTime convertToLocalTime(@NotNull String time) {
         return convertToLocalTime(time, TIME_FORMATTER_DEFAULT);
     }

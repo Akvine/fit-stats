@@ -104,7 +104,7 @@ public class ProfileService {
                         .setCalories(Double.parseDouble(csvRow.getCalories()))
                         .setVolume(Double.parseDouble(csvRow.getVolume()))
                         .setDate(DateUtils.convertToLocalDate(csvRow.getDate()))
-                        .setTime(DateUtils.convertToLocalTime(csvRow.getTime()));
+                        .setTime(StringUtils.isBlank(csvRow.getTime()) ? null : DateUtils.convertToLocalTime(csvRow.getTime()));
                 dietService.add(dietRecordBean);
             }
         });

@@ -28,7 +28,7 @@ public class DietConverter {
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .setVolume(request.getVolume())
                 .setDate(request.getDate() == null ? LocalDate.now() : request.getDate())
-                .setTime(request.getTime() == null ? LocalTime.now() : request.getTime());
+                .setTime(request.getTime());
     }
 
     public DietRecordResponse convertDietRecordResponse(AddDietRecordFinish dietRecordFinish) {
