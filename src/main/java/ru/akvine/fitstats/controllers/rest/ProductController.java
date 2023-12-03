@@ -34,7 +34,6 @@ public class ProductController implements ProductControllerMeta {
 
     @Override
     public Response list(@Valid ListProductRequest request) {
-        productValidator.verifyListProductRequest(request);
         Filter filter = productConverter.convertToFilter(request);
         List<ProductBean> products = productService.findByFilter(filter);
         return productConverter.convertToProductListResponse(products);

@@ -23,7 +23,6 @@ import ru.akvine.fitstats.utils.UUIDGenerator;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -127,51 +126,10 @@ public class ProductService {
 
     @Transactional
     public List<ProductBean> findByFilter(Filter filter) {
-        List<ProductBean> filteredBeans;
         if (StringUtils.isBlank(filter.getFilterName())) {
-            filteredBeans = findWithoutFilter();
-        } else {
-            filteredBeans = findWithFilter(filter.getFilterName());
+            return findWithoutFilter();
         }
-
-        if (filter.getMacronutrientsWithValues() != null && !filter.getMacronutrientsWithValues().isEmpty()) {
-            AtomicReference<List<ProductBean>> superFiltered = new AtomicReference<>();
-            filter
-                    .getMacronutrientsWithValues()
-                    .forEach((macronutrient, value) -> {
-                        if (macronutrient.equals("fats")) {
-                            superFiltered.set(filteredBeans
-                                    .stream()
-                                    .filter(product -> product.getFats() < value)
-                                    .collect(Collectors.toList()));
-                        }
-                        if (macronutrient.equals("proteins")) {
-                            superFiltered.set(filteredBeans
-                                    .stream()
-                                    .filter(product -> product.getProteins() < value)
-                                    .collect(Collectors.toList()));
-                        }
-                        if (macronutrient.equals("carbohydrates")) {
-                            superFiltered.set(filteredBeans
-                                    .stream()
-                                    .filter(product -> product.getCarbohydrates() < value)
-                                    .collect(Collectors.toList()));
-                        }
-                        if (macronutrient.equals("calories")) {
-                            superFiltered.set(filteredBeans
-                                    .stream()
-                                    .filter(product -> product.getCalories() < value)
-                                    .collect(Collectors.toList()));
-                        }
-                    });
-            return superFiltered.get();
-        }
-        return filteredBeans;
-    }
-
-    public ProductBean getByUuid(String uuid) {
-        Preconditions.checkNotNull(uuid, "uuid is null");
-        return new ProductBean(verifyExistsAndGet(uuid));
+        return findWithFilter(filter.getFilterName());
     }
 
     public ProductEntity verifyExistsAndGet(String uuid) {

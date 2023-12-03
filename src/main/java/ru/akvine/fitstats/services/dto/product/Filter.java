@@ -11,6 +11,4 @@ import java.util.Map;
 public class Filter {
     @Nullable
     private String filterName;
-    @Nullable
-    private Map<String, Double> macronutrientsWithValues;
 }
