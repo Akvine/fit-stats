@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
+import ru.akvine.fitstats.services.dto.diet.AddDietRecordFinish;
 import ru.akvine.fitstats.services.dto.diet.AddDietRecordStart;
 import ru.akvine.fitstats.services.dto.diet.DietDisplay;
 import ru.akvine.fitstats.services.dto.diet.Display;
@@ -49,22 +50,39 @@ public class TelegramDietConverter {
                 .setDate(LocalDate.now());
     }
 
+    public SendMessage convertToAddDietRecordFinishResponse(String chatId, AddDietRecordFinish addDietRecordFinish) {
+        Preconditions.checkNotNull(addDietRecordFinish, "addDietRecordFinish is null");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Запись была успешно добавлена!").append(NEXT_LINE);
+
+        sb.append("Калорий: ").append(MathUtils.round(addDietRecordFinish.getCalories())).append(NEXT_LINE);;
+        sb.append("Белки: ").append(MathUtils.round(addDietRecordFinish.getProteins())).append(NEXT_LINE);;
+        sb.append("Жиры: ").append(MathUtils.round(addDietRecordFinish.getFats())).append(NEXT_LINE);;
+        sb.append("Углеводы: ").append(MathUtils.round(addDietRecordFinish.getCarbohydrates())).append(NEXT_LINE);;
+        sb.append("Объем: ").append(MathUtils.round(addDietRecordFinish.getVolume())).append(NEXT_LINE);;
+
+        return new SendMessage(chatId, sb.toString());
+    }
+
     private String buildDietDisplayStatistic(DietDisplay dietDisplay) {
         StringBuilder sb = new StringBuilder();
-        sb.append("БЖУ на сегодня: ").append(NEXT_LINE);
 
-        sb.append("Максимум калорий: ").append(MathUtils.round(dietDisplay.getMaxCalories())).append(NEXT_LINE);
-        sb.append("Максимум белка: ").append(MathUtils.round(dietDisplay.getMaxProteins())).append(NEXT_LINE);
-        sb.append("Максимум жиров: ").append(MathUtils.round(dietDisplay.getMaxFats())).append(NEXT_LINE);
-        sb.append("Максимум углеводов: ").append(MathUtils.round(dietDisplay.getMaxCarbohydrates())).append(NEXT_LINE);
-        sb.append("Потреблено калорий: ").append(MathUtils.round(dietDisplay.getCurrentCalories())).append(NEXT_LINE);
-        sb.append("Потреблено белка: ").append(MathUtils.round(dietDisplay.getCurrentProteins())).append(NEXT_LINE);
-        sb.append("Потреблено жиров: ").append(MathUtils.round(dietDisplay.getCurrentFats())).append(NEXT_LINE);
-        sb.append("Потреблено углеводов: ").append(MathUtils.round(dietDisplay.getCurrentCarbohydrates())).append(NEXT_LINE);
-        sb.append("Оставшиеся калорий: ").append(MathUtils.round(dietDisplay.getRemainingCalories())).append(NEXT_LINE);
-        sb.append("Оставшиеся белки: ").append(MathUtils.round(dietDisplay.getRemainingProteins())).append(NEXT_LINE);
-        sb.append("Оставшиеся жиры: ").append(MathUtils.round(dietDisplay.getRemainingFats())).append(NEXT_LINE);
-        sb.append("Оставшиеся углеводы: ").append(MathUtils.round(dietDisplay.getRemainingCarbohydrates())).append(NEXT_LINE);
+        sb.append("=======[Оставшиеся]=======").append(NEXT_LINE);
+        sb.append("1. Калории: ").append(MathUtils.round(dietDisplay.getRemainingCalories())).append(NEXT_LINE);
+        sb.append("2. Белки: ").append(MathUtils.round(dietDisplay.getRemainingProteins())).append(NEXT_LINE);
+        sb.append("3. Жиры: ").append(MathUtils.round(dietDisplay.getRemainingFats())).append(NEXT_LINE);
+        sb.append("4. Углеводы: ").append(MathUtils.round(dietDisplay.getRemainingCarbohydrates())).append(NEXT_LINE);
+        sb.append("=======[Потреблено]=======").append(NEXT_LINE);
+        sb.append("1. Калорий: ").append(MathUtils.round(dietDisplay.getCurrentCalories())).append(NEXT_LINE);
+        sb.append("2. Белка: ").append(MathUtils.round(dietDisplay.getCurrentProteins())).append(NEXT_LINE);
+        sb.append("3. Жиров: ").append(MathUtils.round(dietDisplay.getCurrentFats())).append(NEXT_LINE);
+        sb.append("4. Углеводов: ").append(MathUtils.round(dietDisplay.getCurrentCarbohydrates())).append(NEXT_LINE);
+        sb.append("=======[Максимум]=======").append(NEXT_LINE);
+        sb.append("1. Калорий: ").append(MathUtils.round(dietDisplay.getMaxCalories())).append(NEXT_LINE);
+        sb.append("2. Белка: ").append(MathUtils.round(dietDisplay.getMaxProteins())).append(NEXT_LINE);
+        sb.append("3. Жиров: ").append(MathUtils.round(dietDisplay.getMaxFats())).append(NEXT_LINE);
+        sb.append("4. Углеводов: ").append(MathUtils.round(dietDisplay.getMaxCarbohydrates())).append(NEXT_LINE);
 
         sb.append("======================");
         return sb.toString();

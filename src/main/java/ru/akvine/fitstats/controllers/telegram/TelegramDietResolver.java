@@ -29,10 +29,7 @@ public class TelegramDietResolver {
     public SendMessage addRecord(TelegramDietAddRecord telegramDietAddRecord) {
         telegramDietValidator.verifyTelegramDietAddRecord(telegramDietAddRecord);
         AddDietRecordStart addDietRecordStart = telegramDietConverter.convertToAddDietRecordStart(telegramDietAddRecord);
-        dietService.add(addDietRecordStart);
-        return new SendMessage(
-                telegramDietAddRecord.getChatId(),
-                "Запись была успешно добавлена!"
-        );
+        AddDietRecordFinish addDietRecordFinish = dietService.add(addDietRecordStart);
+        return telegramDietConverter.convertToAddDietRecordFinishResponse(telegramDietAddRecord.getChatId(), addDietRecordFinish);
     }
 }

@@ -48,8 +48,7 @@ public class ProductConverter {
     public Filter convertToFilter(ListProductRequest request) {
         Preconditions.checkNotNull(request, "listProductRequest is null");
         return new Filter()
-                .setFilterName(request.getFilter())
-                .setMacronutrientsWithValues(request.getMacronutrients());
+                .setFilterName(request.getFilter());
     }
 
     private ProductDto buildProductDto(ProductBean productBean) {
