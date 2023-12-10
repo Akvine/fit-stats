@@ -65,6 +65,23 @@ public class BaseMessagesFactory {
         );
     }
 
+    public SendMessage getProfileKeyboard(String chatId) {
+        SendMessage sendMessage = new SendMessage(
+                chatId,
+                "Выберите действие: "
+        );
+        sendMessage.enableMarkdown(true);
+        sendMessage.setReplyMarkup(keyboardFactory.getProfileKeyboard());
+        return sendMessage;
+    }
+
+    public SendMessage getProfileUpdateBiometricInputWaiting(String chatId) {
+        return new SendMessage(
+                chatId,
+                "Введите новые биометрические данные (возраст, рост, вес, физическую активность, тип диеты): "
+        );
+    }
+
     public SendMessage getNotificationSubscriptionDietAdd(String chatId) {
         return new SendMessage(
                 chatId,

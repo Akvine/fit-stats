@@ -64,6 +64,15 @@ public class KeyboardFactory {
         return getKeyboard(List.of(row));
     }
 
+    public ReplyKeyboardMarkup getProfileKeyboard() {
+        KeyboardRow row = new KeyboardRow();
+        row.add(new KeyboardButton("Биометрические показатели"));
+        row.add(new KeyboardButton("Обновить показатели"));
+        row.add(new KeyboardButton("Назад"));
+
+        return getKeyboard(List.of(row));
+    }
+
     private ReplyKeyboardMarkup getKeyboard(List<KeyboardRow> rows) {
 
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();

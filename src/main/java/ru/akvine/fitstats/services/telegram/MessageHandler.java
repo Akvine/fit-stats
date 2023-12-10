@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.akvine.fitstats.controllers.telegram.TelegramDietNotificationSubscriptionResolver;
 import ru.akvine.fitstats.controllers.telegram.TelegramDietResolver;
 import ru.akvine.fitstats.controllers.telegram.TelegramProductResolver;
+import ru.akvine.fitstats.controllers.telegram.TelegramProfileResolver;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDeleteRecordRequest;
@@ -16,7 +17,9 @@ import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.AddDietNoti
 import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.DeleteDietNotificationRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductListRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.profile.TelegramProfileUpdateBiometricRequest;
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramProductParser;
+import ru.akvine.fitstats.controllers.telegram.parser.TelegramProfileParser;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
@@ -35,7 +38,10 @@ public class MessageHandler {
     private final TelegramDietResolver telegramDietResolver;
     private final TelegramProductResolver telegramProductResolver;
     private final TelegramDietNotificationSubscriptionResolver telegramDietNotificationSubscriptionResolver;
+    private final TelegramProfileResolver telegramProfileResolver;
+
     private final TelegramProductParser telegramProductParser;
+    private final TelegramProfileParser telegramProfileParser;
 
     private final Map<String, String> waitingStates = new ConcurrentHashMap<>();
 
@@ -90,6 +96,14 @@ public class MessageHandler {
             } else if (commandResolver.isDietDeleteRecordCommand(text)) {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getDietRecordDeleteInputWaiting(chatId);
+            } else if (commandResolver.isProfileButton(text)) {
+              return baseMessagesFactory.getProfileKeyboard(chatId);
+            } else if (commandResolver.isProfileBiometricDisplayCommand(text)) {
+                TelegramBaseRequest request = new TelegramBaseRequest(clientUuid, chatId, telegramId);
+                return telegramProfileResolver.biometricDisplay(request);
+            } else if (commandResolver.isProfileBiometricUpdateCommand(text)) {
+                waitingStates.put(clientUuid, text);
+                return baseMessagesFactory.getProfileUpdateBiometricInputWaiting(chatId);
             } else if (commandResolver.isNotificationSubscriptionButton(text)) {
                 return baseMessagesFactory.getNotificationSubscriptionTypesKeyboard(chatId);
             } else if (commandResolver.isNotificationSubscriptionDietButton(text)) {
@@ -131,6 +145,10 @@ public class MessageHandler {
             waitingStates.remove(clientUuid);
             TelegramDietDeleteRecordRequest request = new TelegramDietDeleteRecordRequest(text, clientUuid, chatId);
             return telegramDietResolver.deleteRecord(request);
+        } else if (commandResolver.isProfileBiometricUpdateCommand(waitingStates.get(clientUuid))) {
+            waitingStates.remove(clientUuid);
+            TelegramProfileUpdateBiometricRequest request = telegramProfileParser.parseToTelegramProfileUpdateBiometricRequest(chatId, clientUuid, text);
+            return telegramProfileResolver.biometricUpdate(request);
         } else if (commandResolver.isNotificationSubscriptionDietAdd(waitingStates.get(clientUuid))) {
             waitingStates.remove(clientUuid);
             AddDietNotificationRequest request = new AddDietNotificationRequest(clientUuid, chatId, telegramId, text);
