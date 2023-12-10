@@ -12,6 +12,7 @@ import ru.akvine.fitstats.controllers.telegram.validators.TelegramDietValidator;
 import ru.akvine.fitstats.services.DietService;
 import ru.akvine.fitstats.services.dto.diet.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -35,7 +36,7 @@ public class TelegramDietResolver {
     }
 
     public SendMessage listRecord(TelegramBaseRequest request) {
-        ListRecord listRecord = new ListRecord().setClientUuid(request.getClientUuid());
+        ListRecord listRecord = telegramDietConverter.convertToListRecord(request);
         List<DietRecordBean> recordBeans = dietService.list(listRecord);
         return telegramDietConverter.convertToListRecordResponse(request.getChatId(), recordBeans);
     }

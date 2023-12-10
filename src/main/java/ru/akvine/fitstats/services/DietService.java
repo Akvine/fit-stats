@@ -186,6 +186,7 @@ public class DietService {
         return new DietRecordBean(dietRecordRepository.save(dietRecordEntity));
     }
 
+    @Transactional
     public List<DietRecordBean> list(ListRecord listRecord) {
         Preconditions.checkNotNull(listRecord, "listRecord is null");
 

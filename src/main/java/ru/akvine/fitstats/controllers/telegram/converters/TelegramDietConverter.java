@@ -3,6 +3,7 @@ package ru.akvine.fitstats.controllers.telegram.converters;
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
 import ru.akvine.fitstats.services.dto.diet.*;
@@ -61,6 +62,13 @@ public class TelegramDietConverter {
         sb.append("Объем: ").append(MathUtils.round(addDietRecordFinish.getVolume())).append(NEXT_LINE);;
 
         return new SendMessage(chatId, sb.toString());
+    }
+
+    public ListRecord convertToListRecord(TelegramBaseRequest request) {
+        Preconditions.checkNotNull(request, "telegramBaseRequest is null");
+        return new ListRecord()
+                .setDate(LocalDate.now())
+                .setClientUuid(request.getClientUuid());
     }
 
     public SendMessage convertToListRecordResponse(String chatId, List<DietRecordBean> records) {
