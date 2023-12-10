@@ -16,6 +16,7 @@ import ru.akvine.fitstats.enums.Gender;
 import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
+import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
@@ -218,9 +219,17 @@ public class DietService {
                 .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
 
         String dietRecordUuid = deleteRecord.getRecordUuid();
-        DietRecordEntity dietRecordEntity = dietRecordRepository
-                .findByUuid(dietRecordUuid)
-                .orElseThrow(() -> new DietRecordNotFoundException("Diet with uuid = [" + dietRecordUuid + "] not found!"));
+        DietRecordEntity dietRecordEntity;
+        if (dietRecordUuid.length() < length) {
+            List<DietRecordEntity> records = verifyExistsByPartialUuidAndGet(dietRecordUuid);
+            if (records.size() != 1) {
+                throw new DietRecordsNotUniqueResultException("Diet records by uuid = [" + dietRecordUuid + "] is not contains single element!");
+            }
+            dietRecordEntity = records.get(SINGLE_ELEMENT);
+        } else {
+            dietRecordEntity = verifyExistsByUuidAndGet(dietRecordUuid);
+        }
+
         dietRecordRepository.delete(dietRecordEntity);
     }
 
@@ -276,11 +285,23 @@ public class DietService {
         Preconditions.checkNotNull(clientUuid, "clientUuid is null");
         Preconditions.checkNotNull(startDate, "startDate is null");
         Preconditions.checkNotNull(endDate, "endDate is null");
-        return dietRecordRepository.
-                findByDateRange(clientUuid, startDate, endDate)
+        return dietRecordRepository
+                .findByDateRange(clientUuid, startDate, endDate)
                 .stream()
                 .map(DietRecordBean::new)
                 .map(DietRecordExport::new)
                 .collect(Collectors.toList());
+    }
+
+    public DietRecordEntity verifyExistsByUuidAndGet(String uuid) {
+        Preconditions.checkNotNull(uuid, "uuid is null");
+        return dietRecordRepository
+                .findByUuid(uuid)
+                .orElseThrow(() -> new DietRecordNotFoundException("Diet with uuid = [" + uuid + "] not found!"));
+    }
+
+    public List<DietRecordEntity> verifyExistsByPartialUuidAndGet(String uuid) {
+        Preconditions.checkNotNull(uuid, "uuid is null");
+        return dietRecordRepository.findByPartialUuid(uuid);
     }
 }

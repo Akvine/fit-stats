@@ -31,4 +31,7 @@ public interface DietRecordRepository extends JpaRepository<DietRecordEntity, Lo
 
     @Query("from DietRecordEntity dre where dre.uuid = :uuid")
     Optional<DietRecordEntity> findByUuid(@Param("uuid") String uuid);
+
+    @Query("from DietRecordEntity dre where dre.uuid like concat('%', :uuid, '%')")
+    List<DietRecordEntity> findByPartialUuid(@Param("uuid") String uuid);
 }

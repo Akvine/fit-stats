@@ -16,6 +16,7 @@ import ru.akvine.fitstats.exceptions.category.CategoryNotFoundException;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
+import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.DietSettingNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
@@ -241,6 +242,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleProductsNotUniqueResultException(ProductsNotUniqueResultException exception) {
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Diet.PRODUCTS_NOT_UNIQUE_RESULT_ERROR,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({DietRecordsNotUniqueResultException.class})
+    public ResponseEntity<ErrorResponse> handleDietRecordsNotUniqueResultException(DietRecordsNotUniqueResultException exception) {
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                Diet.DIET_RECORDS_NOT_UNIQUE_RESULT_ERROR,
                 exception.getMessage()
         );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);

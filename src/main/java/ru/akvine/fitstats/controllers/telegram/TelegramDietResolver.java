@@ -3,16 +3,15 @@ package ru.akvine.fitstats.controllers.telegram;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.akvine.fitstats.controllers.rest.dto.diet.ListRecordRequest;
 import ru.akvine.fitstats.controllers.telegram.converters.TelegramDietConverter;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
-import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
-import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDeleteRecordRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplayRequest;
 import ru.akvine.fitstats.controllers.telegram.validators.TelegramDietValidator;
 import ru.akvine.fitstats.services.DietService;
 import ru.akvine.fitstats.services.dto.diet.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -22,22 +21,31 @@ public class TelegramDietResolver {
     private final TelegramDietConverter telegramDietConverter;
     private final TelegramDietValidator telegramDietValidator;
 
-    public SendMessage display(TelegramDietDisplay telegramDietDisplay) {
-        Display display = telegramDietConverter.convertToDisplay(telegramDietDisplay);
+    public SendMessage display(TelegramDietDisplayRequest telegramDietDisplayRequest) {
+        Display display = telegramDietConverter.convertToDisplay(telegramDietDisplayRequest);
         DietDisplay dietDisplay = dietService.display(display);
-        return telegramDietConverter.convertToDietDisplayResponse(telegramDietDisplay.getChatId(), dietDisplay);
+        return telegramDietConverter.convertToDietDisplayResponse(telegramDietDisplayRequest.getChatId(), dietDisplay);
     }
 
-    public SendMessage addRecord(TelegramDietAddRecord telegramDietAddRecord) {
-        telegramDietValidator.verifyTelegramDietAddRecord(telegramDietAddRecord);
-        AddDietRecordStart addDietRecordStart = telegramDietConverter.convertToAddDietRecordStart(telegramDietAddRecord);
+    public SendMessage addRecord(TelegramDietAddRecordRequest telegramDietAddRecordRequest) {
+        telegramDietValidator.verifyTelegramDietAddRecordRequest(telegramDietAddRecordRequest);
+        AddDietRecordStart addDietRecordStart = telegramDietConverter.convertToAddDietRecordStart(telegramDietAddRecordRequest);
         AddDietRecordFinish addDietRecordFinish = dietService.add(addDietRecordStart);
-        return telegramDietConverter.convertToAddDietRecordFinishResponse(telegramDietAddRecord.getChatId(), addDietRecordFinish);
+        return telegramDietConverter.convertToAddDietRecordFinishResponse(telegramDietAddRecordRequest.getChatId(), addDietRecordFinish);
     }
 
     public SendMessage listRecord(TelegramBaseRequest request) {
         ListRecord listRecord = telegramDietConverter.convertToListRecord(request);
         List<DietRecordBean> recordBeans = dietService.list(listRecord);
         return telegramDietConverter.convertToListRecordResponse(request.getChatId(), recordBeans);
+    }
+
+    public SendMessage deleteRecord(TelegramDietDeleteRecordRequest request) {
+        DeleteRecord deleteRecord = telegramDietConverter.convertToDeleteRecord(request);
+        dietService.deleteRecords(deleteRecord);
+        return new SendMessage(
+                request.getChatId(),
+                "Запись успешно удалена!"
+        );
     }
 }

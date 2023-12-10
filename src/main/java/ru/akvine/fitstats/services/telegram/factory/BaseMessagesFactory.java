@@ -58,6 +58,13 @@ public class BaseMessagesFactory {
         );
     }
 
+    public SendMessage getDietRecordDeleteInputWaiting(String chatId) {
+        return new SendMessage(
+                chatId,
+                "Введите uuid продукта, который собираетесь удалить: "
+        );
+    }
+
     public SendMessage getNotificationSubscriptionDietAdd(String chatId) {
         return new SendMessage(
                 chatId,

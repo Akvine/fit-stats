@@ -9,8 +9,9 @@ import ru.akvine.fitstats.controllers.telegram.TelegramDietNotificationSubscript
 import ru.akvine.fitstats.controllers.telegram.TelegramDietResolver;
 import ru.akvine.fitstats.controllers.telegram.TelegramProductResolver;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
-import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
-import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDeleteRecordRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplayRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.AddDietNotificationRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.DeleteDietNotificationRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
@@ -78,14 +79,17 @@ public class MessageHandler {
             } else if (commandResolver.isDietButton(text)) {
                 return baseMessagesFactory.getDietKeyboard(chatId);
             } else if (commandResolver.isDietStatisticDisplayCommand(text)) {
-                TelegramDietDisplay telegramDietDisplay = new TelegramDietDisplay(clientUuid, chatId);
-                return telegramDietResolver.display(telegramDietDisplay);
+                TelegramDietDisplayRequest telegramDietDisplayRequest = new TelegramDietDisplayRequest(clientUuid, chatId);
+                return telegramDietResolver.display(telegramDietDisplayRequest);
             } else if (commandResolver.isDietAddRecordCommand(text)) {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getDietRecordAddInputWaiting(chatId);
             } else if (commandResolver.isDietListRecordCommand(text)) {
-                TelegramBaseRequest telegramBaseRequest = new TelegramBaseRequest(clientUuid, chatId, telegramId);
-                return telegramDietResolver.listRecord(telegramBaseRequest);
+                TelegramBaseRequest request = new TelegramBaseRequest(clientUuid, chatId, telegramId);
+                return telegramDietResolver.listRecord(request);
+            } else if (commandResolver.isDietDeleteRecordCommand(text)) {
+                waitingStates.put(clientUuid, text);
+                return baseMessagesFactory.getDietRecordDeleteInputWaiting(chatId);
             } else if (commandResolver.isNotificationSubscriptionButton(text)) {
                 return baseMessagesFactory.getNotificationSubscriptionTypesKeyboard(chatId);
             } else if (commandResolver.isNotificationSubscriptionDietButton(text)) {
@@ -114,16 +118,19 @@ public class MessageHandler {
             return telegramProductResolver.list(telegramProductListRequest);
         } else if (commandResolver.isProductAddCommand(waitingStates.get(clientUuid))) {
             waitingStates.remove(clientUuid);
-            TelegramProductAddRequest telegramProductAddRequest = telegramProductParser.parseTelegramProductAddRequest(text);
-            telegramProductAddRequest
+            TelegramProductAddRequest request = (TelegramProductAddRequest) telegramProductParser.parseTelegramProductAddRequest(text)
                     .setChatId(chatId)
                     .setClientUuid(clientUuid)
                     .setTelegramId(telegramId);
-            return telegramProductResolver.add(telegramProductAddRequest);
+            return telegramProductResolver.add(request);
         } else if (commandResolver.isDietAddRecordCommand(waitingStates.get(clientUuid))) {
             waitingStates.remove(clientUuid);
-            TelegramDietAddRecord telegramDietAddRecord = new TelegramDietAddRecord(clientUuid, chatId, text);
-            return telegramDietResolver.addRecord(telegramDietAddRecord);
+            TelegramDietAddRecordRequest request = new TelegramDietAddRecordRequest(clientUuid, chatId, text);
+            return telegramDietResolver.addRecord(request);
+        } else if (commandResolver.isDietDeleteRecordCommand(waitingStates.get(clientUuid))) {
+            waitingStates.remove(clientUuid);
+            TelegramDietDeleteRecordRequest request = new TelegramDietDeleteRecordRequest(text, clientUuid, chatId);
+            return telegramDietResolver.deleteRecord(request);
         } else if (commandResolver.isNotificationSubscriptionDietAdd(waitingStates.get(clientUuid))) {
             waitingStates.remove(clientUuid);
             AddDietNotificationRequest request = new AddDietNotificationRequest(clientUuid, chatId, telegramId, text);

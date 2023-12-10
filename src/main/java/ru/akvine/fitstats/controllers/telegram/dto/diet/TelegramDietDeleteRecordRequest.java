@@ -1,16 +1,16 @@
 package ru.akvine.fitstats.controllers.telegram.dto.diet;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 
 @Data
 @Accessors(chain = true)
-@NoArgsConstructor
-public class TelegramDietDisplay extends TelegramBaseRequest {
+public class TelegramDietDeleteRecordRequest extends TelegramBaseRequest {
+    private String uuid;
 
-    public TelegramDietDisplay(String clientUuid, String chatId) {
+    public TelegramDietDeleteRecordRequest(String uuid, String clientUuid, String chatId) {
+        this.uuid = uuid;
         this.clientUuid = clientUuid;
         this.chatId = chatId;
     }

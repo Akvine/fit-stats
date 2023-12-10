@@ -4,8 +4,9 @@ import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
-import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
-import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDeleteRecordRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplayRequest;
 import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.utils.MathUtils;
 
@@ -19,10 +20,10 @@ public class TelegramDietConverter {
     private final static String NON_EMPTY_SPACE = "";
     private final static String COMMA = ",";
 
-    public Display convertToDisplay(TelegramDietDisplay telegramDietDisplay) {
-        Preconditions.checkNotNull(telegramDietDisplay, "telegramDietDisplay is null");
+    public Display convertToDisplay(TelegramDietDisplayRequest telegramDietDisplayRequest) {
+        Preconditions.checkNotNull(telegramDietDisplayRequest, "telegramDietDisplay is null");
         return new Display()
-                .setClientUuid(telegramDietDisplay.getClientUuid());
+                .setClientUuid(telegramDietDisplayRequest.getClientUuid());
     }
 
     public SendMessage convertToDietDisplayResponse(String chatId, DietDisplay dietDisplay) {
@@ -33,9 +34,9 @@ public class TelegramDietConverter {
         );
     }
 
-    public AddDietRecordStart convertToAddDietRecordStart(TelegramDietAddRecord telegramDietAddRecord) {
-        Preconditions.checkNotNull(telegramDietAddRecord, "telegramDietAddRecord is null");
-        String text = telegramDietAddRecord.getText();
+    public AddDietRecordStart convertToAddDietRecordStart(TelegramDietAddRecordRequest telegramDietAddRecordRequest) {
+        Preconditions.checkNotNull(telegramDietAddRecordRequest, "telegramDietAddRecord is null");
+        String text = telegramDietAddRecordRequest.getText();
         String[] parts = text
                 .trim()
                 .replaceAll(EMPTY_SPACE, NON_EMPTY_SPACE)
@@ -44,7 +45,7 @@ public class TelegramDietConverter {
         double volume = Double.parseDouble(parts[1]);
         return new AddDietRecordStart()
                 .setProductUuid(productUuid)
-                .setClientUuid(telegramDietAddRecord.getClientUuid())
+                .setClientUuid(telegramDietAddRecordRequest.getClientUuid())
                 .setVolume(volume)
                 .setDate(LocalDate.now());
     }
@@ -75,6 +76,13 @@ public class TelegramDietConverter {
         Preconditions.checkNotNull("dietRecords is null");
         return new SendMessage(chatId,
                 buildListRecordResponse(records));
+    }
+
+    public DeleteRecord convertToDeleteRecord(TelegramDietDeleteRecordRequest request) {
+        Preconditions.checkNotNull(request, "telegramDietDeleteRecordRequest is null");
+        return new DeleteRecord()
+                .setRecordUuid(request.getUuid())
+                .setClientUuid(request.getClientUuid());
     }
 
     private String buildListRecordResponse(List<DietRecordBean> records) {

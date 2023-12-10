@@ -8,10 +8,10 @@ import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 @Data
 @Accessors(chain = true)
 @NoArgsConstructor
-public class TelegramDietAddRecord extends TelegramBaseRequest {
+public class TelegramDietAddRecordRequest extends TelegramBaseRequest {
     private String text;
 
-    public TelegramDietAddRecord(String clientUuid, String chatId, String text) {
+    public TelegramDietAddRecordRequest(String clientUuid, String chatId, String text) {
         this.clientUuid = clientUuid;
         this.chatId = chatId;
         this.text = text;
