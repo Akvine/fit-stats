@@ -221,13 +221,13 @@ public class DietService {
         String dietRecordUuid = deleteRecord.getRecordUuid();
         DietRecordEntity dietRecordEntity;
         if (dietRecordUuid.length() < length) {
-            List<DietRecordEntity> records = verifyExistsByPartialUuidAndGet(dietRecordUuid);
+            List<DietRecordEntity> records = verifyExistsByPartialUuidAndGet(dietRecordUuid, clientUuid);
             if (records.size() != 1) {
                 throw new DietRecordsNotUniqueResultException("Diet records by uuid = [" + dietRecordUuid + "] is not contains single element!");
             }
             dietRecordEntity = records.get(SINGLE_ELEMENT);
         } else {
-            dietRecordEntity = verifyExistsByUuidAndGet(dietRecordUuid);
+            dietRecordEntity = verifyExistsByUuidAndGet(dietRecordUuid, clientUuid);
         }
 
         dietRecordRepository.delete(dietRecordEntity);
@@ -293,15 +293,17 @@ public class DietService {
                 .collect(Collectors.toList());
     }
 
-    public DietRecordEntity verifyExistsByUuidAndGet(String uuid) {
+    public DietRecordEntity verifyExistsByUuidAndGet(String uuid, String clientUuid) {
         Preconditions.checkNotNull(uuid, "uuid is null");
+        Preconditions.checkNotNull(clientUuid, "clientUuid is null");
         return dietRecordRepository
-                .findByUuid(uuid)
+                .findByUuid(uuid, clientUuid)
                 .orElseThrow(() -> new DietRecordNotFoundException("Diet with uuid = [" + uuid + "] not found!"));
     }
 
-    public List<DietRecordEntity> verifyExistsByPartialUuidAndGet(String uuid) {
+    public List<DietRecordEntity> verifyExistsByPartialUuidAndGet(String uuid, String clientUuid) {
         Preconditions.checkNotNull(uuid, "uuid is null");
-        return dietRecordRepository.findByPartialUuid(uuid);
+        Preconditions.checkNotNull(clientUuid, "clientUuid is null");
+        return dietRecordRepository.findByPartialUuid(uuid, clientUuid);
     }
 }

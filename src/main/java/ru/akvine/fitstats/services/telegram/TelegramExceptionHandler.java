@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.telegram;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.parse.*;
@@ -21,6 +22,8 @@ public class TelegramExceptionHandler {
             return handleTelegramVolParseException(chatId);
         } else if (exception instanceof ProductsNotUniqueResultException) {
             return handleProductsNotUniqueException(chatId);
+        } else if (exception instanceof DietRecordsNotUniqueResultException) {
+          return handleDietRecordsNotUniqueException(chatId);
         } else {
             return handleException(chatId);
         }
@@ -52,5 +55,8 @@ public class TelegramExceptionHandler {
 
     private SendMessage handleProductsNotUniqueException(String chatId) {
         return new SendMessage(chatId, "Данному uuid соответствует не один продукт. Введите uuid по длиннее");
+    }
+    private SendMessage handleDietRecordsNotUniqueException(String chatId) {
+        return new SendMessage(chatId, "Данному uuid соответствует не одна запись. Введите uuid по длиннее");
     }
 }
