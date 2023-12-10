@@ -139,6 +139,12 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException("Product with uuid = [" + uuid + "] not found!"));
     }
 
+    public List<ProductEntity> verifyExistsByPartialUuidAndGet(String uuid) {
+        Preconditions.checkNotNull(uuid, "uuid is null");
+        return productRepository.findByPartialUuidAndNotDeleted(uuid);
+
+    }
+
     public ProductEntity findByUuid(String uuid) {
         Preconditions.checkNotNull(uuid, "uuid is null");
         return productRepository

@@ -17,6 +17,7 @@ import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietSettingNotFoundException;
+import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.exceptions.security.*;
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationNotStartedException;
@@ -231,6 +232,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTelegramAuthCodeNotFoundException(TelegramAuthCodeNotFoundException exception) {
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Telegram.TELEGRAM_AUTH_CODE_NOT_FOUND_ERROR,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ProductsNotUniqueResultException.class})
+    public ResponseEntity<ErrorResponse> handleProductsNotUniqueResultException(ProductsNotUniqueResultException exception) {
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                Diet.PRODUCTS_NOT_UNIQUE_RESULT_ERROR,
                 exception.getMessage()
         );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);

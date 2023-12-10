@@ -16,6 +16,7 @@ import ru.akvine.fitstats.enums.Gender;
 import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
+import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
@@ -46,6 +47,8 @@ public class DietService {
     private final static double GAIN_PROTEIN_COEFFICIENT = 1.7;
     private final static double GAIN_FATS_COEFFICIENT = 1.2;
     private final static double DRYING_FATS_COEFFICIENT = 0.7;
+
+    private static final int SINGLE_ELEMENT = 0;
 
     @Value("${uuid.length}")
     private int length;
@@ -100,7 +103,16 @@ public class DietService {
                 .findByUuid(clientUuid)
                 .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
         String productUuid = addDietRecordStart.getProductUuid();
-        ProductEntity productEntity = productService.verifyExistsAndGet(productUuid);
+        ProductEntity productEntity;
+        if (productUuid.length() < length) {
+            List<ProductEntity> products = productService.verifyExistsByPartialUuidAndGet(productUuid);
+            if (products.size() != 1) {
+                throw new ProductsNotUniqueResultException("Products by uuid = [" + productUuid + "] is not contains single element!");
+            }
+            productEntity = products.get(SINGLE_ELEMENT);
+        } else {
+            productEntity = productService.verifyExistsAndGet(productUuid);
+        }
 
         Macronutrients macronutrientsPer100 = transformPer100(
                 productEntity.getProteins(),

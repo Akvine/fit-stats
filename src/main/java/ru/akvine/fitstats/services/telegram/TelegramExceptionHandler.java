@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.telegram;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.parse.*;
 
@@ -18,6 +19,8 @@ public class TelegramExceptionHandler {
             return handleTelegramCarbohydratesParseException(chatId);
         } else if (exception instanceof TelegramVolParseException) {
             return handleTelegramVolParseException(chatId);
+        } else if (exception instanceof ProductsNotUniqueResultException) {
+            return handleProductsNotUniqueException(chatId);
         } else {
             return handleException(chatId);
         }
@@ -45,5 +48,9 @@ public class TelegramExceptionHandler {
 
     private SendMessage handleTelegramVolParseException(String chatId) {
         return new SendMessage(chatId, "Некорректно введен процент крепости алкоголя!");
+    }
+
+    private SendMessage handleProductsNotUniqueException(String chatId) {
+        return new SendMessage(chatId, "Данному uuid соответствует не один продукт. Введите uuid по длиннее");
     }
 }

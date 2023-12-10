@@ -19,6 +19,11 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             "pe.uuid = :uuid")
     Optional<ProductEntity> findByUuidAndNotDeleted(@Param("uuid") String uuid);
 
+    @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null " +
+            "and " +
+            "pe.uuid like concat('%', :uuid, '%')")
+    List<ProductEntity> findByPartialUuidAndNotDeleted(@Param("uuid") String uuid);
+
     @Query("from ProductEntity pe where pe.uuid = :uuid")
     Optional<ProductEntity> findByUuid(@Param("uuid") String uuid);
 
