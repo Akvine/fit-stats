@@ -77,9 +77,9 @@ public class TelegramAuthService {
         );
     }
 
-    public void authenticateTelegramClient(String text, Long telegramId) {
+    public void authenticateTelegramClient(String text, Long telegramId, String chatId) {
         TelegramAuthCode authCode = getByAuthCode(text);
-        telegramSubscriptionService.save(telegramId, authCode);
+        telegramSubscriptionService.save(telegramId, authCode, chatId);
         deleteById(authCode.getId());
     }
 

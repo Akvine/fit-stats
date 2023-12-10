@@ -59,6 +59,10 @@ public class CommonErrorCodes {
             String TEXT_MESSAGE_LENGTH_ERROR = "text.message.length.error";
             String VOLUME_INVALID_ERROR = "volume.invalid.error";
             String DIET_ADD_RECORD_MESSAGE_INVALID_ERROR = "diet.record.message.invalid.error";
+            String DIET_NOTIFICATION_TYPE_BLANK_ERROR = "diet.notification.type.blank.error";
+            String DIET_NOTIFICATION_TYPE_INVALID_ERROR = "diet.notification.type.invalid.error";
+            String DIET_NOTIFICATION_TYPE_EXISTS_FOR_CLIENT_ERROR = "diet.notification.type.exists.for.client.error";
+            String DIET_NOTIFICATION_TYPE_NOT_EXISTS_FOR_CLIENT_ERROR = "diet.notification.type.notExists.for.client.error";
         }
 
         interface Security {

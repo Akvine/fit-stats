@@ -27,7 +27,7 @@ public class TelegramLongPoolingBot extends TelegramLongPollingBot {
         return botUsername;
     }
 
-    private void sendMessage(BotApiMethod<?> message) {
+    public void sendMessage(BotApiMethod<?> message) {
         try {
             execute(message);
         } catch (Exception exception) {

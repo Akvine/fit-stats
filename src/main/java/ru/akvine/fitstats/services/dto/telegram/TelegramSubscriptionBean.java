@@ -16,12 +16,14 @@ public class TelegramSubscriptionBean extends SoftBean {
     private Long id;
     private Long telegramId;
     private ClientBean client;
+    private String chatId;
     private LocalDateTime createdDate;
 
     public TelegramSubscriptionBean(TelegramSubscriptionEntity telegramSubscriptionEntity) {
         this.id = telegramSubscriptionEntity.getId();
         this.telegramId = telegramSubscriptionEntity.getTelegramId();
         this.client = new ClientBean(telegramSubscriptionEntity.getClient());
+        this.chatId = telegramSubscriptionEntity.getChatId();
 
         this.createdDate = telegramSubscriptionEntity.getCreatedDate();
         this.updatedDate = telegramSubscriptionEntity.getUpdatedDate();

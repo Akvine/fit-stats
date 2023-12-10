@@ -3,13 +3,11 @@ package ru.akvine.fitstats.services.telegram.factory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.akvine.fitstats.services.telegram.TelegramServicesAdapter;
 
 @Component
 @RequiredArgsConstructor
 public class BaseMessagesFactory {
     private final KeyboardFactory keyboardFactory;
-    private final TelegramServicesAdapter telegramServicesAdapter;
 
     public SendMessage getInvalidMessage(String chatId) {
         return new SendMessage(chatId, "Незнаю такой команды! Справка: /help");
@@ -39,6 +37,40 @@ public class BaseMessagesFactory {
                 chatId,
                 "Введите uuid продукта и объем, который вы потребили: "
         );
+    }
+
+    public SendMessage getNotificationSubscriptionDietAdd(String chatId) {
+        return new SendMessage(
+                chatId,
+                "Введите тип уведомления для отслеживания (proteins, fats, carbohydrates, energy):"
+        );
+    }
+
+    public SendMessage getNotificationSubscriptionDietDelete(String chatId) {
+        return new SendMessage(
+                chatId,
+                "Введите тип уведомления для удаления (proteins, fats, carbohydrates, energy):"
+        );
+    }
+
+    public SendMessage getNotificationSubscriptionTypesKeyboard(String chatId) {
+        SendMessage sendMessage = new SendMessage(
+                chatId,
+                "Выберите тип подписки: "
+        );
+        sendMessage.enableMarkdown(true);
+        sendMessage.setReplyMarkup(keyboardFactory.getNotificationSubscriptionTypesKeyboard());
+        return sendMessage;
+    }
+
+    public SendMessage getDietNotificationSubscriptionKeyboard(String chatId) {
+        SendMessage sendMessage = new SendMessage(
+                chatId,
+                "Выберите действие: "
+        );
+        sendMessage.enableMarkdown(true);
+        sendMessage.setReplyMarkup(keyboardFactory.getDietNotificationSubscriptionKeyboard());
+        return sendMessage;
     }
 
     public SendMessage getMainMenuKeyboard(String chatId) {

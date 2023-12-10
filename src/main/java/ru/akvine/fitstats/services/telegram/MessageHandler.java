@@ -3,13 +3,16 @@ package ru.akvine.fitstats.services.telegram;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.akvine.fitstats.controllers.telegram.TelegramDietNotificationSubscriptionResolver;
 import ru.akvine.fitstats.controllers.telegram.TelegramDietResolver;
 import ru.akvine.fitstats.controllers.telegram.TelegramProductResolver;
+import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
+import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.AddDietNotificationRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.DeleteDietNotificationRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductList;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
@@ -28,6 +31,7 @@ public class MessageHandler {
     private final TelegramAuthService telegramAuthService;
     private final TelegramDietResolver telegramDietResolver;
     private final TelegramProductResolver telegramProductResolver;
+    private final TelegramDietNotificationSubscriptionResolver telegramDietNotificationSubscriptionResolver;
 
     private final Map<String, String> waitingStates = new ConcurrentHashMap<>();
 
@@ -46,10 +50,11 @@ public class MessageHandler {
         String chatId = getChatId(message);
         String text = message.getText();
         String clientUuid = client.getUuid();
+        Long telegramId = message.getFrom().getId();
 
         try {
             if (waitingStates.containsKey(clientUuid)) {
-                return processWaitingState(text, chatId, clientUuid);
+                return processWaitingState(text, chatId, clientUuid, telegramId);
             }
 
             if (commandResolver.isStartCommand(text)) {
@@ -65,6 +70,19 @@ public class MessageHandler {
                 return baseMessagesFactory.getDietRecordAddInputWaiting(chatId);
             } else if (commandResolver.isHelpCommand(text)) {
                 return baseMessagesFactory.getHelpMessage(chatId);
+            } else if (commandResolver.isNotificationSubscriptionCommand(text)) {
+                return baseMessagesFactory.getNotificationSubscriptionTypesKeyboard(chatId);
+            } else if (commandResolver.isNotificationSubscriptionDietCommand(text)) {
+                return baseMessagesFactory.getDietNotificationSubscriptionKeyboard(chatId);
+            } else if (commandResolver.isNotificationSubscriptionDietAdd(text)) {
+                waitingStates.put(clientUuid, text);
+                return baseMessagesFactory.getNotificationSubscriptionDietAdd(chatId);
+            } else if (commandResolver.isNotificationSubscriptionDietList(text)) {
+                TelegramBaseRequest telegramBaseRequest = new TelegramBaseRequest(clientUuid, chatId, telegramId);
+                return telegramDietNotificationSubscriptionResolver.list(telegramBaseRequest);
+            } else if (commandResolver.isNotificationSubscriptionDietDelete(text)) {
+                waitingStates.put(clientUuid, text);
+                return baseMessagesFactory.getNotificationSubscriptionDietDelete(chatId);
             } else {
                 return baseMessagesFactory.getInvalidMessage(chatId);
             }
@@ -73,7 +91,7 @@ public class MessageHandler {
         }
     }
 
-    private BotApiMethod<?> processWaitingState(String text, String chatId, String clientUuid) {
+    private BotApiMethod<?> processWaitingState(String text, String chatId, String clientUuid, Long telegramId) {
         if (commandResolver.isProductListCommand(waitingStates.get(clientUuid))) {
             waitingStates.remove(clientUuid);
             TelegramProductList telegramProductList = new TelegramProductList(clientUuid, chatId, text);
@@ -82,6 +100,14 @@ public class MessageHandler {
             waitingStates.remove(clientUuid);
             TelegramDietAddRecord telegramDietAddRecord = new TelegramDietAddRecord(clientUuid, chatId, text);
             return telegramDietResolver.addRecord(telegramDietAddRecord);
+        } else if (commandResolver.isNotificationSubscriptionDietAdd(waitingStates.get(clientUuid))) {
+            waitingStates.remove(clientUuid);
+            AddDietNotificationRequest request = new AddDietNotificationRequest(clientUuid, chatId, telegramId, text);
+            return telegramDietNotificationSubscriptionResolver.add(request);
+        } else if (commandResolver.isNotificationSubscriptionDietDelete(waitingStates.get(clientUuid))) {
+            waitingStates.remove(clientUuid);
+            DeleteDietNotificationRequest request = new DeleteDietNotificationRequest(clientUuid, chatId, telegramId, text);
+            return telegramDietNotificationSubscriptionResolver.delete(request);
         }
         throw new IllegalStateException("Unknown command = [" + waitingStates.remove(clientUuid) + "]");
     }
@@ -99,7 +125,7 @@ public class MessageHandler {
     }
 
     private BotApiMethod<?> authenticateTelegramClient(String text, String chatId, Long telegramId) {
-        telegramAuthService.authenticateTelegramClient(text, telegramId);
+        telegramAuthService.authenticateTelegramClient(text, telegramId, chatId);
         return baseMessagesFactory.getMainMenuKeyboard(chatId);
     }
 

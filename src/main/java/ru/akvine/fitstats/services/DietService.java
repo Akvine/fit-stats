@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.ClientEntity;
@@ -21,6 +22,7 @@ import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
+import ru.akvine.fitstats.services.listeners.AddDietRecordEvent;
 import ru.akvine.fitstats.utils.DietUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
 
@@ -39,6 +41,7 @@ public class DietService {
     private final DietSettingService dietSettingService;
     private final ClientRepository clientRepository;
     private final ProductService productService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final static double GAIN_PROTEIN_COEFFICIENT = 1.7;
     private final static double GAIN_FATS_COEFFICIENT = 1.2;
@@ -126,6 +129,12 @@ public class DietService {
                 .setProduct(productEntity);
 
         DietRecordBean dietRecordBean = new DietRecordBean(dietRecordRepository.save(dietRecordEntity));
+
+        Long clientId = clientEntity.getId();
+        DietSettingEntity dietSettingEntity = dietSettingService.verifyExistsAndGet(clientUuid);
+        List<DietRecordEntity> records = dietRecordRepository.findByDate(clientUuid, LocalDate.now());
+        applicationEventPublisher.publishEvent(new AddDietRecordEvent(new Object(), clientId, dietSettingEntity, records));
+
         return new AddDietRecordFinish()
                 .setUuid(dietRecordBean.getUuid())
                 .setProductTitle(productEntity.getTitle())
