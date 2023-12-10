@@ -4,61 +4,107 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.enums.CommandEnum;
 
+import static ru.akvine.fitstats.services.telegram.CommandResolver.Actions.*;
+import static ru.akvine.fitstats.services.telegram.CommandResolver.Buttons.*;
+
 @Component
 @RequiredArgsConstructor
 public class CommandResolver {
+    public interface Buttons {
+        String BASE_HELP_BUTTON = "Помощь";
+        String BACK_BUTTON = "Назад";
 
-    private static final String PRODUCT_LIST_MESSAGE = "Список продуктов";
-    private static final String DIET_DISPLAY_STATISTIC_MESSAGE = "БЖУ за сегодня";
-    private static final String DIET_ADD_RECORD_MESSAGE = "Добавить запись";
-    private static final String HELP_MESSAGE = "Помощь";
-    private static final String BACK_MESSAGE = "Назад";
+        String NOTIFICATION_SUBSCRIPTION_BUTTON = "Уведомления";
+        String NOTIFICATION_SUBSCRIPTION_DIET_BUTTON = "Диета";
+        String NOTIFICATION_SUBSCRIPTION_STATISTIC_BUTTON = "Статистика";
 
-    private static final String NOTIFICATION_SUBSCRIPTIONS = "Уведомления";
-    private static final String NOTIFICATION_SUBSCRIPTION_DIET = "Диета";
+        String PRODUCTS_BUTTON = "Продукты";
 
-    private static final String NOTIFICATION_SUBSCRIPTION_DIET_ADD_MESSAGE = "Добавить подписку на уведомления";
-    private static final String NOTIFICATION_SUBSCRIPTION_DIET_LIST_MESSAGE = "Список подписок на уведомления";
-    private static final String NOTIFICATION_SUBSCRIPTION_DIET_DELETE_MESSAGE = "Удалить подписку на уведомление";
+        String DIET_BUTTON = "Диетический дневник";
+    }
+
+    public interface Actions {
+        String NOTIFICATION_SUBSCRIPTION_DIET_ADD_ACTION = "Добавить подписку на уведомления";
+        String NOTIFICATION_SUBSCRIPTION_DIET_LIST_ACTION = "Список подписок на уведомления";
+        String NOTIFICATION_SUBSCRIPTION_DIET_DELETE_ACTION = "Удалить подписку на уведомление";
+
+        String PRODUCTS_ADD_ACTION = "Добавить продукт";
+        String PRODUCTS_LIST_ACTION = "Список продуктов";
+
+        String DIET_ADD_ACTION = "Добавить запись";
+        String DIET_LIST_ACTION = "Список записей";
+        String DIET_DELETE_ACTION = "Удалить запись";
+        String DIET_STATISTIC_DISPLAY_ACTION = "КБЖУ за сегодня";
+
+        String PROFILE_DISPLAY_ACTION = "Данные профиля";
+        String PROFILE_UPDATE_ACTION = "Обновить профиль";
+
+        String STATISTIC_HISTORY_ACTION = "История";
+        String STATISTIC_ADDITIONAL_ACTION = "Основные показатели";
+    }
+
 
     public boolean isStartCommand(String command) {
-        return CommandEnum.COMMAND_START.getCommandName().equals(command) || command.equals(BACK_MESSAGE);
+        return CommandEnum.COMMAND_START.getCommandName().equals(command);
     }
 
-    public boolean isProductListCommand(String command) {
-        return CommandEnum.COMMAND_PRODUCTS_LIST.getCommandName().equals(command) || command.equals(PRODUCT_LIST_MESSAGE);
-    }
-
-    public boolean isDietStatisticDisplayCommand(String command) {
-        return CommandEnum.COMMAND_DIET_DISPLAY.getCommandName().equals(command) || command.equals(DIET_DISPLAY_STATISTIC_MESSAGE);
-    }
-
-    public boolean isNotificationSubscriptionCommand(String command) {
-        return command.equals(NOTIFICATION_SUBSCRIPTIONS);
-    }
-
-    public boolean isNotificationSubscriptionDietCommand(String command) {
-        return command.equals(NOTIFICATION_SUBSCRIPTION_DIET);
-    }
-
-    public boolean isDietAddRecordCommand(String command) {
-        return CommandEnum.COMMAND_DIET_ADD_RECORD.getCommandName().equals(command) || command.equals(DIET_ADD_RECORD_MESSAGE);
+    public boolean isBackCommand(String command) {
+        return command.equals(BACK_BUTTON);
     }
 
     public boolean isHelpCommand(String command) {
-        return CommandEnum.COMMAND_HELP.getCommandName().equals(command) || command.equals(HELP_MESSAGE);
+        return CommandEnum.COMMAND_HELP.getCommandName().equals(command) || command.equals(BASE_HELP_BUTTON);
+    }
+
+    public boolean isNotificationSubscriptionButton(String command) {
+        return command.equals(NOTIFICATION_SUBSCRIPTION_BUTTON);
+    }
+
+    public boolean isNotificationSubscriptionDietButton(String command) {
+        return command.equals(NOTIFICATION_SUBSCRIPTION_DIET_BUTTON);
     }
 
     public boolean isNotificationSubscriptionDietAdd(String command) {
-        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_ADD.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_ADD_MESSAGE);
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_ADD.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_ADD_ACTION);
     }
 
     public boolean isNotificationSubscriptionDietList(String command) {
-        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_LIST.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_LIST_MESSAGE);
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_LIST.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_LIST_ACTION);
     }
 
     public boolean isNotificationSubscriptionDietDelete(String command) {
-        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_DELETE.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_DELETE_MESSAGE);
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_DELETE.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_DELETE_ACTION);
     }
 
+    public boolean isProductButton(String command) {
+        return command.equals(PRODUCTS_BUTTON);
+    }
+
+    public boolean isProductAddCommand(String command) {
+        return CommandEnum.COMMAND_PRODUCTS_ADD.getCommandName().equals(command) || command.equals(PRODUCTS_ADD_ACTION);
+    }
+
+    public boolean isDietButton(String command) {
+        return command.equals(DIET_BUTTON);
+    }
+
+    public boolean isProductListCommand(String command) {
+        return CommandEnum.COMMAND_PRODUCTS_LIST.getCommandName().equals(command) || command.equals(PRODUCTS_LIST_ACTION);
+    }
+
+    public boolean isDietAddRecordCommand(String command) {
+        return CommandEnum.COMMAND_DIET_RECORD_ADD.getCommandName().equals(command) || command.equals(DIET_ADD_ACTION);
+    }
+
+    public boolean isDietListRecordCommand(String command) {
+        return CommandEnum.COMMAND_DIET_RECORD_LIST.getCommandName().equals(command) || command.equals(DIET_LIST_ACTION);
+    }
+
+    public boolean isDietDeleteRecordCommand(String command) {
+        return CommandEnum.COMMAND_DIET_RECORD_DELETE.getCommandName().equals(command) || command.equals(DIET_DELETE_ACTION);
+    }
+
+    public boolean isDietStatisticDisplayCommand(String command) {
+        return CommandEnum.COMMAND_DIET_STATISTIC_DISPLAY.getCommandName().equals(command) || command.equals(Actions.DIET_STATISTIC_DISPLAY_ACTION);
+    }
 }

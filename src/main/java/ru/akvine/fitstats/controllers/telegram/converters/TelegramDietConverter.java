@@ -5,13 +5,11 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
-import ru.akvine.fitstats.services.dto.diet.AddDietRecordFinish;
-import ru.akvine.fitstats.services.dto.diet.AddDietRecordStart;
-import ru.akvine.fitstats.services.dto.diet.DietDisplay;
-import ru.akvine.fitstats.services.dto.diet.Display;
+import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.utils.MathUtils;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class TelegramDietConverter {
@@ -63,6 +61,39 @@ public class TelegramDietConverter {
         sb.append("Объем: ").append(MathUtils.round(addDietRecordFinish.getVolume())).append(NEXT_LINE);;
 
         return new SendMessage(chatId, sb.toString());
+    }
+
+    public SendMessage convertToListRecordResponse(String chatId, List<DietRecordBean> records) {
+        Preconditions.checkNotNull("dietRecords is null");
+        return new SendMessage(chatId,
+                buildListRecordResponse(records));
+    }
+
+    private String buildListRecordResponse(List<DietRecordBean> records) {
+        int roundAccuracy = 2;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=======[Список записей]=======").append(NEXT_LINE);
+
+        int size = records.size();
+        int lastElementIndex = records.size() - 1;
+        for (int i = 0; i < size; ++i) {
+            sb.append("--------------------").append(NEXT_LINE);
+            sb.append("1. UUID: ").append(records.get(i).getUuid()).append(NEXT_LINE);
+            sb.append("2. UUID продукта: ").append(records.get(i).getProductBean().getUuid()).append(NEXT_LINE);
+            sb.append("3. Название продукта: ").append(records.get(i).getProductBean().getTitle()).append(NEXT_LINE);
+            sb.append("4. Белка: ").append(MathUtils.round(records.get(i).getProteins(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("5. Жиров: ").append(MathUtils.round(records.get(i).getFats(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("6. Углеводов: ").append(MathUtils.round(records.get(i).getCarbohydrates(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("7. Калории: ").append(MathUtils.round(records.get(i).getCalories(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("8. Единица измерения: ").append(records.get(i).getProductBean().getMeasurement()).append(NEXT_LINE);
+            sb.append("9. Объем: ").append(MathUtils.round(records.get(i).getVolume(), roundAccuracy)).append(NEXT_LINE);
+            if (i == lastElementIndex) {
+                sb.append("======================");
+            }
+        }
+
+        return sb.toString();
     }
 
     private String buildDietDisplayStatistic(DietDisplay dietDisplay) {

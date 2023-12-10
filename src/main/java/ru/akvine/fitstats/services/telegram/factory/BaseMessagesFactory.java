@@ -25,11 +25,30 @@ public class BaseMessagesFactory {
         );
     }
 
+    public SendMessage getProductAddInputWaiting(String chatId) {
+        return new SendMessage(
+                chatId,
+                "Введите название продукта, производителя, жиры (на 100 грамм)," +
+                        " белки (на 100 грамм), углеводы (на 100 грамм), процент крепости алкоголя, измерение, категории " +
+                        "(Пример: Творог, ООО Савушкин, 2.5, 16, 1.2, 0, g, Творожные): "
+        );
+    }
+
     public SendMessage getProductListFilter(String chatId) {
         return new SendMessage(
                 chatId,
                 "Введите фильтр, по которому мы найдем продукты: "
-                );
+        );
+    }
+
+    public SendMessage getDietKeyboard(String chatId) {
+        SendMessage sendMessage = new SendMessage(
+                chatId,
+                "Выберите действие: "
+        );
+        sendMessage.enableMarkdown(true);
+        sendMessage.setReplyMarkup(keyboardFactory.getDietKeyboard());
+        return sendMessage;
     }
 
     public SendMessage getDietRecordAddInputWaiting(String chatId) {
@@ -63,6 +82,16 @@ public class BaseMessagesFactory {
         return sendMessage;
     }
 
+    public SendMessage getProductKeyboard(String chatId) {
+        SendMessage sendMessage = new SendMessage(
+                chatId,
+                "Выберите действие: "
+        );
+        sendMessage.enableMarkdown(true);
+        sendMessage.setReplyMarkup(keyboardFactory.getProductsKeyboard());
+        return sendMessage;
+    }
+
     public SendMessage getDietNotificationSubscriptionKeyboard(String chatId) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
@@ -73,10 +102,10 @@ public class BaseMessagesFactory {
         return sendMessage;
     }
 
-    public SendMessage getMainMenuKeyboard(String chatId) {
+    public SendMessage getMainMenuKeyboard(String chatId, String message) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
-                "Добро пожаловать! Вам доступен полный функционал бота Fit-Stats"
+                message
         );
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(keyboardFactory.getMainMenuKeyboard());

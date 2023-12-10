@@ -3,12 +3,21 @@ package ru.akvine.fitstats.services.telegram;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
+import ru.akvine.fitstats.exceptions.telegram.parse.*;
 
 @Component
 public class TelegramExceptionHandler {
     public SendMessage handle(String chatId, Exception exception) {
         if (exception instanceof ProductNotFoundException) {
             return handleProductNotFoundException(chatId);
+        } else if (exception instanceof TelegramFatsParseException) {
+            return handleTelegramFatsParseException(chatId);
+        } else if (exception instanceof TelegramProteinsParseException) {
+            return handleTelegramProteinsParseException(chatId);
+        } else if (exception instanceof TelegramCarbohydratesParseException) {
+            return handleTelegramCarbohydratesParseException(chatId);
+        } else if (exception instanceof TelegramVolParseException) {
+            return handleTelegramVolParseException(chatId);
         } else {
             return handleException(chatId);
         }
@@ -20,5 +29,21 @@ public class TelegramExceptionHandler {
 
     private SendMessage handleProductNotFoundException(String chatId) {
         return new SendMessage(chatId, "Продукт с указанным uuid не найден!");
+    }
+
+    private SendMessage handleTelegramFatsParseException(String chatId) {
+        return new SendMessage(chatId, "Некорректно введены жиры!");
+    }
+
+    private SendMessage handleTelegramProteinsParseException(String chatId) {
+        return new SendMessage(chatId, "Некорректно введены белки!");
+    }
+
+    private SendMessage handleTelegramCarbohydratesParseException(String chatId) {
+        return new SendMessage(chatId, "Некорректно введены углеводы!");
+    }
+
+    private SendMessage handleTelegramVolParseException(String chatId) {
+        return new SendMessage(chatId, "Некорректно введен процент крепости алкоголя!");
     }
 }

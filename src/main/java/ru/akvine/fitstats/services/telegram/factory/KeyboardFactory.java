@@ -44,6 +44,26 @@ public class KeyboardFactory {
         return getKeyboard(List.of(row));
     }
 
+    public ReplyKeyboardMarkup getProductsKeyboard() {
+        KeyboardRow row = new KeyboardRow();
+        row.add(new KeyboardButton("Добавить продукт"));
+        row.add(new KeyboardButton("Список продуктов"));
+        row.add(new KeyboardButton("Назад"));
+
+        return getKeyboard(List.of(row));
+    }
+
+    public ReplyKeyboardMarkup getDietKeyboard() {
+        KeyboardRow row = new KeyboardRow();
+        row.add(new KeyboardButton("Добавить запись"));
+        row.add(new KeyboardButton("Список записей"));
+        row.add(new KeyboardButton("Удалить запись"));
+        row.add(new KeyboardButton("КБЖУ за сегодня"));
+        row.add(new KeyboardButton("Назад"));
+
+        return getKeyboard(List.of(row));
+    }
+
     private ReplyKeyboardMarkup getKeyboard(List<KeyboardRow> rows) {
 
         final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();

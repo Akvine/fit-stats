@@ -3,6 +3,8 @@ package ru.akvine.fitstats.controllers.telegram.converters;
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
+import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
@@ -12,7 +14,7 @@ import java.util.List;
 
 @Component
 public class TelegramProductConverter {
-    private final static String NEW_LINE = "\n";
+    private final static String NEXT_LINE = "\n";
     private final static int MAX_TELEGRAM_TEXT_LENGTH = 4096;
 
     public SendMessage convertToProductListResponse(String chatId, List<ProductBean> productBeans) {
@@ -31,6 +33,26 @@ public class TelegramProductConverter {
         );
     }
 
+    public ProductBean convertToProductBean(TelegramProductAddRequest request) {
+        Preconditions.checkNotNull(request, "telegramProductAddRequest is null");
+        return new ProductBean()
+                .setTitle(request.getTitle())
+                .setProducer(request.getProducer())
+                .setFats(request.getFats())
+                .setProteins(request.getProteins())
+                .setCarbohydrates(request.getCarbohydrates())
+                .setVol(request.getVol())
+                .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()))
+                .setCategoriesTitles(request.getCategories());
+    }
+
+    public SendMessage convertToProductAddResponse(String chatId, ProductBean productBean) {
+        return new SendMessage(
+                chatId,
+                buildProductAddResponse(productBean)
+        );
+    }
+
     private void validateResponseText(String text) {
         int length = text.length();
         if (length > MAX_TELEGRAM_TEXT_LENGTH) {
@@ -46,23 +68,39 @@ public class TelegramProductConverter {
         int roundAccuracy = 2;
 
         StringBuilder sb = new StringBuilder();
-        sb.append("=======[Список продуктов]=======").append(NEW_LINE);
+        sb.append("=======[Список продуктов]=======").append(NEXT_LINE);
 
         int size = products.size();
         int lastElementIndex = products.size() - 1;
         for (int i = 0; i < size; ++i) {
-            sb.append("--------------------").append(NEW_LINE);
-            sb.append("1. UUID: ").append(products.get(i).getUuid()).append(NEW_LINE);
-            sb.append("2. Название: ").append(products.get(i).getTitle()).append(NEW_LINE);
-            sb.append("3. Производитель: ").append(products.get(i).getProducer()).append(NEW_LINE);
-            sb.append("4. Белка: ").append(MathUtils.round(products.get(i).getProteins(), roundAccuracy)).append(NEW_LINE);
-            sb.append("5. Жиров: ").append(MathUtils.round(products.get(i).getFats(), roundAccuracy)).append(NEW_LINE);
-            sb.append("6. Углеводов: ").append(MathUtils.round(products.get(i).getCarbohydrates(), roundAccuracy)).append(NEW_LINE);
-            sb.append("7. Калории: ").append(MathUtils.round(products.get(i).getCalories(), roundAccuracy)).append(NEW_LINE);
+            sb.append("--------------------").append(NEXT_LINE);
+            sb.append("1. UUID: ").append(products.get(i).getUuid()).append(NEXT_LINE);
+            sb.append("2. Название: ").append(products.get(i).getTitle()).append(NEXT_LINE);
+            sb.append("3. Производитель: ").append(products.get(i).getProducer()).append(NEXT_LINE);
+            sb.append("4. Белка: ").append(MathUtils.round(products.get(i).getProteins(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("5. Жиров: ").append(MathUtils.round(products.get(i).getFats(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("6. Углеводов: ").append(MathUtils.round(products.get(i).getCarbohydrates(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("7. Калории: ").append(MathUtils.round(products.get(i).getCalories(), roundAccuracy)).append(NEXT_LINE);
             if (i == lastElementIndex) {
                 sb.append("======================");
             }
         }
+
+        return sb.toString();
+    }
+
+    private String buildProductAddResponse(ProductBean productBean) {
+        int roundAccuracy = 2;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Продукт был успешно добавлен: ").append(NEXT_LINE);
+        sb.append("1. UUID: ").append(productBean.getUuid()).append(NEXT_LINE);
+        sb.append("2. Название: ").append(productBean.getTitle()).append(NEXT_LINE);
+        sb.append("3. Производитель: ").append(productBean.getProducer()).append(NEXT_LINE);
+        sb.append("4. Белка: ").append(MathUtils.round(productBean.getProteins(), roundAccuracy)).append(NEXT_LINE);
+        sb.append("5. Жиры: ").append(MathUtils.round(productBean.getFats(), roundAccuracy)).append(NEXT_LINE);
+        sb.append("6. Углеводы: ").append(MathUtils.round(productBean.getCarbohydrates(), roundAccuracy)).append(NEXT_LINE);
+        sb.append("7. Калории: ").append(MathUtils.round(productBean.getCalories(), roundAccuracy)).append(NEXT_LINE);
+        sb.append("======================");
 
         return sb.toString();
     }

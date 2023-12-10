@@ -13,7 +13,9 @@ import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecord;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplay;
 import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.AddDietNotificationRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.DeleteDietNotificationRequest;
-import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductList;
+import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductListRequest;
+import ru.akvine.fitstats.controllers.telegram.parser.TelegramProductParser;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
@@ -32,6 +34,7 @@ public class MessageHandler {
     private final TelegramDietResolver telegramDietResolver;
     private final TelegramProductResolver telegramProductResolver;
     private final TelegramDietNotificationSubscriptionResolver telegramDietNotificationSubscriptionResolver;
+    private final TelegramProductParser telegramProductParser;
 
     private final Map<String, String> waitingStates = new ConcurrentHashMap<>();
 
@@ -58,21 +61,34 @@ public class MessageHandler {
             }
 
             if (commandResolver.isStartCommand(text)) {
-                return baseMessagesFactory.getMainMenuKeyboard(chatId);
+                String welcomeMessage = "Добро пожаловать! Вам доступен полный функционал бота Fit-Stats";
+                return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage);
+            } else if (commandResolver.isHelpCommand(text)) {
+                return baseMessagesFactory.getHelpMessage(chatId);
+            } else if (commandResolver.isBackCommand(text)) {
+                return baseMessagesFactory.getMainMenuKeyboard(chatId, "Выберите действие: ");
+            } else if (commandResolver.isProductButton(text)) {
+                return baseMessagesFactory.getProductKeyboard(chatId);
+            } else if (commandResolver.isProductAddCommand(text)) {
+                waitingStates.put(clientUuid, text);
+                return baseMessagesFactory.getProductAddInputWaiting(chatId);
             } else if (commandResolver.isProductListCommand(text)) {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getProductListFilter(chatId);
+            } else if (commandResolver.isDietButton(text)) {
+                return baseMessagesFactory.getDietKeyboard(chatId);
             } else if (commandResolver.isDietStatisticDisplayCommand(text)) {
                 TelegramDietDisplay telegramDietDisplay = new TelegramDietDisplay(clientUuid, chatId);
                 return telegramDietResolver.display(telegramDietDisplay);
             } else if (commandResolver.isDietAddRecordCommand(text)) {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getDietRecordAddInputWaiting(chatId);
-            } else if (commandResolver.isHelpCommand(text)) {
-                return baseMessagesFactory.getHelpMessage(chatId);
-            } else if (commandResolver.isNotificationSubscriptionCommand(text)) {
+            } else if (commandResolver.isDietListRecordCommand(text)) {
+                TelegramBaseRequest telegramBaseRequest = new TelegramBaseRequest(clientUuid, chatId, telegramId);
+                return telegramDietResolver.listRecord(telegramBaseRequest);
+            } else if (commandResolver.isNotificationSubscriptionButton(text)) {
                 return baseMessagesFactory.getNotificationSubscriptionTypesKeyboard(chatId);
-            } else if (commandResolver.isNotificationSubscriptionDietCommand(text)) {
+            } else if (commandResolver.isNotificationSubscriptionDietButton(text)) {
                 return baseMessagesFactory.getDietNotificationSubscriptionKeyboard(chatId);
             } else if (commandResolver.isNotificationSubscriptionDietAdd(text)) {
                 waitingStates.put(clientUuid, text);
@@ -94,8 +110,16 @@ public class MessageHandler {
     private BotApiMethod<?> processWaitingState(String text, String chatId, String clientUuid, Long telegramId) {
         if (commandResolver.isProductListCommand(waitingStates.get(clientUuid))) {
             waitingStates.remove(clientUuid);
-            TelegramProductList telegramProductList = new TelegramProductList(clientUuid, chatId, text);
-            return telegramProductResolver.list(telegramProductList);
+            TelegramProductListRequest telegramProductListRequest = new TelegramProductListRequest(clientUuid, chatId, text);
+            return telegramProductResolver.list(telegramProductListRequest);
+        } else if (commandResolver.isProductAddCommand(waitingStates.get(clientUuid))) {
+            waitingStates.remove(clientUuid);
+            TelegramProductAddRequest telegramProductAddRequest = telegramProductParser.parseTelegramProductAddRequest(text);
+            telegramProductAddRequest
+                    .setChatId(chatId)
+                    .setClientUuid(clientUuid)
+                    .setTelegramId(telegramId);
+            return telegramProductResolver.add(telegramProductAddRequest);
         } else if (commandResolver.isDietAddRecordCommand(waitingStates.get(clientUuid))) {
             waitingStates.remove(clientUuid);
             TelegramDietAddRecord telegramDietAddRecord = new TelegramDietAddRecord(clientUuid, chatId, text);
@@ -126,7 +150,8 @@ public class MessageHandler {
 
     private BotApiMethod<?> authenticateTelegramClient(String text, String chatId, Long telegramId) {
         telegramAuthService.authenticateTelegramClient(text, telegramId, chatId);
-        return baseMessagesFactory.getMainMenuKeyboard(chatId);
+        String welcomeMessage = "Добро пожаловать! Вам доступен полный функционал бота Fit-Stats";
+        return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage);
     }
 
     private String getChatId(Message message) {

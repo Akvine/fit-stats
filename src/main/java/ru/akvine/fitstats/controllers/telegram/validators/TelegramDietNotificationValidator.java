@@ -22,7 +22,7 @@ public class TelegramDietNotificationValidator {
     public void verifyTelegramAddDietNotificationRequest(AddDietNotificationRequest addDietNotificationRequest) {
         Preconditions.checkNotNull(addDietNotificationRequest, "telegramAddDietNotification is null");
 
-        String type = addDietNotificationRequest.getType();
+        String type = addDietNotificationRequest.getType().toUpperCase();
         dietNotificationTypeValidator.validate(type);
 
         Long clientId = clientService.getByUuid(addDietNotificationRequest.getClientUuid()).getId();
