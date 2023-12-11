@@ -16,7 +16,6 @@ public class KeyboardFactory {
         KeyboardRow firstRow = new KeyboardRow();
         KeyboardRow secondRow = new KeyboardRow();
         firstRow.add(new KeyboardButton("Продукты"));
-        firstRow.add(new KeyboardButton("Статистика"));
         firstRow.add(new KeyboardButton("Диетический дневник"));
         secondRow.add(new KeyboardButton("Уведомления"));
         secondRow.add(new KeyboardButton("Профиль"));
@@ -27,8 +26,7 @@ public class KeyboardFactory {
 
     public ReplyKeyboardMarkup getNotificationSubscriptionTypesKeyboard() {
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Диета"));
-        row.add(new KeyboardButton("Статистика"));
+        row.add(new KeyboardButton("Диета"));;
         row.add(new KeyboardButton("Назад"));
 
         return getKeyboard(List.of(row));
