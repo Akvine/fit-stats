@@ -17,6 +17,7 @@ public class KeyboardFactory {
         KeyboardRow secondRow = new KeyboardRow();
         firstRow.add(new KeyboardButton("Продукты"));
         firstRow.add(new KeyboardButton("Диетический дневник"));
+        firstRow.add(new KeyboardButton("Статистика"));
         secondRow.add(new KeyboardButton("Уведомления"));
         secondRow.add(new KeyboardButton("Профиль"));
         secondRow.add(new KeyboardButton("Помощь"));
@@ -66,6 +67,15 @@ public class KeyboardFactory {
         KeyboardRow row = new KeyboardRow();
         row.add(new KeyboardButton("Биометрические показатели"));
         row.add(new KeyboardButton("Обновить показатели"));
+        row.add(new KeyboardButton("Назад"));
+
+        return getKeyboard(List.of(row));
+    }
+
+    public ReplyKeyboardMarkup getStatisticKeyboard() {
+        KeyboardRow row = new KeyboardRow();
+        row.add(new KeyboardButton("История"));
+        row.add(new KeyboardButton("Основные показатели"));
         row.add(new KeyboardButton("Назад"));
 
         return getKeyboard(List.of(row));

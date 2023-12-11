@@ -126,6 +126,23 @@ public class BaseMessagesFactory {
         return sendMessage;
     }
 
+    public SendMessage getStatisticHistoryInputWaiting(String chatId) {
+        return new SendMessage(
+                chatId,
+                "Введите продолжительность (DAY, MONTH, WEEK, YEAR) и макронутриент (FATS, PROTEINS, CARBOHYDRATES, CALORIES): "
+        );
+    }
+
+    public SendMessage getStatisticKeyboard(String chatId) {
+        SendMessage sendMessage = new SendMessage(
+                chatId,
+                "Выберите действие: "
+        );
+        sendMessage.enableMarkdown(true);
+        sendMessage.setReplyMarkup(keyboardFactory.getStatisticKeyboard());
+        return sendMessage;
+    }
+
     public SendMessage getMainMenuKeyboard(String chatId, String message) {
         SendMessage sendMessage = new SendMessage(
                 chatId,

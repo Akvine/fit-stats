@@ -23,6 +23,8 @@ public class CommandResolver {
         String DIET_BUTTON = "Диетический дневник";
 
         String PROFILE_BUTTON = "Профиль";
+
+        String STATISTIC_BUTTON = "Статистика";
     }
 
     public interface Actions {
@@ -42,7 +44,7 @@ public class CommandResolver {
         String PROFILE_UPDATE_ACTION = "Обновить показатели";
 
         String STATISTIC_HISTORY_ACTION = "История";
-        String STATISTIC_ADDITIONAL_ACTION = "Основные показатели";
+        String STATISTIC_INDICATORS_ACTION = "Основные показатели";
     }
 
 
@@ -120,5 +122,17 @@ public class CommandResolver {
 
     public boolean isProfileBiometricUpdateCommand(String command) {
         return CommandEnum.COMMAND_PROFILE_UPDATE.getCommandName().equals(command) || command.equals(PROFILE_UPDATE_ACTION);
+    }
+
+    public boolean isStatisticButton(String command) {
+        return command.equals(STATISTIC_BUTTON);
+    }
+
+    public boolean isStatisticHistoryCommand(String command) {
+        return CommandEnum.COMMAND_STATISTIC_HISTORY.getCommandName().equals(command) || command.equals(STATISTIC_HISTORY_ACTION);
+    }
+
+    public boolean isStatisticIndicatorsCommand(String command) {
+        return CommandEnum.COMMAND_STATISTIC_INDICATORS.getCommandName().equals(command) || command.equals(STATISTIC_INDICATORS_ACTION);
     }
 }

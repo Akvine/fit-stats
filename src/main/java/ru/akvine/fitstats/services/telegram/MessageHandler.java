@@ -5,10 +5,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.akvine.fitstats.controllers.telegram.TelegramDietNotificationSubscriptionResolver;
-import ru.akvine.fitstats.controllers.telegram.TelegramDietResolver;
-import ru.akvine.fitstats.controllers.telegram.TelegramProductResolver;
-import ru.akvine.fitstats.controllers.telegram.TelegramProfileResolver;
+import ru.akvine.fitstats.controllers.telegram.*;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDeleteRecordRequest;
@@ -18,8 +15,10 @@ import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.DeleteDietN
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductListRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.profile.TelegramProfileUpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.statistic.TelegramStatisticHistoryRequest;
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramProductParser;
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramProfileParser;
+import ru.akvine.fitstats.controllers.telegram.parser.TelegramStatisticParser;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
@@ -35,13 +34,16 @@ public class MessageHandler {
     private final BaseMessagesFactory baseMessagesFactory;
     private final CommandResolver commandResolver;
     private final TelegramAuthService telegramAuthService;
+
     private final TelegramDietResolver telegramDietResolver;
     private final TelegramProductResolver telegramProductResolver;
     private final TelegramDietNotificationSubscriptionResolver telegramDietNotificationSubscriptionResolver;
     private final TelegramProfileResolver telegramProfileResolver;
+    private final TelegramStatisticResolver telegramStatisticResolver;
 
     private final TelegramProductParser telegramProductParser;
     private final TelegramProfileParser telegramProfileParser;
+    private final TelegramStatisticParser telegramStatisticParser;
 
     private final Map<String, String> waitingStates = new ConcurrentHashMap<>();
 
@@ -97,7 +99,7 @@ public class MessageHandler {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getDietRecordDeleteInputWaiting(chatId);
             } else if (commandResolver.isProfileButton(text)) {
-              return baseMessagesFactory.getProfileKeyboard(chatId);
+                return baseMessagesFactory.getProfileKeyboard(chatId);
             } else if (commandResolver.isProfileBiometricDisplayCommand(text)) {
                 TelegramBaseRequest request = new TelegramBaseRequest(clientUuid, chatId, telegramId);
                 return telegramProfileResolver.biometricDisplay(request);
@@ -114,6 +116,11 @@ public class MessageHandler {
             } else if (commandResolver.isNotificationSubscriptionDietList(text)) {
                 TelegramBaseRequest telegramBaseRequest = new TelegramBaseRequest(clientUuid, chatId, telegramId);
                 return telegramDietNotificationSubscriptionResolver.list(telegramBaseRequest);
+            } else if (commandResolver.isStatisticButton(text)) {
+                return baseMessagesFactory.getStatisticKeyboard(chatId);
+            } else if (commandResolver.isStatisticHistoryCommand(text)) {
+                waitingStates.put(clientUuid, text);
+                return baseMessagesFactory.getStatisticHistoryInputWaiting(chatId);
             } else if (commandResolver.isNotificationSubscriptionDietDelete(text)) {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getNotificationSubscriptionDietDelete(chatId);
@@ -157,6 +164,10 @@ public class MessageHandler {
             waitingStates.remove(clientUuid);
             DeleteDietNotificationRequest request = new DeleteDietNotificationRequest(clientUuid, chatId, telegramId, text);
             return telegramDietNotificationSubscriptionResolver.delete(request);
+        } else if (commandResolver.isStatisticHistoryCommand(waitingStates.get(clientUuid))) {
+            waitingStates.remove(clientUuid);
+            TelegramStatisticHistoryRequest request = telegramStatisticParser.parseToTelegramStatisticHistoryRequest(clientUuid, chatId, text);
+            return telegramStatisticResolver.history(request);
         }
         throw new IllegalStateException("Unknown command = [" + waitingStates.remove(clientUuid) + "]");
     }
