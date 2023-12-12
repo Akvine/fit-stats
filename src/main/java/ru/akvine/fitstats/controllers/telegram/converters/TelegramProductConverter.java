@@ -16,6 +16,7 @@ import java.util.List;
 public class TelegramProductConverter {
     private final static String NEXT_LINE = "\n";
     private final static int MAX_TELEGRAM_TEXT_LENGTH = 4096;
+    private static final int DEFAULT_PRODUCT_VOLUME = 100;
 
     public SendMessage convertToProductListResponse(String chatId, List<ProductBean> productBeans) {
         Preconditions.checkNotNull(productBeans, "products is null");
@@ -40,6 +41,7 @@ public class TelegramProductConverter {
                 .setProducer(request.getProducer())
                 .setFats(request.getFats())
                 .setProteins(request.getProteins())
+                .setVolume(DEFAULT_PRODUCT_VOLUME)
                 .setCarbohydrates(request.getCarbohydrates())
                 .setVol(request.getVol())
                 .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()))
