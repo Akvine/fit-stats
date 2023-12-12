@@ -20,10 +20,7 @@ import ru.akvine.fitstats.utils.MathUtils;
 
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -41,6 +38,8 @@ public class StatisticService {
     private static final int FATS_MACRONUTRIENT_CALORIES_COEFFICIENT = 9;
     private static final int PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT = 4;
     private static final int CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT = 4;
+
+    private static final int MONTH_AVERAGE_COUNT = 30;
 
     private final DietRecordRepository dietRecordRepository;
     private final ClientService clientService;
@@ -201,36 +200,48 @@ public class StatisticService {
                 macronutrientHistory = statisticHistoryMap
                         .entrySet()
                         .stream()
+                        .sorted(Map.Entry.<String, DietStatisticHistory>comparingByKey().reversed())
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
-                                entry -> entry.getValue().getProteins()
+                                entry -> entry.getValue().getProteins(),
+                                (existing, replacement) -> existing,
+                                LinkedHashMap::new
                         ));
                 break;
             case FATS:
                 macronutrientHistory = statisticHistoryMap
                         .entrySet()
                         .stream()
+                        .sorted(Map.Entry.<String, DietStatisticHistory>comparingByKey().reversed())
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
-                                entry -> entry.getValue().getFats()
+                                entry -> entry.getValue().getFats(),
+                                (existing, replacement) -> existing,
+                                LinkedHashMap::new
                         ));
                 break;
             case CARBOHYDRATES:
                 macronutrientHistory = statisticHistoryMap
                         .entrySet()
                         .stream()
+                        .sorted(Map.Entry.<String, DietStatisticHistory>comparingByKey().reversed())
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
-                                entry -> entry.getValue().getCarbohydrates()
+                                entry -> entry.getValue().getCarbohydrates(),
+                                (existing, replacement) -> existing,
+                                LinkedHashMap::new
                         ));
                 break;
             case CALORIES:
                 macronutrientHistory = statisticHistoryMap
                         .entrySet()
                         .stream()
+                        .sorted(Map.Entry.<String, DietStatisticHistory>comparingByKey().reversed())
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
-                                entry -> entry.getValue().getCalories()
+                                entry -> entry.getValue().getCalories(),
+                                (existing, replacement) -> existing,
+                                LinkedHashMap::new
                         ));
                 break;
             default:
@@ -252,9 +263,10 @@ public class StatisticService {
 
     private Map<String, DietStatisticHistory> calculatePerPastDays(List<DietRecordEntity> entities) {
         return entities.stream()
-                .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusDays(30)))
+                .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusDays(MONTH_AVERAGE_COUNT)))
                 .collect(Collectors.groupingBy(
                         entity -> entity.getDate().toString(),
+                        LinkedHashMap::new,
                         Collectors.reducing(
                                 new DietStatisticHistory(),
                                 entity -> new DietStatisticHistory(
@@ -375,5 +387,17 @@ public class StatisticService {
             findDateRange = new DateRange(startDate, endDate);
         }
         return findDateRange;
+    }
+
+    private Map<String, DietStatisticHistory> sort(Map<LocalDate, DietStatisticHistory> history) {
+        Map<LocalDate, DietStatisticHistory> sortedHistoryLocalDateMap = new TreeMap<>();
+        Map<String, DietStatisticHistory> sortedHistoryStringMap = new LinkedHashMap<>();
+        for (Map.Entry<LocalDate, DietStatisticHistory> entry : history.entrySet()) {
+            sortedHistoryLocalDateMap.put(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<LocalDate, DietStatisticHistory> entry : sortedHistoryLocalDateMap.entrySet()) {
+            sortedHistoryStringMap.put(entry.getKey().toString(), entry.getValue());
+        }
+        return sortedHistoryStringMap;
     }
 }
