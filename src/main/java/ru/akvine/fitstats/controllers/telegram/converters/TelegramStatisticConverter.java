@@ -8,6 +8,7 @@ import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.Macronutrient;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistory;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
+import ru.akvine.fitstats.utils.MathUtils;
 
 @Component
 public class TelegramStatisticConverter {
@@ -33,6 +34,7 @@ public class TelegramStatisticConverter {
         StringBuilder sb = new StringBuilder();
         sb.append("Период: ").append(statisticHistoryResult.getDuration()).append(NEXT_LINE);
         sb.append("Макронутриент: ").append(statisticHistoryResult.getMacronutrient()).append(NEXT_LINE);
+        sb.append("Среднее: ").append(MathUtils.round(statisticHistoryResult.getAverage(), 2)).append(NEXT_LINE);
 
         statisticHistoryResult
                 .getHistory()
