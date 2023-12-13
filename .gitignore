@@ -40,3 +40,4 @@ build/
 *.tdump
 application-*.properties
 /src/main/resources/ssl/test_*.pfx
+/src/main/resources/logging/logback-spring-local.xml
