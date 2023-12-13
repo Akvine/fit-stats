@@ -39,4 +39,4 @@ build/
 /tdumps
 *.tdump
 application-*.properties
-!**/src/main/resources/ssl/test_*.pfx
+/src/main/resources/ssl/test_*.pfx
