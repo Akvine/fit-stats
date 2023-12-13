@@ -17,7 +17,4 @@ import javax.persistence.MappedSuperclass;
 public abstract class TelegramNotificationSubscriptionEntity {
     @Column(name = "TELEGRAM_ID", nullable = false)
     private Long telegramId;
-
-    @Column(name = "IS_PROCESSED", nullable = false)
-    private boolean processed;
 }

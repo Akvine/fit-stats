@@ -27,4 +27,7 @@ public class TelegramDietNotificationSubscriptionEntity extends TelegramNotifica
     @ManyToOne
     @JoinColumn(name = "CLIENT_ID", nullable = false)
     private ClientEntity client;
+
+    @Column(name = "IS_PROCESSED", nullable = false)
+    private boolean processed;
 }

@@ -14,7 +14,7 @@ import ru.akvine.fitstats.enums.telegram.DietNotificationSubscriptionType;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
 import ru.akvine.fitstats.repositories.ClientRepository;
-import ru.akvine.fitstats.repositories.telegram.TelegramDietNotificationRepository;
+import ru.akvine.fitstats.repositories.telegram.TelegramDietNotificationSubscriptionRepository;
 import ru.akvine.fitstats.repositories.telegram.TelegramSubscriptionRepository;
 import ru.akvine.fitstats.services.dto.telegram.AddDietNotificationSubscription;
 import ru.akvine.fitstats.services.dto.telegram.DeleteDietNotificationSubscription;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TelegramDietNotificationSubscriptionService {
-    private final TelegramDietNotificationRepository telegramDietNotificationSubscriptionRepository;
+    private final TelegramDietNotificationSubscriptionRepository telegramDietNotificationSubscriptionRepository;
     private final TelegramSubscriptionRepository telegramSubscriptionRepository;
     private final ClientRepository clientRepository;
     private final ApplicationEventPublisher applicationEventPublisher;

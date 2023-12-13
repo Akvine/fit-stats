@@ -11,7 +11,7 @@ import ru.akvine.fitstats.enums.telegram.DietNotificationSubscriptionType;
 import java.util.List;
 import java.util.Optional;
 
-public interface TelegramDietNotificationRepository extends JpaRepository<TelegramDietNotificationSubscriptionEntity, Long> {
+public interface TelegramDietNotificationSubscriptionRepository extends JpaRepository<TelegramDietNotificationSubscriptionEntity, Long> {
     @Query("from TelegramDietNotificationSubscriptionEntity tdne where tdne.dietNotificationSubscriptionType = :type and tdne.client.id = :clientId")
     Optional<TelegramDietNotificationSubscriptionEntity> findByClientIdAndType(@Param("clientId") Long clientId, @Param("type") DietNotificationSubscriptionType type);
 
@@ -22,4 +22,10 @@ public interface TelegramDietNotificationRepository extends JpaRepository<Telegr
     @Modifying
     @Transactional
     void deleteByClientIdAndType(@Param("clientId") Long clientId, @Param("type") DietNotificationSubscriptionType type);
+
+    @Query("update TelegramDietNotificationSubscriptionEntity tdnse set tdnse.processed = false " +
+            "where tdnse.processed = true")
+    @Modifying
+    @Transactional
+    void resetProcessedSubscriptions();
 }
