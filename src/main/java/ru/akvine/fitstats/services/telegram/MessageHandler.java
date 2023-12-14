@@ -121,6 +121,9 @@ public class MessageHandler {
             } else if (commandResolver.isStatisticHistoryCommand(text)) {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getStatisticHistoryInputWaiting(chatId);
+            } else if (commandResolver.isStatisticIndicatorsCommand(text)) {
+                TelegramBaseRequest request = new TelegramBaseRequest(clientUuid, chatId, telegramId);
+                return telegramStatisticResolver.indicators(request);
             } else if (commandResolver.isNotificationSubscriptionDietDelete(text)) {
                 waitingStates.put(clientUuid, text);
                 return baseMessagesFactory.getNotificationSubscriptionDietDelete(chatId);

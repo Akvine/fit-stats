@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.controllers.telegram.converters.TelegramStatisticConverter;
+import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.statistic.TelegramStatisticHistoryRequest;
 import ru.akvine.fitstats.controllers.telegram.validators.TelegramStatisticValidator;
 import ru.akvine.fitstats.services.StatisticService;
+import ru.akvine.fitstats.services.dto.statistic.AdditionalStatistic;
+import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistory;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
 
@@ -22,5 +25,11 @@ public class TelegramStatisticResolver {
         StatisticHistory statisticHistory = telegramStatisticConverter.convertToStatisticHistory(request);
         StatisticHistoryResult statisticHistoryResult = statisticService.statisticHistoryInfo(statisticHistory);
         return telegramStatisticConverter.convertToStatisticHistoryResponse(request.getChatId(), statisticHistoryResult);
+    }
+
+    public SendMessage indicators(TelegramBaseRequest request) {
+        AdditionalStatistic additionalStatistic = telegramStatisticConverter.convertToAdditionalStatistic(request);
+        AdditionalStatisticInfo additionalStatisticInfo = statisticService.calculateAdditionalStatisticInfo(additionalStatistic);
+        return telegramStatisticConverter.convertToAdditionalStatisticResponse(request.getChatId(), additionalStatisticInfo);
     }
 }

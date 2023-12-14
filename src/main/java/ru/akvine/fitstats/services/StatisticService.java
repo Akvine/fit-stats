@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.Macronutrient;
@@ -105,6 +106,7 @@ public class StatisticService {
                 .setStatisticInfo(indicatorStatistics);
     }
 
+    @Transactional
     public AdditionalStatisticInfo calculateAdditionalStatisticInfo(AdditionalStatistic additionalStatistic) {
         Preconditions.checkNotNull(additionalStatistic, "additionalStatistic is null");
 
