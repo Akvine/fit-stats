@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.security;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthActionService extends PasswordRequiredActionService<AuthActionEntity> {
     private final AuthActionRepository authActionRepository;
 

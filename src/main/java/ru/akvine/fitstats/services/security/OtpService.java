@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.security;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OtpService {
     private final NotificationProvider notificationProvider;
     private final OtpCounterRepository otpCounterRepository;
@@ -43,6 +45,7 @@ public class OtpService {
             value = OneTimePasswordGenerator.generate(otpLength);
         }
         int orderNumber = (int) getNextOtpNumber(login);
+        logger.info("Otp №{} has been generated for client with email = {}", orderNumber, login);
         return new OtpInfo(otpMaxInvalidAttempts, otpLifetimeSeconds, orderNumber, value);
     }
 

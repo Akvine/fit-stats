@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.profile;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProfileDeleteActionService extends PasswordRequiredActionService<ProfileDeleteActionEntity> {
     private final ProfileDeleteActionRepository profileDeleteActionRepository;
 
@@ -92,23 +94,29 @@ public class ProfileDeleteActionService extends PasswordRequiredActionService<Pr
 
         ProfileDeleteActionEntity deleteActionEntity = getRepository().findCurrentAction(login);
         if (deleteActionEntity == null) {
+            logger.info("Client with email = {} tried to {}, but action is not started", login, getActionName());
             throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated!", getActionName()));
         }
 
         // Действие просрочено
         if (deleteActionEntity.getOtpAction().isActionExpired()) {
+            logger.info("Client with email = {} tried to {}, but action is expired", login, getActionName());
             getRepository().delete(deleteActionEntity);
+            logger.info("Expired action = {}[id = {}] removed from DB", getActionName(), deleteActionEntity.getId());
             throw new ActionNotStartedException(String.format("Can't finish %s, action is expired!", getActionName()));
         }
 
         // Действие не просрочено, но просрочен код
         if (deleteActionEntity.getOtpAction().isExpiredOtp()) {
+            logger.info("Client with email = {} tried to finish = {}, but otp is expired! New otp left = {}", login, getActionName(), deleteActionEntity.getOtpAction().getOtpCountLeft());
             throw new OtpExpiredException(deleteActionEntity.getOtpAction().getOtpCountLeft());
         }
 
         // Действие не просрочено и код еще активен - проверяем
         if (deleteActionEntity.getOtpAction().isOtpValid(otp)) {
             clientService.delete(login);
+            logger.info("Client with email = {} successfully passed one-time-password and was deleted", login);
+
             getRepository().delete(deleteActionEntity);
             return;
         }
@@ -142,6 +150,8 @@ public class ProfileDeleteActionService extends PasswordRequiredActionService<Pr
         if (!otpCreateNewAction.isCredentialsValid()) {
             profileDeleteActionEntity.decrementPwdInvalidAttemptsLeft();
             getRepository().save(profileDeleteActionEntity);
+            logger.info("Client with email = {} tried to initiate {}, but entered wrong account password! Invalid attempts left = {}",
+                    profileDeleteActionEntity.getLogin(), getActionName(), profileDeleteActionEntity.getPwdInvalidAttemptsLeft());
             throw new BadCredentialsException("Bad credentials!");
         }
         return updateNewOtpAndSendToClient(profileDeleteActionEntity);

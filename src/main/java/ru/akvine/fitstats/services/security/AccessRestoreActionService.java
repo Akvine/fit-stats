@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.security;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.security.AccessRestoreActionEntity;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AccessRestoreActionService extends OtpActionService<AccessRestoreActionEntity> {
     @Value("${security.otp.action.lifetime.seconds}")
     private int otpActionLifetimeSeconds;
@@ -76,11 +78,11 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
         Preconditions.checkNotNull(actionRequest, "accessRestoreActionRequest is null");
 
         String login = actionRequest.getLogin();
-        String sessionId = actionRequest.getSessionId();
         String otpValue = actionRequest.getOtp();
 
         AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
         if (accessRestoreAction == null) {
+            logger.info("Client tried to check otp of {}, but action is not started", getActionName());
             throw new ActionNotStartedException(String.format("Can't be check otp of %s, action not initiated!", getActionName()));
         }
 
@@ -88,6 +90,7 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
 
         // Действие просрочено
         if (accessRestoreAction.getOtpAction().isActionExpired()) {
+            logger.info("Client with email = {} tried to check otp {}, but action is expired", login, getActionName());
             accessRestoreActionRepository.delete(accessRestoreAction);
             throw new ActionNotStartedException(String.format("Can't check otp of %s, action not initiated", getActionName()));
         }
@@ -103,11 +106,14 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
 
         // Действие не просрочено, но просрочен код
         if (accessRestoreAction.getOtpAction().isExpiredOtp()) {
+            logger.info("Client with email = {} tried to check otp {}, but otp is expired! New otp left = {}", login,
+                    getActionName(), accessRestoreAction.getOtpAction().getOtpValue());
             throw new OtpExpiredException(accessRestoreAction.getOtpAction().getOtpCountLeft());
         }
 
         // Действие не просрочено и код еще активен - проверяем
         if (accessRestoreAction.getOtpAction().isOtpValid(otpValue)) {
+            logger.debug("Client with email = {} successfully passed otp for state = {}", login, accessRestoreAction.getState());
             return buildActionInfo(handleValidOtp(accessRestoreAction));
         }
 
@@ -125,25 +131,27 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
         Preconditions.checkNotNull(actionRequest, "actionRestoreRequest is null");
 
         String login = actionRequest.getLogin();
-        String sessionId = actionRequest.getSessionId();
         String password = actionRequest.getPassword();
 
         AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
         if (accessRestoreAction == null) {
+            logger.info("Client tried to finish {}, but action is not started", getActionName());
             throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated", getActionName()));
         }
 
         verifyNotBlocked(login);
 
+        // Действие просрочено
         if (accessRestoreAction.getOtpAction().isActionExpired()) {
+            logger.info("Client with email = {} tried to finish {}, but action is expired!", login, getActionName());
             accessRestoreActionRepository.delete(accessRestoreAction);
-            throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated"));
+            logger.trace("Expired {}[id={}] removed from DB", getActionName(), accessRestoreAction.getId());
+            throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated", getActionName()));
         }
 
         if (accessRestoreAction.getState() == ActionState.OTP_PASSED) {
             accessRestoreActionRepository.delete(accessRestoreAction);
-            ClientBean clientBean = clientService.updatePassword(login, password);
-            return clientBean;
+            return clientService.updatePassword(login, password);
         }
 
         throw new OtpAuthRequiredException(String.format("Can't finish %s, otp auth required!", getActionName()));
@@ -163,8 +171,10 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
     protected void sendNewOtpToClient(AccessRestoreActionEntity action) {
         String login = action.getLogin();
         String otpValue = action.getOtpAction().getOtpValue();
+        Integer otpNumber = action.getOtpAction().getOtpNumber();
 
         notificationProvider.sendAccessRestoreCode(login, otpValue);
+        logger.info("Otp №{} for {} has been send to client with email = {}", otpNumber, getActionName(), login);
     }
 
     @Override
@@ -191,6 +201,7 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
                 .setState(ActionState.NEW)
                 .setOtpAction(otpAction);
         notificationProvider.sendAccessRestoreCode(login, accessRestoreAction.getOtpAction().getOtpValue());
+        logger.info("Client with email = {} started new {}", login, getActionName());
         return accessRestoreActionRepository.save(accessRestoreAction);
     }
 

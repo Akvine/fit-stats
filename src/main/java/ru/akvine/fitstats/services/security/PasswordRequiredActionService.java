@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.services.security;
 
 import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.security.OtpCreateNewAction;
 
 @Service
+@Slf4j
 public abstract class PasswordRequiredActionService <T extends AccountPasswordable & OneTimePasswordable> extends OtpActionService<T> {
     @Autowired
     protected ClientService clientService;
@@ -31,6 +33,9 @@ public abstract class PasswordRequiredActionService <T extends AccountPasswordab
             handleNoMorePasswordInvalidAttemptsLeft(action);
             throw new BadCredentialsException("Client reached limit of password invalid attempts");
         } else {
+            action = getRepository().save(action);
+            logger.info("Client with email = {} tried to initiate {}, but entered wrong account password. Invalid attempts left = {}",
+                    action.getLogin(), getActionName(), action.getPwdInvalidAttemptsLeft());
             throw new BadCredentialsException("Invalid password");
         }
     }
@@ -38,7 +43,9 @@ public abstract class PasswordRequiredActionService <T extends AccountPasswordab
     protected void handleNoMorePasswordInvalidAttemptsLeft(T action) {
         String login = action.getLogin();
         blockingService.setBlock(login);
+        logger.info("Client with email = {} reached limit for invalid password input and set blocked", login);
         getRepository().delete(action);
+        logger.info("Blocked client's with email = {} {}[id={}] removed from DB", login, getActionName(), action.getId());
     }
 
     protected abstract T createNewActionAndSendOtp(OtpCreateNewAction otpCreateNewAction);

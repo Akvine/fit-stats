@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.services.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BlockingService {
     private final BlockedCredentialsRepository blockedCredentialsRepository;
 
@@ -63,6 +65,7 @@ public class BlockingService {
         newBlockedCredentials.setBlockEndDate(newBlock.end);
 
         BlockedCredentialsEntity savedBlockedCredentials = blockedCredentialsRepository.save(newBlockedCredentials);
+        logger.info("Client with email = {} has been blocked!", login);
         return savedBlockedCredentials.getId();
     }
 
@@ -74,16 +77,17 @@ public class BlockingService {
             BlockTime blockInfo = blockEntry.getValue();
             if (LocalDateTime.now().isAfter(blockInfo.end)) {
                 if (!headerPrinted[0]) {
-                    // TODO : этот блок нужен для того, чтобы в логе написать, что очистка началась
+                    logger.info("Blocking cache cleaning started");
                     headerPrinted[0] = true;
                 }
+                logger.info("Blocking start = [{}], end = [{}] of client with email = [{}] is expired. Remove it from cache.", blockInfo.start, blockInfo.end, login);
                 return true;
             }
             return false;
         });
 
         if (headerPrinted[0]) {
-            // TODO : тоже самое. Здесь должно быть написано в логе, что очистка завершена
+            logger.info("Blocking cache cleaning ended");
         }
     }
 
@@ -93,14 +97,15 @@ public class BlockingService {
         List<BlockedCredentialsEntity> blockedCredentials = blockedCredentialsRepository.findExpired(LocalDateTime.now());
         blockedCredentials.forEach(block -> {
             if (!headerPrinted[0]) {
-                // TODO : этот блок нужен для того, чтобы в логе написать, что очистка началась
+                logger.info("BlockedCredentials table cleaning started");
                 headerPrinted[0] = true;
             }
+            logger.info("Blocking of client with email = {} has expired at = [{}]", block.getLogin(), block.getBlockEndDate());
             blockedCredentialsRepository.deleteById(block.getId());
         });
 
         if (headerPrinted[0]) {
-            // TODO : тоже самое. Здесь должно быть написано в логе, что очистка завершена
+            logger.info("BlockedCredentials table cleaning ended");
         }
     }
 

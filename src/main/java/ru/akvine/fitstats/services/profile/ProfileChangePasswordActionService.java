@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.profile;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.profile.ProfileChangePasswordActionEntity;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProfileChangePasswordActionService extends PasswordRequiredActionService<ProfileChangePasswordActionEntity> {
     private final ProfileChangePasswordActionRepository profileChangePasswordActionRepository;
     private final PasswordService passwordService;
@@ -28,8 +30,6 @@ public class ProfileChangePasswordActionService extends PasswordRequiredActionSe
     private int otpActionLifetimeSeconds;
     @Value("${security.otp.max.invalid.attempts}")
     private int otpMaxInvalidAttempts;
-    @Value("${security.otp.max.new.generation.per.action}")
-    private int otpMaxNewGenerationPerAction;
     @Value("${security.otp.password.max.invalid.attempts}")
     private int otpPasswordMaxInvalidAttempts;
 
@@ -117,17 +117,22 @@ public class ProfileChangePasswordActionService extends PasswordRequiredActionSe
 
         ProfileChangePasswordActionEntity profileChangePasswordAction = getRepository().findCurrentAction(login);
         if (profileChangePasswordAction == null) {
+            logger.info("Client with email = {} tried to {}, but action is not started", login, getActionName());
             throw new ActionNotStartedException("Can`t finish " + getActionName() + ", action not initiated!");
         }
 
         // Действие просрочено
         if (profileChangePasswordAction.getOtpAction().isActionExpired()) {
+            logger.info("Client with email = {} tired to finish action = {}, but action is expired", login, getActionName());
             getRepository().delete(profileChangePasswordAction);
+            logger.info("Expired action = {}[id={}] removed from DB", getActionName(), profileChangePasswordAction.getId());
             throw new ActionNotStartedException("Can`t finish " + getActionName() + ", action is expired!");
         }
 
         // Действие не просрочено, но просрочен код
         if (profileChangePasswordAction.getOtpAction().isExpiredOtp()) {
+            logger.info("Client with email = {} tried to finish action = {}, but otp is expired! New otp left = {}", login, getActionName(),
+                    profileChangePasswordAction.getOtpAction().getOtpCountLeft());
             throw new OtpExpiredException(profileChangePasswordAction.getOtpAction().getOtpCountLeft());
         }
 
@@ -135,6 +140,8 @@ public class ProfileChangePasswordActionService extends PasswordRequiredActionSe
         if (profileChangePasswordAction.getOtpAction().isOtpValid(otp)) {
             String newPasswordHash = profileChangePasswordAction.getNewHash();
             clientService.updatePassword(login, newPasswordHash);
+            logger.info("Client with email = {} successfully passed one-time-password and was updated his password", login);
+
             getRepository().delete(profileChangePasswordAction);
             return;
         }

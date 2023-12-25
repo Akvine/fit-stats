@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.security;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RegistrationActionService extends OtpActionService<RegistrationActionEntity> {
     private final RegistrationActionRepository registrationActionRepository;
     private final ClientService clientService;
@@ -105,12 +107,14 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
 
         RegistrationActionEntity registrationAction = getRepository().findCurrentAction(login);
         if (registrationAction == null) {
+            logger.info("Registration for email = {} not started yet!", login);
             throw new RegistrationNotStartedException("Registration not started yet");
         }
 
         // Действие просрочено
         if (registrationAction.getOtpAction().isActionExpired()) {
             getRepository().delete(registrationAction);
+            logger.info("Registration for email = {} not started yet!", login);
             throw new RegistrationNotStartedException("Registration not started yet!");
         }
 

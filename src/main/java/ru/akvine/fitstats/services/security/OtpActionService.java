@@ -33,6 +33,7 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
 
         T action = getRepository().findCurrentAction(payload);
         if (action == null) {
+            logger.info("Client tried to get new otp, but {} is not initiated", getActionName());
             throw new ActionNotStartedException("Can'[t generate new one-time-password, action not started!");
         }
 
@@ -40,7 +41,9 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
 
         // Действие просрочено
         if (action.getOtpAction().isActionExpired()) {
+            logger.info("Client with email = {} tried to get new otp, but {} is expired", action.getLogin(), getActionName());
             getRepository().delete(action);
+            logger.info("Expired {}[id = {}] removed from DB", getActionName(), action.getId());
             throw new ActionNotStartedException("Can't generate new one-time-password, action not started!");
         }
 
@@ -64,6 +67,7 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
     protected T checkOtpInput(String payload, String clientInput, String sessionId) {
         T action = getRepository().findCurrentAction(payload);
         if (action == null) {
+            logger.info("User tried to finish {}, but it is not initiated", getActionName());
             throw new ActionNotStartedException("Start registration action not started!");
         }
 
@@ -72,12 +76,16 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
         String login = action.getLogin();
         // Действие просрочено
         if (action.getOtpAction().isActionExpired()) {
+            logger.info("User with email = {} tried to finish {}, but action is expired!", login, getActionName());
             getRepository().delete(action);
+            logger.info("Expired {}[id = {}] removed from DB", getActionName(), action.getId());
             throw new ActionNotStartedException(String.format("Can't finish %s, action is expired!", getActionName()));
         }
 
         // Действие не просрочено, но просрочен код
         if (action.getOtpAction().isExpiredOtp()) {
+            logger.info("User with email = {} tried to finish {}, but otp is expired! New otp left = {}", login, getActionName(),
+                    action.getOtpAction().getOtpCountLeft());
             throw new OtpExpiredException(action.getOtpAction().getOtpCountLeft());
         }
         // Действие не просрочено и код еще активен - проверяем
@@ -101,13 +109,16 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
             return;
         }
 
+        logger.info("Blocked email = {} trying to perform action = {}. Block until date = {}", login, getActionName(), unblockDate);
         throw new BlockedCredentialsException(login);
     }
 
     protected void handleNoMoreNewOtp(T action) {
         String login = action.getLogin();
         blockingService.setBlock(login);
+        logger.info("Client with email = {} reached limit of maximum otp generation for {} and set blocked!", login, getActionName());
         getRepository().delete(action);
+        logger.info("Blocked client's action = {} for email = {}[id = {}] removed from DB", login, getActionName(), action.getId());
     }
 
     protected T updateNewOtpAndSendToClient(T action) {
@@ -148,13 +159,16 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
             return;
         }
 
+        logger.info("{} for email = {} can't be processed. Wrong session!", getActionName(), action.getLogin());
         throw new WrongSessionException("Wrong session");
     }
 
     protected void handleNoMoreOtpInvalidAttemptsLeft(T action) {
         String login = action.getLogin();
         blockingService.setBlock(login);
+        logger.info("Client with email = {} reached limit for invalid otp input and set blocked!", login);
         getRepository().delete(action);
+        logger.info("Blocked client's action = {} for email = {}[id = {}] removed from DB", login, getActionName(), action.getId());
     }
 
     protected void handleOtpInvalidAttempt(String login, int otpInvalidAttemptsLeft) {
