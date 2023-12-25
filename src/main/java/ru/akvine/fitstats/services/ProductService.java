@@ -3,16 +3,12 @@ package ru.akvine.fitstats.services;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.akvine.fitstats.entities.CategoryEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
-import ru.akvine.fitstats.exceptions.category.CategoryNotFoundException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
-import ru.akvine.fitstats.repositories.CategoryRepository;
 import ru.akvine.fitstats.repositories.ProductRepository;
 import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
@@ -22,7 +18,6 @@ import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +25,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
 
     private static final String EMPTY_SPACE = " ";
 
@@ -40,13 +34,6 @@ public class ProductService {
     public ProductBean add(ProductBean productBean) {
         Preconditions.checkNotNull(productBean, "productBean is null");
         logger.info("Try to add product by product bean = [{}]", productBean);
-
-        Set<String> categoriesTitles = productBean.getCategoriesTitles();
-        Set<CategoryEntity> categories = categoryRepository.findByTitles(categoriesTitles);
-        if (CollectionUtils.isEmpty(categories)) {
-            String errorMessage = String.format("No one of the presented categories = %s were found", categoriesTitles);
-            throw new CategoryNotFoundException(errorMessage);
-        }
 
         ProductEntity productEntity = new ProductEntity()
                 .setUuid(StringUtils.isBlank(productBean.getUuid()) ? UUIDGenerator.uuidWithoutDashes(uuidLength) : productBean.getUuid())
@@ -63,8 +50,7 @@ public class ProductService {
                         productBean.getProteins(),
                         productBean.getFats(),
                         productBean.getCarbohydrates(),
-                        productBean.getVol()))
-                .setCategories(categories);
+                        productBean.getVol()));
 
         ProductBean savedProductBean = new ProductBean(productRepository.save(productEntity));
         logger.info("Successful save product bean = [{}]", savedProductBean);

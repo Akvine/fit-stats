@@ -3,10 +3,7 @@ package ru.akvine.fitstats.services.dto.admin;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
-import ru.akvine.fitstats.services.dto.category.CategoryBean;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
-
-import java.util.stream.Collectors;
 
 import static ru.akvine.fitstats.utils.MathUtils.round;
 
@@ -23,7 +20,6 @@ public class ProductExport {
     private double vol;
     private double volume;
     private VolumeMeasurement measurement;
-    private String categoriesTitles;
 
     public ProductExport(ProductBean productBean) {
         this.uuid = productBean.getUuid();
@@ -36,10 +32,5 @@ public class ProductExport {
         this.vol = round(productBean.getVol(), 2);
         this.volume = round(productBean.getVolume(), 2);
         this.measurement = productBean.getMeasurement();
-        this.categoriesTitles = productBean
-                .getCategories()
-                .stream()
-                .map(CategoryBean::getTitle)
-                .collect(Collectors.joining(", "));
     }
 }

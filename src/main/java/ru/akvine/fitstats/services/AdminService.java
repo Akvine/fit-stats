@@ -67,8 +67,7 @@ public class AdminService {
                         .setVolume(Double.parseDouble(csvRow.getVolume()))
                         .setTitle(csvRow.getTitle())
                         .setProducer(csvRow.getProducer())
-                        .setMeasurement(VolumeMeasurement.safeValueOf(csvRow.getMeasurement()))
-                        .setCategoriesTitles(Arrays.stream(csvRow.getCategoriesTitles().split(COMMA)).collect(Collectors.toSet()));
+                        .setMeasurement(VolumeMeasurement.safeValueOf(csvRow.getMeasurement()));
                 productService.add(productBean);
             }
         });

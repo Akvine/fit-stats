@@ -6,7 +6,6 @@ import ru.akvine.fitstats.entities.base.SoftBaseEntity;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Data
 @Accessors(chain = true)
@@ -45,13 +44,6 @@ public class ProductEntity extends SoftBaseEntity {
 
     @Column(name = "VOLUME", nullable = false)
     private double volume;
-
-    @ManyToMany
-    @JoinTable(
-            name = "PRODUCT_CATEGORY",
-            joinColumns = @JoinColumn(name = "PRODUCT_ID"),
-            inverseJoinColumns = @JoinColumn(name = "CATEGORY_ID"))
-    private Set<CategoryEntity> categories;
 
     @Column(name = "MEASUREMENT")
     @Enumerated(EnumType.STRING)

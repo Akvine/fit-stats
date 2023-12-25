@@ -36,7 +36,4 @@ public class ProductCsvRow {
 
     @CsvBindByPosition(position = 9)
     private String measurement;
-
-    @CsvBindByPosition(position = 10)
-    private String categoriesTitles;
 }

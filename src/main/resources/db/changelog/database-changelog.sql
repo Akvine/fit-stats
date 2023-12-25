@@ -180,8 +180,8 @@ CREATE SEQUENCE SEQ_REGISTRATION_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
 --changeset lymar-sa:FIT-STATS-1-10
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'CATEGORY_ENTITY' and table_schema = 'public';
-CREATE TABLE CATEGORY_ENTITY
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TAG_ENTITY' and table_schema = 'public';
+CREATE TABLE TAG_ENTITY
 (
     ID           BIGINT       NOT NULL,
     CREATED_DATE TIMESTAMP    NOT NULL,
@@ -190,9 +190,9 @@ CREATE TABLE CATEGORY_ENTITY
     DELETED_DATE TIMESTAMP,
     TITLE        VARCHAR(128) NOT NULL,
     TYPE         VARCHAR(128) NOT NULL,
-    CONSTRAINT CATEGORY_ENTITY_PKEY PRIMARY KEY (ID)
+    CONSTRAINT TAG_ENTITY_PKEY PRIMARY KEY (ID)
 );
-CREATE SEQUENCE SEQ_CATEGORY_ENTITY START WITH 100 INCREMENT BY 1000;
+CREATE SEQUENCE SEQ_TAG_ENTITY START WITH 100 INCREMENT BY 1000;
 
 --changeset lymar-sa:FIT-STATS-1-11
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
@@ -222,117 +222,27 @@ CREATE SEQUENCE SEQ_OTP_COUNTER_ENTITY START WITH 1 INCREMENT BY 1000;
 
 --changeset lymar-sa:FIT-STATS-1-13
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PRODUCT_CATEGORY' and table_schema = 'public';
-CREATE TABLE PRODUCT_CATEGORY
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PRODUCT_TAG' and table_schema = 'public';
+CREATE TABLE PRODUCT_TAG
 (
     PRODUCT_ID  BIGINT NOT NULL,
-    CATEGORY_ID BIGINT NOT NULL,
-    PRIMARY KEY (PRODUCT_ID, CATEGORY_ID),
-    CONSTRAINT FK_PRODUCT_CATEGORY_PRODUCT FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT_ENTITY (ID),
-    CONSTRAINT FK_PRODUCT_CATEGORY_CATEGORY FOREIGN KEY (CATEGORY_ID) REFERENCES CATEGORY_ENTITY (ID)
+    TAG_ID BIGINT NOT NULL,
+    PRIMARY KEY (PRODUCT_ID, TAG_ID),
+    CONSTRAINT FK_PRODUCT_TAG_PRODUCT FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT_ENTITY (ID),
+    CONSTRAINT FK_PRODUCT_TAG_TAG FOREIGN KEY (TAG_ID) REFERENCES TAG_ENTITY (ID)
 );
 
 --changeset lymar-sa:FIT-STATS-1-14
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from CATEGORY_ENTITY;
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (1, 'Фрукты', 'FRUITS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (2, 'Овощи', 'VEGETABLES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (3, 'Зеленые овощи', 'GREEN_VEGETABLES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (4, 'Коренья', 'ROOTS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (5, 'Рис', 'RICE', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (6, 'Макароны', 'PASTA', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (7, 'Крупы', 'CEREALS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (8, 'Мучное', 'FLOUR', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (9, 'Молочное', 'MILK', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (10, 'Йогурт', 'YOGURT', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (11, 'Творожные', 'COTTAGE_CHEESE', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (12, 'Говядина', 'BEEF', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (13, 'Курица', 'CHICKEN', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (14, 'Индейка', 'TURKEY', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (15, 'Рыбное', 'FISH', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (16, 'Свинина', 'PORK', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (17, 'Замороженные овощи', 'FROZEN_VEGETABLES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (18, 'Замороженные фруты', 'FROZEN_FRUITS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (19, 'Замороженные полуфабрикаты', 'FROZEN_SEMI_FINISHED_PRODUCTS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (20, 'Сахар', 'SUGAR', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (21, 'Соленое', 'SALT', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (22, 'Мед', 'HONEY', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (23, 'Подсолнечное масло', 'SUNFLOWER_OIL', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (24, 'Вода', 'WATER', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (25, 'Соки', 'JUICES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (26, 'Чаи', 'TEA', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (27, 'Кофе', 'COFFEE', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (28, 'Органические продукты', 'ORGANIC_PRODUCTS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (29, 'Безглютеновые продукты', 'GLUTEN_FREE_PRODUCTS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (30, 'Протеиновые продукты', 'PROTEIN_PRODUCTS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (31, 'Детские кашы', 'BABY_PORRIDGE', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (32, 'Детские соки', 'BABY_JUICES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (33, 'Детское печенье', 'CHILDREN_COOKIES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (34, 'Копчености', 'SMOKED_MEATS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (35, 'Маслины', 'OLIVES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (36, 'Крекеры', 'CRACKERS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (37, 'Шоколад', 'CHOCOLATE', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (38, 'Конфеты', 'CANDIES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (39, 'Печенье', 'COOKIES', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (40, 'Зефир', 'MARSHMALLOWS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (41, 'Чипсы', 'CHIPS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (42, 'Газированные напитки', 'CARBONATED_DRINKS', '2023-11-19', false);
-INSERT INTO CATEGORY_ENTITY (ID, TITLE, TYPE, CREATED_DATE, IS_DELETED)
-VALUES (43, 'Энергетики', 'ENERGETICS', '2023-11-19', false);
-
---changeset lymar-sa:FIT-STATS-1-15
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'PRODUCT_ENTITY' and upper(column_name) = 'VOL' AND table_schema = 'public'
 ALTER TABLE PRODUCT_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;
 
---changeset lymar-sa:FIT-STATS-1-16
+--changeset lymar-sa:FIT-STATS-1-15
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'DIET_RECORD_ENTITY' and upper(column_name) = 'VOL' AND table_schema = 'public'
 ALTER TABLE DIET_RECORD_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;
 
---changeset lymar-sa:FIT-STATS-1-17
+--changeset lymar-sa:FIT-STATS-1-16
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'ACCESS_RESTORE_ACTION_ENTITY' and table_schema = 'public';
 CREATE TABLE ACCESS_RESTORE_ACTION_ENTITY
@@ -353,7 +263,7 @@ CREATE TABLE ACCESS_RESTORE_ACTION_ENTITY
 );
 CREATE SEQUENCE SEQ_ACCESS_RESTORE_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-18
+--changeset lymar-sa:FIT-STATS-1-17
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PROFILE_DELETE_ACTION_ENTITY' and table_schema = 'public';
 CREATE TABLE PROFILE_DELETE_ACTION_ENTITY
@@ -374,7 +284,7 @@ CREATE TABLE PROFILE_DELETE_ACTION_ENTITY
 );
 CREATE SEQUENCE SEQ_PROFILE_DELETE_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-19
+--changeset lymar-sa:FIT-STATS-1-18
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PROFILE_CHANGE_EMAIL_ACTION_ENTITY' and table_schema = 'public';
 CREATE TABLE PROFILE_CHANGE_EMAIL_ACTION_ENTITY
@@ -396,7 +306,7 @@ CREATE TABLE PROFILE_CHANGE_EMAIL_ACTION_ENTITY
 );
 CREATE SEQUENCE SEQ_PROFILE_CHANGE_EMAIL_ENTITY_ACTION START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-20
+--changeset lymar-sa:FIT-STATS-1-19
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PROFILE_CHANGE_PASSWORD_ACTION_ENTITY' and table_schema = 'public';
 CREATE TABLE PROFILE_CHANGE_PASSWORD_ACTION_ENTITY
@@ -418,7 +328,7 @@ CREATE TABLE PROFILE_CHANGE_PASSWORD_ACTION_ENTITY
 );
 CREATE SEQUENCE SEQ_PROFILE_CHANGE_PASSWORD_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-21
+--changeset lymar-sa:FIT-STATS-1-20
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'WEIGHT_RECORD_ENTITY' and table_schema = 'public';
 CREATE TABLE WEIGHT_RECORD_ENTITY (
@@ -433,7 +343,7 @@ CREATE TABLE WEIGHT_RECORD_ENTITY (
 );
 CREATE SEQUENCE SEQ_WEIGHT_RECORD_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-22
+--changeset lymar-sa:FIT-STATS-1-21
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_AUTH_CODE_ENTITY' and table_schema = 'public';
 CREATE TABLE TELEGRAM_AUTH_CODE_ENTITY (
@@ -447,7 +357,7 @@ CREATE TABLE TELEGRAM_AUTH_CODE_ENTITY (
 );
 CREATE SEQUENCE SEQ_TELEGRAM_AUTH_CODE_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-23
+--changeset lymar-sa:FIT-STATS-1-22
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_SUBSCRIPTION_ENTITY' and table_schema = 'public';
 CREATE TABLE TELEGRAM_SUBSCRIPTION_ENTITY (
@@ -464,7 +374,7 @@ CREATE TABLE TELEGRAM_SUBSCRIPTION_ENTITY (
 );
 CREATE SEQUENCE SEQ_TELEGRAM_SUBSCRIPTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-24
+--changeset lymar-sa:FIT-STATS-1-23
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY' and table_schema = 'public';
 CREATE TABLE TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY (

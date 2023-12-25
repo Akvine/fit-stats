@@ -30,8 +30,7 @@ public class ProductConverter {
                 .setTitle(request.getTitle())
                 .setProducer(request.getProducer())
                 .setVolume(DEFAULT_PRODUCT_VOLUME)
-                .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()))
-                .setCategoriesTitles(request.getCategories());
+                .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()));
     }
 
     public ProductResponse convertToProductResponse(ProductBean productBean) {

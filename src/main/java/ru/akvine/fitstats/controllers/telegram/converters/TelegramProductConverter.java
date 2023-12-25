@@ -44,8 +44,7 @@ public class TelegramProductConverter {
                 .setVolume(DEFAULT_PRODUCT_VOLUME)
                 .setCarbohydrates(request.getCarbohydrates())
                 .setVol(request.getVol())
-                .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()))
-                .setCategoriesTitles(request.getCategories());
+                .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()));
     }
 
     public SendMessage convertToProductAddResponse(String chatId, ProductBean productBean) {
