@@ -57,6 +57,7 @@ public class DietService {
     public Macronutrients calculate(BiometricBean biometricBean, Diet diet) {
         Preconditions.checkNotNull(biometricBean, "biometricBean is null");
         Preconditions.checkNotNull(diet, "diet is null");
+        logger.info("Try to calculate macronutrients by biometricBean = [{}] and diet data = [{}]", biometricBean, diet);
 
         Gender gender = biometricBean.getGender();
         PhysicalActivity physicalActivity = biometricBean.getPhysicalActivity();
@@ -98,6 +99,7 @@ public class DietService {
     @Transactional
     public AddDietRecordFinish add(AddDietRecordStart addDietRecordStart) {
         Preconditions.checkNotNull(addDietRecordStart, "addDietRecordStart is null");
+        logger.info("Try to add diet record = [{}]", addDietRecordStart);
 
         String clientUuid = addDietRecordStart.getClientUuid();
         ClientEntity clientEntity = clientRepository
@@ -148,6 +150,7 @@ public class DietService {
         List<DietRecordEntity> records = dietRecordRepository.findByDate(clientUuid, LocalDate.now());
         applicationEventPublisher.publishEvent(new AddDietRecordEvent(new Object(), clientId, dietSettingEntity, records));
 
+        logger.info("Successful add diet record = [{}]", dietRecordBean);
         return new AddDietRecordFinish()
                 .setUuid(dietRecordBean.getUuid())
                 .setProductTitle(productEntity.getTitle())
@@ -163,6 +166,7 @@ public class DietService {
 
     public DietRecordBean add(DietRecordBean dietRecordBean) {
         Preconditions.checkNotNull(dietRecordBean, "dietRecordBean is null");
+        logger.info("Try to add diet record = [{}]", dietRecordBean);
 
         String clientUuid = dietRecordBean.getClientBean().getUuid();
         ClientEntity clientEntity = clientRepository
@@ -184,12 +188,15 @@ public class DietService {
                 .setClient(clientEntity)
                 .setProduct(productEntity);
 
-        return new DietRecordBean(dietRecordRepository.save(dietRecordEntity));
+        DietRecordBean savedDietRecordBean = new DietRecordBean(dietRecordRepository.save(dietRecordEntity));
+        logger.info("Successful add diet record = [{}]", savedDietRecordBean);
+        return savedDietRecordBean;
     }
 
     @Transactional
     public List<DietRecordBean> list(ListRecord listRecord) {
         Preconditions.checkNotNull(listRecord, "listRecord is null");
+        logger.info("Try to get list diet records = [{}]", listRecord);
 
         String clientUuid = listRecord.getClientUuid();
         clientRepository
@@ -212,6 +219,7 @@ public class DietService {
 
     public void deleteRecords(DeleteRecord deleteRecord) {
         Preconditions.checkNotNull(deleteRecord, "deleteRecords is null");
+        logger.info("Try to delete record = [{}]", deleteRecord);
 
         String clientUuid = deleteRecord.getClientUuid();
         clientRepository
@@ -235,6 +243,7 @@ public class DietService {
 
     public DietDisplay display(Display display) {
         Preconditions.checkNotNull(display, "display is null");
+        logger.info("Display diet macronutrients = [{}]", display);
 
         String clientUuid = display.getClientUuid();
         clientRepository

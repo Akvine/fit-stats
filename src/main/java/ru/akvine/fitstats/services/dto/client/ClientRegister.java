@@ -3,6 +3,7 @@ package ru.akvine.fitstats.services.dto.client;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.enums.*;
 
@@ -11,6 +12,7 @@ import ru.akvine.fitstats.enums.*;
 @NoArgsConstructor
 public class ClientRegister {
     private String email;
+    @ToStringExclude
     private String password;
     private String firstName;
     private String secondName;

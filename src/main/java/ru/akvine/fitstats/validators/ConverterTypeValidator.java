@@ -1,5 +1,6 @@
 package ru.akvine.fitstats.validators;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.enums.ConverterType;
@@ -7,6 +8,7 @@ import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 
 @Component
+@Slf4j
 public class ConverterTypeValidator implements Validator<String> {
     @Override
     public void validate(String converterType) {

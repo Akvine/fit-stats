@@ -18,6 +18,7 @@ import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.services.AdminService;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
+import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.validation.Valid;
 

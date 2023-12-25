@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -70,15 +71,18 @@ public class ProfileService {
 
     public byte[] exportRecords(ProfileDownload profileDownload) {
         Preconditions.checkNotNull(profileDownload, "profileDownload is null");
+        logger.info("Export records for client with uuid = {}", profileDownload.getClientUuid());
 
         DateRange getDateRange = getDateRange(profileDownload);
         List<DietRecordExport> dietRecordsExport = dietService.findByDateRange(
                 profileDownload.getClientUuid(),
                 getDateRange.getStartDate(),
                 getDateRange.getEndDate());
-        return availableConverters
+        byte[] records = availableConverters
                 .get(profileDownload.getConverterType())
                 .convert(dietRecordsExport, DietRecordExport.class);
+        logger.info("Successful export records for client with uuid = {}", profileDownload.getClientUuid());
+        return records;
     }
 
     public void importRecords(ImportRecords importRecords) {
@@ -86,6 +90,7 @@ public class ProfileService {
 
         String clientUuid = importRecords.getClientUuid();
         List<?> records = importRecords.getRecords();
+        logger.info("Import records for client with uuid = {}", importRecords.getClientUuid());
 
         // TODO : получение списка продуктов через цикл - может нагружать БД
 
@@ -108,10 +113,12 @@ public class ProfileService {
                 dietService.add(dietRecordBean);
             }
         });
+        logger.info("Successful import records for client with uuid = {}", clientUuid);
     }
 
     public BiometricBean updateBiometric(UpdateBiometric updateBiometric) {
         Preconditions.checkNotNull(updateBiometric, "updateBiometric is null");
+        logger.info("Update biometric for client with uuid = {}", updateBiometric.getClientUuid());
 
         String clientUuid = updateBiometric.getClientUuid();
         BiometricEntity biometricEntity = biometricService.verifyExistsAndGet(clientUuid);
@@ -142,6 +149,7 @@ public class ProfileService {
             dietSettingRepository.save(dietSettingEntity);
         }
 
+        logger.info("Successful update biometric data for client with uuid = {}", clientUuid);
         return savedBiometricBean;
     }
 
@@ -158,7 +166,7 @@ public class ProfileService {
         DateRange findDateRange;
 
         if (profileDownload.getDuration() != null) {
-            switch (duration) {
+            switch (Objects.requireNonNull(duration)) {
                 case DAY:
                     findDateRange = getDayRange();
                     break;

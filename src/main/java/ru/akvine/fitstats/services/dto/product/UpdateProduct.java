@@ -13,6 +13,9 @@ public class UpdateProduct {
     @NotBlank
     private String uuid;
 
+    @NotBlank
+    private String clientUuid;
+
     @Nullable
     private String title;
 

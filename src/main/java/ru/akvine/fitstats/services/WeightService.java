@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.WeightRecordEntity;
@@ -22,14 +23,16 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WeightService {
     private final ProfileService profileService;
     private final WeightRecordRepository weightRecordRepository;
     private final ClientService clientService;
 
-    public ListWeightResult list() {
+    public ListWeightResult list(String clientUuid) {
+        logger.info("List weights for client with uuid = {}", clientUuid);
         Map<String, String> weights = weightRecordRepository
-                .findAll()
+                .findAll(clientUuid)
                 .stream()
                 .collect(toMap(weight -> weight.getDate().toString(), WeightRecordEntity::getValue));
         return new ListWeightResult(weights);
@@ -37,6 +40,7 @@ public class WeightService {
 
     public void change(ChangeWeight changeWeight) {
         Preconditions.checkNotNull(changeWeight, "changeWeight is null");
+        logger.info("Add or change weight data for client by = [{}]", changeWeight);
 
         String clientUuid = changeWeight.getClientUuid();
         ClientEntity clientEntity = clientService.verifyExistsByUuidAndGet(clientUuid);
@@ -48,7 +52,7 @@ public class WeightService {
             date = LocalDate.now();
         }
 
-        Optional<WeightRecordEntity> weightOptional = weightRecordRepository.findByDate(date);
+        Optional<WeightRecordEntity> weightOptional = weightRecordRepository.findByDate(date, clientUuid);
         if (weightOptional.isPresent()) {
             WeightRecordEntity weightRecord = weightOptional.get();
             weightRecord.setValue(changeWeight.getWeight());
@@ -68,10 +72,11 @@ public class WeightService {
         }
     }
 
-    public void delete(LocalDate date) {
+    public void delete(LocalDate date, String clientUuid) {
+        logger.info("Delete weight data for client with uuid = {} and date = {}", clientUuid, date);
         LocalDate findDate = Objects.requireNonNullElseGet(date, LocalDate::now);
         WeightRecordEntity weightRecord = weightRecordRepository
-                .findByDate(findDate)
+                .findByDate(findDate, clientUuid)
                 .orElseThrow(() -> new WeightRecordNotFoundException("Weight record not found by date = [" + findDate.toString() + "]"));
         weightRecordRepository.delete(weightRecord);
     }

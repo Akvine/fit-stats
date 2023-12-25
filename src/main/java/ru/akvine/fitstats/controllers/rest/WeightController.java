@@ -13,6 +13,7 @@ import ru.akvine.fitstats.controllers.rest.validators.WeightValidator;
 import ru.akvine.fitstats.services.WeightService;
 import ru.akvine.fitstats.services.dto.weight.ChangeWeight;
 import ru.akvine.fitstats.services.dto.weight.ListWeightResult;
+import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.validation.Valid;
 
@@ -25,7 +26,8 @@ public class WeightController implements WeightControllerMeta {
 
     @Override
     public Response list() {
-        ListWeightResult result = weightService.list();
+        String clientUuid = SecurityUtils.getCurrentUser().getUuid();
+        ListWeightResult result = weightService.list(clientUuid);
         return weightConverter.convertToListWeightResponse(result);
     }
 
@@ -39,7 +41,8 @@ public class WeightController implements WeightControllerMeta {
 
     @Override
     public Response delete(@Valid DeleteWeightRequest request) {
-        weightService.delete(request.getDate());
+        String clientUuid = SecurityUtils.getCurrentUser().getUuid();
+        weightService.delete(request.getDate(), clientUuid);
         return new SuccessfulResponse();
     }
 }

@@ -16,7 +16,7 @@ public class DietSettingService {
 
     public DietSettingEntity verifyExistsAndGet(String clientUuid) {
         Preconditions.checkNotNull(clientUuid, "clientUuid is null");
-
+        logger.info("Verify diet setting entity data exists for client with uuid = {}", clientUuid);
         return dietSettingRepository.findByClientUuid(clientUuid)
                 .orElseThrow(() -> new DietSettingNotFoundException("Diet setting with client uuid = [" + clientUuid + "] not found!"));
     }

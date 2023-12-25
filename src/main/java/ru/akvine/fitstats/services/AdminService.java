@@ -52,6 +52,7 @@ public class AdminService {
 
     public void importProducts(ImportProducts importProducts) {
         Preconditions.checkNotNull(importProducts, "importProducts is null");
+        logger.info("Import products by clientUuid = {}", importProducts.getClientUuid());
 
         List<?> records = importProducts.getRecords();
         records.forEach(record -> {
@@ -75,6 +76,7 @@ public class AdminService {
 
     public ProductBean updateProduct(UpdateProduct updateProduct) {
         Preconditions.checkNotNull(updateProduct, "updateProduct is null");
+        logger.info("Update product by clientUuid = {}", updateProduct.getClientUuid());
         return productService.update(updateProduct);
     }
 

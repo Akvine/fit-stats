@@ -75,6 +75,7 @@ public class AdminConverter {
 
     public UpdateProduct convertToUpdateProduct(UpdateProductRequest request) {
         return new UpdateProduct()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .setUuid(request.getUuid())
                 .setMeasurement(StringUtils.isBlank(request.getMeasurement()) ? null : VolumeMeasurement.valueOf(request.getMeasurement()))
                 .setTitle(request.getTitle())

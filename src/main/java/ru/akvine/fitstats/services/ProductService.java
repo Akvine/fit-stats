@@ -39,6 +39,7 @@ public class ProductService {
 
     public ProductBean add(ProductBean productBean) {
         Preconditions.checkNotNull(productBean, "productBean is null");
+        logger.info("Try to add product by product bean = [{}]", productBean);
 
         Set<String> categoriesTitles = productBean.getCategoriesTitles();
         Set<CategoryEntity> categories = categoryRepository.findByTitles(categoriesTitles);
@@ -46,6 +47,7 @@ public class ProductService {
             String errorMessage = String.format("No one of the presented categories = %s were found", categoriesTitles);
             throw new CategoryNotFoundException(errorMessage);
         }
+
         ProductEntity productEntity = new ProductEntity()
                 .setUuid(StringUtils.isBlank(productBean.getUuid()) ? UUIDGenerator.uuidWithoutDashes(uuidLength) : productBean.getUuid())
                 .setTitle(productBean.getTitle())
@@ -63,11 +65,15 @@ public class ProductService {
                         productBean.getCarbohydrates(),
                         productBean.getVol()))
                 .setCategories(categories);
-        return new ProductBean(productRepository.save(productEntity));
+
+        ProductBean savedProductBean = new ProductBean(productRepository.save(productEntity));
+        logger.info("Successful save product bean = [{}]", savedProductBean);
+        return savedProductBean;
     }
 
     public ProductBean update(UpdateProduct updateProduct) {
         Preconditions.checkNotNull(updateProduct, "updateProduct is null");
+        logger.info("Try to update product = [{}] by client with uuid = {}", updateProduct, updateProduct.getClientUuid());
         ProductEntity productEntity = verifyExistsAndGet(updateProduct.getUuid());
 
         boolean macronutrientsUpdated = false;
@@ -107,11 +113,14 @@ public class ProductService {
         }
 
         productEntity.setUpdatedDate(LocalDateTime.now());
-        return new ProductBean(productRepository.save(productEntity));
+        ProductBean savedProductBean = new ProductBean(productRepository.save(productEntity));
+        logger.info("Successful save product = [{}]", savedProductBean);
+        return savedProductBean;
     }
 
     public void deleteByUuid(String uuid) {
         Preconditions.checkNotNull(uuid, "product uuid is null");
+        logger.info("Delete product by uuid = {}", uuid);
         ProductEntity productEntity = verifyExistsAndGet(uuid);
 
         productEntity.setDeleted(true);
@@ -121,6 +130,7 @@ public class ProductService {
     }
 
     public List<ProductBean> getAll() {
+        logger.info("Get all products");
         return findByFilter(new Filter());
     }
 
