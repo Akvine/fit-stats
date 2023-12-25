@@ -14,6 +14,10 @@ public class DietUtils {
 
     private static final int DEFAULT_VOLUME = 100;
 
+    private static final double HEIGHT_COEFFICIENT = 6.25;
+    private static final double WEIGHT_COEFFICIENT = 10;
+    private static final double AGE_COEFFICIENT = 5;
+
     @NotNull
     public static Macronutrients calculateMacronutrients(
             double proteinsPer100,
@@ -30,12 +34,7 @@ public class DietUtils {
             double carbohydratesPer100,
             double volPer100,
             double grams) {
-        double proteins = proteinsPer100 * grams / DEFAULT_VOLUME;
-        double fats = fatsPer100 * grams / DEFAULT_VOLUME;
-        double carbohydrates = carbohydratesPer100 * grams / DEFAULT_VOLUME;
-        double vol = volPer100 * grams / DEFAULT_VOLUME;
-        double calories = calculateCalories(proteins, fats, carbohydrates, vol);
-        return new Macronutrients(proteins, fats, carbohydrates, vol, calories);
+        return getMacronutrients(proteinsPer100, fatsPer100, carbohydratesPer100, volPer100, DEFAULT_VOLUME, grams);
     }
 
     public static Macronutrients transformPer100(double proteins,
@@ -43,12 +42,7 @@ public class DietUtils {
                                                  double carbohydrates,
                                                  double vol,
                                                  double volume) {
-        double proteinsPer100 = proteins * DEFAULT_VOLUME / volume;
-        double fatsPer100 = fats * DEFAULT_VOLUME / volume;
-        double carbohydratesPer100 = carbohydrates * DEFAULT_VOLUME / volume;
-        double volPer100 = vol * DEFAULT_VOLUME / volume;
-        double caloriesPer100 = calculateCalories(proteinsPer100, fatsPer100, carbohydratesPer100, volPer100);
-        return new Macronutrients(proteinsPer100, fatsPer100, carbohydratesPer100, volPer100, caloriesPer100);
+        return getMacronutrients(proteins, fats, carbohydrates, vol, volume, DEFAULT_VOLUME);
     }
 
     public static double calculateCalories(double proteins, double fats, double carbohydrates, double vol) {
@@ -70,9 +64,9 @@ public class DietUtils {
                                                 double weight) {
         switch (gender) {
             case MALE:
-                return (10 * weight) + (6.25 * height) - (5 * age) + 5;
+                return (WEIGHT_COEFFICIENT * weight) + (HEIGHT_COEFFICIENT * height) - (AGE_COEFFICIENT * age) + 5;
             case FEMALE:
-                return (10 * weight) + (6.25 * height) - (5 * age) - 161;
+                return (WEIGHT_COEFFICIENT * weight) + (HEIGHT_COEFFICIENT * height) - (AGE_COEFFICIENT * age) - 161;
             default:
                 throw new IllegalStateException("Gender [" + gender + "] is not supported!");
         }
@@ -87,5 +81,14 @@ public class DietUtils {
      */
     public static double calculateDailyCaloriesIntake(double basicExchangeCalories, PhysicalActivity physicalActivity) {
         return basicExchangeCalories * physicalActivity.getValue();
+    }
+
+    private static Macronutrients getMacronutrients(double proteins, double fats, double carbohydrates, double vol, double volume, double defaultVolume) {
+        double proteinsPer100 = proteins * defaultVolume / volume;
+        double fatsPer100 = fats * defaultVolume / volume;
+        double carbohydratesPer100 = carbohydrates * defaultVolume / volume;
+        double volPer100 = vol * defaultVolume / volume;
+        double caloriesPer100 = calculateCalories(proteinsPer100, fatsPer100, carbohydratesPer100, volPer100);
+        return new Macronutrients(proteinsPer100, fatsPer100, carbohydratesPer100, volPer100, caloriesPer100);
     }
 }

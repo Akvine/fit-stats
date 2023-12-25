@@ -390,16 +390,4 @@ public class StatisticService {
         }
         return findDateRange;
     }
-
-    private Map<String, DietStatisticHistory> sort(Map<LocalDate, DietStatisticHistory> history) {
-        Map<LocalDate, DietStatisticHistory> sortedHistoryLocalDateMap = new TreeMap<>();
-        Map<String, DietStatisticHistory> sortedHistoryStringMap = new LinkedHashMap<>();
-        for (Map.Entry<LocalDate, DietStatisticHistory> entry : history.entrySet()) {
-            sortedHistoryLocalDateMap.put(entry.getKey(), entry.getValue());
-        }
-        for (Map.Entry<LocalDate, DietStatisticHistory> entry : sortedHistoryLocalDateMap.entrySet()) {
-            sortedHistoryStringMap.put(entry.getKey().toString(), entry.getValue());
-        }
-        return sortedHistoryStringMap;
-    }
 }

@@ -49,7 +49,16 @@ public class DietService {
     private final static double GAIN_FATS_COEFFICIENT = 1.2;
     private final static double DRYING_FATS_COEFFICIENT = 0.7;
 
-    private static final int SINGLE_ELEMENT = 0;
+    private final static int SINGLE_ELEMENT = 0;
+
+    private final static int MALE_HEIGHT_COEFFICIENT = 100;
+    private final static int FEMALE_HEIGHT_COEFFICIENT = 110;
+
+    private final static int PROTEINS_CALORIES_COEFFICIENT = 4;
+    private final static int CARBOHYDRATES_CALORIES_COEFFICIENT = 4;;
+    private final static int FATS_CALORIES_COEFFICIENT = 9;
+
+    private final static int VOL_ZERO = 0;
 
     @Value("${uuid.length}")
     private int length;
@@ -85,15 +94,15 @@ public class DietService {
                 break;
             case DRYING:
                 maxCalories = dailyCaloriesIntake - dailyCaloriesIntake * 0.2;
-                maxProteins = gender == Gender.MALE ? (height - 100) * GAIN_PROTEIN_COEFFICIENT
-                        : (height - 110) * GAIN_PROTEIN_COEFFICIENT;
-                maxFats = gender == Gender.MALE ? (height - 100) * DRYING_FATS_COEFFICIENT : (height - 110) * DRYING_FATS_COEFFICIENT;
+                maxProteins = gender == Gender.MALE ? (height - MALE_HEIGHT_COEFFICIENT) * GAIN_PROTEIN_COEFFICIENT
+                        : (height - FEMALE_HEIGHT_COEFFICIENT) * GAIN_PROTEIN_COEFFICIENT;
+                maxFats = gender == Gender.MALE ? (height - MALE_HEIGHT_COEFFICIENT) * DRYING_FATS_COEFFICIENT : (height - FEMALE_HEIGHT_COEFFICIENT) * DRYING_FATS_COEFFICIENT;
                 break;
             default:
                 throw new IllegalStateException("Diet type = [" + diet + "] is not supported!");
         }
-        maxCarbohydrates = (maxCalories - (maxProteins * 4 + maxFats * 9)) / 4;
-        return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, 0, maxCalories);
+        maxCarbohydrates = (maxCalories - (maxProteins * PROTEINS_CALORIES_COEFFICIENT + maxFats * FATS_CALORIES_COEFFICIENT)) / CARBOHYDRATES_CALORIES_COEFFICIENT;
+        return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, VOL_ZERO, maxCalories);
     }
 
     @Transactional
