@@ -61,7 +61,7 @@ public class BaseMessagesFactory {
     public SendMessage getDietRecordDeleteInputWaiting(String chatId) {
         return new SendMessage(
                 chatId,
-                "Введите uuid продукта, который собираетесь удалить: "
+                "Введите uuid записи, которую собираетесь удалить: "
         );
     }
 
