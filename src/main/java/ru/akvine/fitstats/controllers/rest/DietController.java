@@ -41,7 +41,7 @@ public class DietController implements DietControllerMeta {
     @Override
     public Response delete(@Valid DeleteRecordRequest request) {
         DeleteRecord deleteRecord = dietConverter.convertToDeleteRecord(request);
-        dietService.deleteRecords(deleteRecord);
+        dietService.deleteRecord(deleteRecord);
         return new SuccessfulResponse();
     }
 

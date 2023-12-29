@@ -25,6 +25,7 @@ import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.services.processors.format.Converter;
 import ru.akvine.fitstats.utils.DateUtils;
+import ru.akvine.fitstats.utils.DietUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -139,7 +140,7 @@ public class ProfileService {
 
         if (updateBiometric.isUpdateDietSetting()) {
             DietSettingEntity dietSettingEntity = dietSettingService.verifyExistsAndGet(clientUuid);
-            Macronutrients macronutrients = dietService.calculate(savedBiometricBean, dietSettingEntity.getDiet());
+            Macronutrients macronutrients = DietUtils.calculate(savedBiometricBean, dietSettingEntity.getDiet());
 
             dietSettingEntity.setMaxProteins(macronutrients.getProteins());
             dietSettingEntity.setMaxFats(macronutrients.getFats());

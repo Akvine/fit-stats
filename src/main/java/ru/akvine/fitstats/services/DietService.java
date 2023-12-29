@@ -11,9 +11,6 @@ import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
-import ru.akvine.fitstats.enums.Diet;
-import ru.akvine.fitstats.enums.Gender;
-import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
@@ -21,11 +18,9 @@ import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
-import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.services.listeners.AddDietRecordEvent;
-import ru.akvine.fitstats.utils.DietUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDate;
@@ -45,65 +40,10 @@ public class DietService {
     private final ProductService productService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private final static double GAIN_PROTEIN_COEFFICIENT = 1.7;
-    private final static double GAIN_FATS_COEFFICIENT = 1.2;
-    private final static double DRYING_FATS_COEFFICIENT = 0.7;
-
     private final static int SINGLE_ELEMENT = 0;
-
-    private final static int MALE_HEIGHT_COEFFICIENT = 100;
-    private final static int FEMALE_HEIGHT_COEFFICIENT = 110;
-
-    private final static int PROTEINS_CALORIES_COEFFICIENT = 4;
-    private final static int CARBOHYDRATES_CALORIES_COEFFICIENT = 4;;
-    private final static int FATS_CALORIES_COEFFICIENT = 9;
-
-    private final static int VOL_ZERO = 0;
 
     @Value("${uuid.length}")
     private int length;
-
-    public Macronutrients calculate(BiometricBean biometricBean, Diet diet) {
-        Preconditions.checkNotNull(biometricBean, "biometricBean is null");
-        Preconditions.checkNotNull(diet, "diet is null");
-        logger.info("Try to calculate macronutrients by biometricBean = [{}] and diet data = [{}]", biometricBean, diet);
-
-        Gender gender = biometricBean.getGender();
-        PhysicalActivity physicalActivity = biometricBean.getPhysicalActivity();
-        int age = biometricBean.getAge();
-        double height = Double.parseDouble(biometricBean.getHeight());
-        double weight = Double.parseDouble(biometricBean.getWeight());
-
-        double basicExchange = DietUtils.calculateBasicExchange(gender, age, height, weight);
-        double dailyCaloriesIntake = DietUtils.calculateDailyCaloriesIntake(basicExchange, physicalActivity);
-
-        double maxCalories = dailyCaloriesIntake;
-        double maxProteins;
-        double maxFats;
-        double maxCarbohydrates;
-
-        switch (diet) {
-            case GAIN:
-                maxCalories = dailyCaloriesIntake + dailyCaloriesIntake * 0.15;
-                maxProteins = weight * GAIN_PROTEIN_COEFFICIENT;
-                maxFats = weight * GAIN_FATS_COEFFICIENT;
-                break;
-            case RETENTION:
-                maxProteins = weight;
-                maxFats = weight;
-                break;
-            case DRYING:
-                maxCalories = dailyCaloriesIntake - dailyCaloriesIntake * 0.2;
-                maxProteins = gender == Gender.MALE ? (height - MALE_HEIGHT_COEFFICIENT) * GAIN_PROTEIN_COEFFICIENT
-                        : (height - FEMALE_HEIGHT_COEFFICIENT) * GAIN_PROTEIN_COEFFICIENT;
-                maxFats = gender == Gender.MALE ? (height - MALE_HEIGHT_COEFFICIENT) * DRYING_FATS_COEFFICIENT : (height - FEMALE_HEIGHT_COEFFICIENT) * DRYING_FATS_COEFFICIENT;
-                break;
-            default:
-                throw new IllegalStateException("Diet type = [" + diet + "] is not supported!");
-        }
-        maxCarbohydrates = (maxCalories - (maxProteins * PROTEINS_CALORIES_COEFFICIENT + maxFats * FATS_CALORIES_COEFFICIENT)) / CARBOHYDRATES_CALORIES_COEFFICIENT;
-        return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, VOL_ZERO, maxCalories);
-    }
 
     @Transactional
     public AddDietRecordFinish add(AddDietRecordStart addDietRecordStart) {
@@ -226,7 +166,7 @@ public class DietService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteRecords(DeleteRecord deleteRecord) {
+    public void deleteRecord(DeleteRecord deleteRecord) {
         Preconditions.checkNotNull(deleteRecord, "deleteRecords is null");
         logger.info("Try to delete record = [{}]", deleteRecord);
 
@@ -248,6 +188,7 @@ public class DietService {
         }
 
         dietRecordRepository.delete(dietRecordEntity);
+        logger.info("Successful delete record with uuid = {} for client with uuid = {}", deleteRecord.getRecordUuid(), deleteRecord.getClientUuid());
     }
 
     public DietDisplay display(Display display) {

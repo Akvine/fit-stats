@@ -18,6 +18,7 @@ import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
+import ru.akvine.fitstats.utils.DietUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDateTime;
@@ -62,7 +63,7 @@ public class ClientService {
                 .setHeightMeasurement(clientRegister.getHeightMeasurement())
                 .setWeightMeasurement(clientRegister.getWeightMeasurement())
                 .setClientEntity(savedClientEntity);
-        Macronutrients macronutrients = dietService.calculate(
+        Macronutrients macronutrients = DietUtils.calculate(
                 new BiometricBean(biometricEntity), diet);
         DietSettingEntity dietSettingEntity = new DietSettingEntity()
                 .setDiet(diet)

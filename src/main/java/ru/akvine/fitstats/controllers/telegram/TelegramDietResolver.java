@@ -42,7 +42,7 @@ public class TelegramDietResolver {
 
     public SendMessage deleteRecord(TelegramDietDeleteRecordRequest request) {
         DeleteRecord deleteRecord = telegramDietConverter.convertToDeleteRecord(request);
-        dietService.deleteRecords(deleteRecord);
+        dietService.deleteRecord(deleteRecord);
         return new SendMessage(
                 request.getChatId(),
                 "Запись успешно удалена!"
