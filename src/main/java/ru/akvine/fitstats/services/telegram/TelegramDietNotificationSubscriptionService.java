@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.telegram;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TelegramDietNotificationSubscriptionService {
     private final TelegramDietNotificationSubscriptionRepository telegramDietNotificationSubscriptionRepository;
     private final TelegramSubscriptionRepository telegramSubscriptionRepository;
@@ -150,6 +152,12 @@ public class TelegramDietNotificationSubscriptionService {
         Preconditions.checkNotNull(deleteDietNotificationSubscription, "deleteDietNotificationSubscription is null");
         ClientEntity clientEntity = verifyExistsByUuidAndGet(deleteDietNotificationSubscription.getClientUuid());
         telegramDietNotificationSubscriptionRepository.deleteByClientIdAndType(clientEntity.getId(), deleteDietNotificationSubscription.getType());
+    }
+
+    public void deleteAllForClient(Long clientId) {
+        Preconditions.checkNotNull(clientId, "clientId is null");
+        logger.info("Delete all telegram diet notification subscriptions for client with id = {}", clientId);
+        telegramDietNotificationSubscriptionRepository.deleteForClientWithId(clientId);
     }
 
     public boolean isExistsByClientIdAndType(Long clientId, DietNotificationSubscriptionType type) {

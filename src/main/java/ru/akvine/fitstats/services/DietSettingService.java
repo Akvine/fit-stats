@@ -56,6 +56,12 @@ public class DietSettingService {
         return new DietSettingBean(savedDietSettingEntity);
     }
 
+    public void deleteForClient(Long clientId) {
+        Preconditions.checkNotNull(clientId, "clientId is null");
+        logger.info("Delete diet setting for client with id = {}", clientId);
+        dietSettingRepository.deleteForClientWithId(clientId);
+    }
+
     public DietSettingEntity verifyExistsAndGet(String clientUuid) {
         Preconditions.checkNotNull(clientUuid, "clientUuid is null");
         logger.info("Verify diet setting entity data exists for client with uuid = {}", clientUuid);

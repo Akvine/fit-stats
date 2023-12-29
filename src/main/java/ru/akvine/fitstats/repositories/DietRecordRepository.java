@@ -1,8 +1,10 @@
 package ru.akvine.fitstats.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 
 import java.time.LocalDate;
@@ -38,4 +40,9 @@ public interface DietRecordRepository extends JpaRepository<DietRecordEntity, Lo
             "and " +
             "dre.client.uuid = :clientUuid")
     List<DietRecordEntity> findByPartialUuid(@Param("uuid") String uuid, @Param("clientUuid") String clientUuid);
+
+    @Modifying
+    @Transactional
+    @Query("delete from DietRecordEntity dre where dre.client.id = :id")
+    void deleteAllForClientWithId(@Param("id") Long id);
 }

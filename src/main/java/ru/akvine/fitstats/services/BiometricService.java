@@ -82,6 +82,12 @@ public class BiometricService {
         return savedBiometricBean;
     }
 
+    public void deleteForClient(Long clientId) {
+        Preconditions.checkNotNull(clientId, "clientId is null");
+        logger.info("Delete biometric data for client with id = {}", clientId);
+        biometricRepository.deleteForClientWithId(clientId);
+    }
+
     public BiometricEntity verifyExistsAndGet(String clientUuid) {
         Preconditions.checkNotNull(clientUuid, "clientUuid is null");
         logger.info("Verify biometric entity data exists for client with uuid = {}", clientUuid);

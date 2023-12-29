@@ -10,10 +10,13 @@ import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.repositories.ClientRepository;
+import ru.akvine.fitstats.repositories.telegram.TelegramAuthRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
+import ru.akvine.fitstats.services.telegram.TelegramAuthService;
+import ru.akvine.fitstats.services.telegram.TelegramDietNotificationSubscriptionService;
 import ru.akvine.fitstats.utils.DietUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
 
@@ -29,7 +32,10 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final BiometricService biometricService;
     private final DietSettingService dietSettingService;
+    private final DietRecordService dietRecordService;
     private final PasswordService passwordService;
+    private final TelegramAuthRepository telegramAuthRepository;
+    private final TelegramDietNotificationSubscriptionService telegramDietNotificationSubscriptionService;
 
     public ClientBean register(ClientRegister clientRegister) {
         Preconditions.checkNotNull(clientRegister, "clientRegister is null");
@@ -73,8 +79,14 @@ public class ClientService {
         ClientEntity clientEntity = (ClientEntity) verifyExistsByEmailAndGet(email)
                 .setDeleted(true)
                 .setDeletedDate(LocalDateTime.now());
+        Long clientId = clientEntity.getId();
 
-        // TODO : сделать удаление всех записей (DietRecordEntity), биометрии (BiometricEntity) и т.д.
+        dietRecordService.deleteAllForClient(clientId);
+        dietSettingService.deleteForClient(clientId);
+        biometricService.deleteForClient(clientId);
+        telegramAuthRepository.deleteAllByClientId(clientId);
+        telegramDietNotificationSubscriptionService.deleteAllForClient(clientId);
+
         logger.info("Successful delete client with email = {}", email);
         return new ClientBean(clientRepository.save(clientEntity));
     }

@@ -28,4 +28,9 @@ public interface TelegramDietNotificationSubscriptionRepository extends JpaRepos
     @Modifying
     @Transactional
     void resetProcessedSubscriptions();
+
+    @Modifying
+    @Transactional
+    @Query("delete from TelegramDietNotificationSubscriptionEntity tdne where tdne.client.id = :id")
+    void deleteForClientWithId(@Param("id") Long id);
 }
