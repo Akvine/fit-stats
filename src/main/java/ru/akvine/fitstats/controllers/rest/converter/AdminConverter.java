@@ -9,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
-import ru.akvine.fitstats.controllers.rest.dto.admin.ExportProductsRequest;
-import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
-import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.*;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
@@ -71,6 +69,12 @@ public class AdminConverter {
                 .setRecords(availableParsers
                         .get(type)
                         .parse(file, resolveClass(type)));
+    }
+
+    public InvalidProductsRowsResponse convertToInvalidProductsRowsResponse(List<InvalidProductRow> invalidProductRows) {
+        Preconditions.checkNotNull(invalidProductRows, "invalidProductRows is null");
+        return new InvalidProductsRowsResponse()
+                .setInvalidRows(invalidProductRows);
     }
 
     public UpdateProduct convertToUpdateProduct(UpdateProductRequest request) {

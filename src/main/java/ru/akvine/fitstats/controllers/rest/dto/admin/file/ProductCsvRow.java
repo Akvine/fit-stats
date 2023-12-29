@@ -8,32 +8,35 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ProductCsvRow {
     @CsvBindByPosition(position = 0)
-    private String uuid;
+    private String rowNumber;
 
     @CsvBindByPosition(position = 1)
-    private String title;
+    private String uuid;
 
     @CsvBindByPosition(position = 2)
-    private String producer;
+    private String title;
 
     @CsvBindByPosition(position = 3)
-    private String proteins;
+    private String producer;
 
     @CsvBindByPosition(position = 4)
-    private String fats;
+    private String proteins;
 
     @CsvBindByPosition(position = 5)
-    private String carbohydrates;
+    private String fats;
 
     @CsvBindByPosition(position = 6)
-    private String calories;
+    private String carbohydrates;
 
     @CsvBindByPosition(position = 7)
-    private String vol;
+    private String calories;
 
     @CsvBindByPosition(position = 8)
-    private String volume;
+    private String vol;
 
     @CsvBindByPosition(position = 9)
+    private String volume;
+
+    @CsvBindByPosition(position = 10)
     private String measurement;
 }

@@ -75,6 +75,12 @@ public class CommonErrorCodes {
         interface Admin {
             String UUID_VALUE_BLANK_ERROR = "uuid.value.blank.error";
             String MACRONUTRIENT_INVALID_ERROR = "macronutrient.invalid.error";
+            String ROW_NUMBER_BLANK_ERROR = "row.number.blank.error";
+            String ROW_NUMBER_INVALID_FORMAT_ERROR = "row.number.invalid.format.error";
+            String PRODUCT_ALREADY_EXISTS_ERROR = "product.with.uuid.already.exists.error";
+            String TITLE_BLANK_ERROR = "title.blank.error";
+            String PRODUCER_BLANK_ERROR = "producer.blank.error";
+            String MEASUREMENT_INVALID_ERROR = "measurement.invalid.error";
         }
 
         interface Product {

@@ -7,6 +7,7 @@ import ru.akvine.fitstats.entities.ProductEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null " +

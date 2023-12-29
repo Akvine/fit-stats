@@ -19,6 +19,9 @@ public class CsvConverter implements Converter {
     @Value("${csv.file.converter.separator}")
     private char csvDelimiter;
 
+    private final static int START_INDEX = 0;
+    private final static String ROW_NUMBER_HEADER = "rowNumber";
+
     @Override
     public <T> byte[] convert(List<T> records, Class<T> clazz) {
         Preconditions.checkNotNull(records, "records is null");
@@ -30,10 +33,14 @@ public class CsvConverter implements Converter {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              CSVPrinter csvPrinter = new CSVPrinter(new PrintWriter(out), format)) {
             List<String> headers = ReflectionUtils.getFieldNames(clazz);
+            headers.add(START_INDEX, ROW_NUMBER_HEADER);
             csvPrinter.printRecord(headers);
+            int rowNumber = 1;
             for (T dietRecordCsv : records) {
                 List<String> data = ReflectionUtils.getFieldsValues(dietRecordCsv);
+                data.add(START_INDEX, String.valueOf(rowNumber));
                 csvPrinter.printRecord(data);
+                rowNumber++;
             }
 
             csvPrinter.flush();

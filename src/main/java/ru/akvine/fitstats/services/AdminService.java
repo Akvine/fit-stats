@@ -13,7 +13,6 @@ import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.services.processors.format.Converter;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,8 +25,6 @@ import static java.util.stream.Collectors.toMap;
 public class AdminService {
     private final ProductService productService;
     private final Map<ConverterType, Converter> availableConverters;
-
-    private final static String COMMA = ",";
 
     @Autowired
     public AdminService(ProductService productService,

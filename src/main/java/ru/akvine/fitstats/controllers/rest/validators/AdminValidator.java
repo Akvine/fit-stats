@@ -7,13 +7,17 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.admin.*;
+import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
+import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorCsvWrapper;
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
+import ru.akvine.fitstats.repositories.ProductRepository;
 import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.VolumeMeasurementValidator;
 import ru.akvine.fitstats.validators.file.FileValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,11 +34,14 @@ public class AdminValidator {
     private final VolumeMeasurementValidator volumeMeasurementValidator;
     private final ConverterTypeValidator converterTypeValidator;
     private final Map<FileType, FileValidator> availableFileValidators;
+    private final AdminValidatorCsvWrapper adminValidatorCsvWrapper;
 
     public AdminValidator(VolumeMeasurementValidator volumeMeasurementValidator,
                           ConverterTypeValidator converterTypeValidator,
-                          List<FileValidator> fileValidators) {
+                          List<FileValidator> fileValidators,
+                          AdminValidatorCsvWrapper adminValidatorCsvWrapper) {
         this.volumeMeasurementValidator = volumeMeasurementValidator;
+        this.adminValidatorCsvWrapper = adminValidatorCsvWrapper;
         this.converterTypeValidator = converterTypeValidator;
         this.availableFileValidators = fileValidators
                 .stream()
@@ -59,9 +66,7 @@ public class AdminValidator {
                 .validate(file);
     }
 
-    public void verifyImportProducts(ImportProducts importProducts) {
-        // TODO : добавить валидацию записей
-
+    public List<InvalidProductRow> verifyImportProducts(ImportProducts importProducts) {
         int rowsCount = importProducts.getRecords().size();
         if (rowsCount > maxRowsLimit) {
             String message = String.format("File rows count = [%s] greater than limit [%s]!", rowsCount, maxRowsLimit);
@@ -70,6 +75,20 @@ public class AdminValidator {
                     message
             );
         }
+
+        List<?> records = importProducts.getRecords();
+        List<InvalidProductRow> invalidProductRows = new ArrayList<>();
+        records.forEach(record -> {
+            if (record instanceof ProductCsvRow) {
+                InvalidProductRow invalidProductRow = adminValidatorCsvWrapper.wrap((ProductCsvRow) record);
+                if (invalidProductRow != null) {
+                    invalidProductRows.add(invalidProductRow);
+                }
+            } else {
+                throw new IllegalStateException("Invalid records format");
+            }
+        });
+        return invalidProductRows;
     }
 
     public void verifyUpdateProductRequest(UpdateProductRequest updateProductRequest) {
