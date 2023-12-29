@@ -29,15 +29,6 @@ public class TelegramSubscriptionService {
         );
     }
 
-    public TelegramSubscriptionBean findByClientId(Long clientId) {
-        Preconditions.checkNotNull(clientId, "clientId is null");
-
-        return new TelegramSubscriptionBean(
-                telegramSubscriptionRepository.findByClientId(clientId)
-                        .orElseThrow(() -> new TelegramSubscriptionNotFoundException("No telegram subscription found with clientId = [" + clientId + "]"))
-        );
-    }
-
     public TelegramSubscriptionBean save(Long telegramId, TelegramAuthCode authCode, String chatId) {
         Preconditions.checkNotNull(telegramId, "telegramId is null");
         Preconditions.checkNotNull(authCode, "authCode is null");

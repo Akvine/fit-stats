@@ -7,15 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
-import ru.akvine.fitstats.entities.BiometricEntity;
-import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
-import ru.akvine.fitstats.repositories.BiometricRepository;
-import ru.akvine.fitstats.repositories.DietSettingRepository;
-import ru.akvine.fitstats.services.*;
+import ru.akvine.fitstats.services.BiometricService;
+import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.DietService;
+import ru.akvine.fitstats.services.ProductService;
 import ru.akvine.fitstats.services.dto.DateRange;
-import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.diet.DietRecordBean;
@@ -25,10 +23,8 @@ import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.services.processors.format.Converter;
 import ru.akvine.fitstats.utils.DateUtils;
-import ru.akvine.fitstats.utils.DietUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,9 +39,6 @@ public class ProfileService {
     private final Map<ConverterType, Converter> availableConverters;
     private final DietService dietService;
     private final BiometricService biometricService;
-    private final BiometricRepository biometricRepository;
-    private final DietSettingService dietSettingService;
-    private final DietSettingRepository dietSettingRepository;
     private final ClientService clientService;
     private final ProductService productService;
 
@@ -53,16 +46,10 @@ public class ProfileService {
     public ProfileService(List<Converter> converters,
                           DietService dietService,
                           BiometricService biometricService,
-                          BiometricRepository biometricRepository,
-                          DietSettingService dietSettingService,
-                          DietSettingRepository dietSettingRepository,
                           ClientService clientService,
                           ProductService productService) {
         this.dietService = dietService;
-        this.dietSettingService = dietSettingService;
-        this.biometricRepository = biometricRepository;
         this.biometricService = biometricService;
-        this.dietSettingRepository = dietSettingRepository;
         this.clientService = clientService;
         this.productService = productService;
         this.availableConverters = converters
@@ -118,40 +105,7 @@ public class ProfileService {
     }
 
     public BiometricBean updateBiometric(UpdateBiometric updateBiometric) {
-        Preconditions.checkNotNull(updateBiometric, "updateBiometric is null");
-        logger.info("Update biometric for client with uuid = {}", updateBiometric.getClientUuid());
-
-        String clientUuid = updateBiometric.getClientUuid();
-        BiometricEntity biometricEntity = biometricService.verifyExistsAndGet(clientUuid);
-        if (updateBiometric.getAge() != null) {
-            biometricEntity.setAge(updateBiometric.getAge());
-        }
-        if (StringUtils.isNotBlank(updateBiometric.getHeight())) {
-            biometricEntity.setHeight(updateBiometric.getHeight());
-        }
-        if (StringUtils.isNotBlank(updateBiometric.getWeight())) {
-            biometricEntity.setWeight(updateBiometric.getWeight());
-        }
-        if (updateBiometric.getPhysicalActivity() != null) {
-            biometricEntity.setPhysicalActivity(updateBiometric.getPhysicalActivity());
-        }
-        biometricEntity.setUpdatedDate(LocalDateTime.now());
-        BiometricBean savedBiometricBean = new BiometricBean(biometricRepository.save(biometricEntity));
-
-        if (updateBiometric.isUpdateDietSetting()) {
-            DietSettingEntity dietSettingEntity = dietSettingService.verifyExistsAndGet(clientUuid);
-            Macronutrients macronutrients = DietUtils.calculate(savedBiometricBean, dietSettingEntity.getDiet());
-
-            dietSettingEntity.setMaxProteins(macronutrients.getProteins());
-            dietSettingEntity.setMaxFats(macronutrients.getFats());
-            dietSettingEntity.setMaxCarbohydrates(macronutrients.getCarbohydrates());
-            dietSettingEntity.setMaxCalories(macronutrients.getCalories());
-            dietSettingEntity.setUpdatedDate(LocalDateTime.now());
-            dietSettingRepository.save(dietSettingEntity);
-        }
-
-        logger.info("Successful update biometric data for client with uuid = {}", clientUuid);
-        return savedBiometricBean;
+       return biometricService.update(updateBiometric);
     }
 
     public BiometricBean display(String clientUuid) {

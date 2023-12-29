@@ -5,15 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.akvine.fitstats.entities.BiometricEntity;
 import ru.akvine.fitstats.entities.ClientEntity;
-import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
-import ru.akvine.fitstats.repositories.BiometricRepository;
 import ru.akvine.fitstats.repositories.ClientRepository;
-import ru.akvine.fitstats.repositories.DietSettingRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
@@ -31,10 +27,9 @@ public class ClientService {
     private int length;
 
     private final ClientRepository clientRepository;
-    private final BiometricRepository biometricRepository;
-    private final DietSettingRepository dietSettingRepository;
+    private final BiometricService biometricService;
+    private final DietSettingService dietSettingService;
     private final PasswordService passwordService;
-    private final DietService dietService;
 
     public ClientBean register(ClientRegister clientRegister) {
         Preconditions.checkNotNull(clientRegister, "clientRegister is null");
@@ -54,26 +49,18 @@ public class ClientService {
                 .setSecondName(clientRegister.getSecondName())
                 .setThirdName(clientRegister.getThirdName());
         ClientEntity savedClientEntity = clientRepository.save(clientEntity);
-        BiometricEntity biometricEntity = new BiometricEntity()
+        BiometricBean biometricBean = new BiometricBean()
                 .setAge(clientRegister.getAge())
                 .setGender(clientRegister.getGender())
                 .setHeight(clientRegister.getHeight())
                 .setWeight(clientRegister.getWeight())
                 .setPhysicalActivity(clientRegister.getPhysicalActivity())
                 .setHeightMeasurement(clientRegister.getHeightMeasurement())
-                .setWeightMeasurement(clientRegister.getWeightMeasurement())
-                .setClientEntity(savedClientEntity);
+                .setWeightMeasurement(clientRegister.getWeightMeasurement());
+        BiometricBean savedBiometricBean = biometricService.add(biometricBean, savedClientEntity);
         Macronutrients macronutrients = DietUtils.calculate(
-                new BiometricBean(biometricEntity), diet);
-        DietSettingEntity dietSettingEntity = new DietSettingEntity()
-                .setDiet(diet)
-                .setMaxCalories(macronutrients.getCalories())
-                .setMaxProteins(macronutrients.getProteins())
-                .setMaxFats(macronutrients.getFats())
-                .setMaxCarbohydrates(macronutrients.getCarbohydrates())
-                .setClient(savedClientEntity);
-        biometricRepository.save(biometricEntity);
-        dietSettingRepository.save(dietSettingEntity);
+                savedBiometricBean, diet);
+        dietSettingService.add(clientEntity, macronutrients, diet);
 
         logger.info("Successful register and save client = [{}]", savedClientEntity);
         return new ClientBean(savedClientEntity);

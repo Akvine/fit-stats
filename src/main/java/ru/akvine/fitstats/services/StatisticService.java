@@ -46,8 +46,8 @@ public class StatisticService {
     private final ClientService clientService;
     private final ModeStatisticProcessor modeStatisticProcessor;
     private final PercentStatisticProcessor percentStatisticProcessor;
-    private Map<String, StatisticProcessor> availableStatisticProcessors;
-    private Map<String, MacronutrientProcessor> availableMacronutrientProcessors;
+    private final Map<String, StatisticProcessor> availableStatisticProcessors;
+    private final Map<String, MacronutrientProcessor> availableMacronutrientProcessors;
 
     @Value("${round.accuracy}")
     private int roundAccuracy;

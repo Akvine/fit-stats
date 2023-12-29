@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.services.dto.client;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.BiometricEntity;
 import ru.akvine.fitstats.enums.Gender;
@@ -11,6 +12,7 @@ import ru.akvine.fitstats.services.dto.base.Bean;
 
 @Data
 @Accessors(chain = true)
+@NoArgsConstructor
 public class BiometricBean extends Bean {
     private Long id;
     private int age;

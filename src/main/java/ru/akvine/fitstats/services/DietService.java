@@ -11,11 +11,9 @@ import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.entities.DietSettingEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
-import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
-import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.diet.*;
@@ -36,7 +34,7 @@ import static ru.akvine.fitstats.utils.DietUtils.transformPer100;
 public class DietService {
     private final DietRecordRepository dietRecordRepository;
     private final DietSettingService dietSettingService;
-    private final ClientRepository clientRepository;
+    private final ClientService clientService;
     private final ProductService productService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -51,9 +49,7 @@ public class DietService {
         logger.info("Try to add diet record = [{}]", addDietRecordStart);
 
         String clientUuid = addDietRecordStart.getClientUuid();
-        ClientEntity clientEntity = clientRepository
-                .findByUuid(clientUuid)
-                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+        ClientEntity clientEntity = clientService.verifyExistsByUuidAndGet(clientUuid);
         String productUuid = addDietRecordStart.getProductUuid();
         ProductEntity productEntity;
         if (productUuid.length() < length) {
@@ -118,9 +114,7 @@ public class DietService {
         logger.info("Try to add diet record = [{}]", dietRecordBean);
 
         String clientUuid = dietRecordBean.getClientBean().getUuid();
-        ClientEntity clientEntity = clientRepository
-                .findByUuid(clientUuid)
-                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+        ClientEntity clientEntity = clientService.verifyExistsByUuidAndGet(clientUuid);
         String productUuid = dietRecordBean.getProductBean().getUuid();
         ProductEntity productEntity = productService.findByUuid(productUuid);
 
@@ -148,9 +142,7 @@ public class DietService {
         logger.info("Try to get list diet records = [{}]", listRecord);
 
         String clientUuid = listRecord.getClientUuid();
-        clientRepository
-                .findByUuid(clientUuid)
-                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+        clientService.verifyExistsByUuidAndGet(clientUuid);
 
         LocalDate date;
         if (listRecord.getDate() == null) {
@@ -171,9 +163,7 @@ public class DietService {
         logger.info("Try to delete record = [{}]", deleteRecord);
 
         String clientUuid = deleteRecord.getClientUuid();
-        clientRepository
-                .findByUuid(clientUuid)
-                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+        clientService.verifyExistsByUuidAndGet(clientUuid);
 
         String dietRecordUuid = deleteRecord.getRecordUuid();
         DietRecordEntity dietRecordEntity;
@@ -196,9 +186,7 @@ public class DietService {
         logger.info("Display diet macronutrients = [{}]", display);
 
         String clientUuid = display.getClientUuid();
-        clientRepository
-                .findByUuid(clientUuid)
-                .orElseThrow(() -> new ClientNotFoundException("Client with uuid = [" + clientUuid + "] not found!"));
+        clientService.verifyExistsByUuidAndGet(clientUuid);
 
         LocalDate date;
         if (display.getDate() == null) {
