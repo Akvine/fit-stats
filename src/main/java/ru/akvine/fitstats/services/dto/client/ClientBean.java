@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.dto.client;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.entities.ClientEntity;
@@ -20,8 +21,10 @@ public class ClientBean extends SoftBean {
     private String thirdName;
     private String email;
     @Nullable
+    @ToString.Exclude
     private String password;
     @Nullable
+    @ToString.Exclude
     private String hash;
     private Diet diet;
 
