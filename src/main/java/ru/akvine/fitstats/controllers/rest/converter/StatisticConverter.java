@@ -24,7 +24,7 @@ public class StatisticConverter {
     private int limit;
 
     public DescriptiveStatistic convertToDescriptiveStatistic(CalculateDescriptiveStatisticRequest request) {
-        Preconditions.checkNotNull("calculateDescriptiveStatisticRequest is null");
+        Preconditions.checkNotNull(request, "calculateDescriptiveStatisticRequest is null");
 
         String duration = request
                 .getDateRangeInfo()
