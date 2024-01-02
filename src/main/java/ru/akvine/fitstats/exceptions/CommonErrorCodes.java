@@ -43,10 +43,6 @@ public class CommonErrorCodes {
         String PASSWORDS_EQUAL_ERROR = "passwords.equal.error";
     }
 
-    public interface Category {
-        String CATEGORY_NOT_FOUND_ERROR = "category.not.found.error";
-    }
-
     public interface Validation {
         String FIELD_NOT_PRESENTED_ERROR = "field.not.presented.error";
 

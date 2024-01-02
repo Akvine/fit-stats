@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
 import ru.akvine.fitstats.exceptions.telegram.parse.TelegramFatsParseException;
 
-import java.util.Set;
-
 @Component
 public class TelegramProductParser {
     private static final String COMMA = ",";
@@ -46,8 +44,6 @@ public class TelegramProductParser {
         }
 
         String volumeMeasurement = parts[6].trim();
-        Set<String> categories = Set.of(parts[7].trim());
-
         return new TelegramProductAddRequest()
                 .setTitle(title)
                 .setProducer(producer)
@@ -55,7 +51,6 @@ public class TelegramProductParser {
                 .setProteins(proteins)
                 .setCarbohydrates(carbohydrates)
                 .setVol(vol)
-                .setVolumeMeasurement(volumeMeasurement)
-                .setCategories(categories);
+                .setVolumeMeasurement(volumeMeasurement);
     }
 }
