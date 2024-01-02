@@ -4,7 +4,7 @@ Application for fitness statistic tracking
 ## Table of contents
 * [General info](#general-info)
 * [Requirements](#requirements)
-* [Running the application locally](#running the application locally)
+* [Running the application locally](#running-the-application-locally)
 * [Technologies](#technologies)
 
 ## General info
