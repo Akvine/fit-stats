@@ -1,8 +1,11 @@
 package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.akvine.fitstats.controllers.rest.converter.parser.macronutrient.MacronutrientParser;
 import ru.akvine.fitstats.controllers.rest.dto.product.*;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.services.dto.product.Filter;
@@ -13,9 +16,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ProductConverter {
     private static final int PRODUCT_ROUND_VALUE_ACCURACY = 1;
     private static final int DEFAULT_PRODUCT_VOLUME = 100;
+    private final MacronutrientParser macronutrientParser;
 
     @Value("${round.accuracy}")
     private int roundAccuracy;
@@ -46,7 +51,13 @@ public class ProductConverter {
 
     public Filter convertToFilter(ListProductRequest request) {
         Preconditions.checkNotNull(request, "listProductRequest is null");
-        return new Filter()
+
+        Filter filter = new Filter();
+        if (StringUtils.isNotBlank(request.getMacronutrientsFilter())) {
+            filter.setMacronutrientFilterParts(macronutrientParser.parse(request.getMacronutrientsFilter()));
+        }
+
+        return filter
                 .setFilterName(request.getFilter());
     }
 

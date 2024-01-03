@@ -7,4 +7,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ListProductRequest {
     private String filter;
+    private String macronutrientsFilter;
 }

@@ -1,20 +1,15 @@
 package ru.akvine.fitstats.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.akvine.fitstats.entities.ProductEntity;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
-    @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null " +
-            "and " +
-            "(lower(pe.title) like concat('%', :filter, '%') or lower(pe.producer) like concat('%', :filter, '%'))")
-    List<ProductEntity> findByFilter(@Param("filter") String filter);
-
+public interface ProductRepository extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
     @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null " +
             "and " +
             "pe.uuid = :uuid")

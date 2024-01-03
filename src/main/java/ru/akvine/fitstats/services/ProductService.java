@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.repositories.ProductRepository;
+import ru.akvine.fitstats.repositories.specifications.ProductSpecification;
 import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
@@ -122,10 +124,12 @@ public class ProductService {
 
     @Transactional
     public List<ProductBean> findByFilter(Filter filter) {
-        if (StringUtils.isBlank(filter.getFilterName())) {
-            return findWithoutFilter();
-        }
-        return findWithFilter(filter.getFilterName());
+        Specification<ProductEntity> specification = ProductSpecification.build(filter);
+        return productRepository
+                .findAll(specification)
+                .stream()
+                .map(ProductBean::new)
+                .collect(Collectors.toList());
     }
 
     public ProductEntity verifyExistsAndGet(String uuid) {
@@ -146,47 +150,5 @@ public class ProductService {
         return productRepository
                 .findByUuid(uuid)
                 .orElseThrow(() -> new ProductNotFoundException("Product with uuid = [" + uuid + "] not found!"));
-    }
-
-    private List<ProductBean> findWithoutFilter() {
-        return productRepository
-                .findAll()
-                .stream()
-                .map(ProductBean::new)
-                .collect(Collectors.toList());
-    }
-
-    private List<ProductBean> findWithFilter(String filter) {
-        return productRepository
-                .findAll()
-                .stream()
-                .filter(product -> {
-                    boolean titleContains = false;
-                    boolean producerContains = false;
-
-                    String[] titleWords = product
-                            .getTitle()
-                            .toLowerCase()
-                            .split(EMPTY_SPACE);
-                    String[] productWords = product
-                            .getProducer()
-                            .toLowerCase()
-                            .split(EMPTY_SPACE);
-                    for (String word : titleWords) {
-                        if (word.contains(filter.toLowerCase())) {
-                            titleContains = true;
-                            break;
-                        }
-                    }
-                    for (String word : productWords) {
-                        if (word.contains(filter.toLowerCase())) {
-                            producerContains = true;
-                            break;
-                        }
-                    }
-                    return titleContains || producerContains;
-                })
-                .map(ProductBean::new)
-                .collect(Collectors.toList());
     }
 }
