@@ -24,9 +24,6 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers("/clients/register").permitAll()
-                        .antMatchers("/clients/login").permitAll()
-                        .antMatchers("/clients/logout").permitAll()
                         .antMatchers("/registration/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
                         .antMatchers("/access/restore/**").permitAll()

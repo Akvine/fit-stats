@@ -1,0 +1,1 @@
+INSERT INTO CLIENT_ENTITY (ID, UUID, FIRST_NAME, SECOND_NAME, EMAIL, HASH, CREATED_DATE, IS_DELETED) VALUES (-1, 'uuid_1', 'first_name_1', 'second_name_1', 'email_1', 'hash', '2024-01-04', 0);

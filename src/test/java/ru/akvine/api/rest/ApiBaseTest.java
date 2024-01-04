@@ -7,21 +7,23 @@ import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import ru.akvine.api.config.RestMethods;
+import ru.akvine.api.config.TestConfiguration;
 import ru.akvine.fitstats.controllers.rest.dto.client.ClientLoginRequest;
 
 import javax.servlet.http.Cookie;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@SpringBootTest
+@SpringBootTest(classes = {TestConfiguration.class})
 @AutoConfigureMockMvc
+@Import(TestConfiguration.class)
 @AutoConfigureTestDatabase
 @AutoConfigureCache
 public abstract class ApiBaseTest {
@@ -36,6 +38,10 @@ public abstract class ApiBaseTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected ResultActions doPost(String link, Object request) throws Exception {
+        return doPost(link, null, request);
     }
 
     protected ResultActions doPost(String link, String sessionId, Object request) throws Exception {
@@ -69,7 +75,7 @@ public abstract class ApiBaseTest {
                 .setPassword(password);
 
         MockHttpServletRequestBuilder requestBuilder =
-                post(RestMethods.CLIENT_LOGIN)
+                post(RestMethods.REGISTRATION_START)
                 .content(toJson(clientLoginRequest))
                 .contentType(MediaType.APPLICATION_JSON);
         return mvc.perform(requestBuilder);
