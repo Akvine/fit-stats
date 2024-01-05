@@ -15,16 +15,10 @@ import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
 import ru.akvine.fitstats.utils.DateUtils;
 import ru.akvine.fitstats.utils.MathUtils;
 
-import java.util.List;
-
 @Component
 public class TelegramStatisticConverter {
     private static final String NEXT_LINE = "\n";
 
-    @Value("${processors.supported.indicators}")
-    private List<String> supportedIndicators;
-    @Value("${processors.supported.macronutrients}")
-    private List<String> supportedMacronutrients;
     @Value("${round.accuracy}")
     private int defaultRoundAccuracy;
 

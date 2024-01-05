@@ -4,8 +4,6 @@ public class OtpInvalidAttemptException extends RuntimeException {
     private String login;
     private int attemptsLeft;
 
-    public OtpInvalidAttemptException() {}
-
     public OtpInvalidAttemptException(String login, int attemptsLeft) {
         this.login = login;
         this.attemptsLeft = attemptsLeft;

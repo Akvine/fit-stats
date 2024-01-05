@@ -163,7 +163,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({ActionNotStartedException.class})
-    public ResponseEntity<ErrorResponse> handleActionNotStartedException(ActionNotStartedException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleActionNotStartedException(ActionNotStartedException ex) {
         logger.info("Action not initiated, wrong step. Exception message={}", ex.getMessage());
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Security.ACTION_NOT_STARTED_ERROR,

@@ -16,6 +16,6 @@ public class ResetProcessedNotificationSubscriptionsJob {
     public void resetProcessed() {
         logger.debug("Reset processed diet notification subscriptions");
         telegramDietNotificationSubscriptionRepository.resetProcessedSubscriptions();
-        logger.debug("Success reset processd diet notification subscriptions");
+        logger.debug("Success reset processed diet notification subscriptions");
     }
 }
