@@ -34,6 +34,7 @@ public class StatisticService {
     private static final String FATS_MACRONUTRIENT_NAME = "fats";
     private static final String PROTEINS_MACRONUTRIENT_NAME = "proteins";
     private static final String CARBOHYDRATES_MACRONUTRIENT_NAME = "carbohydrates";
+    private static final String ALCOHOL_NAME = "alcohol";
     private static final String CALORIES_MACRONUTRIENT_NAME = "calories";
 
     private static final int FATS_MACRONUTRIENT_CALORIES_COEFFICIENT = 9;
@@ -158,10 +159,12 @@ public class StatisticService {
                 percentStatisticProcessor.calculate(fatsValues, totalCalories), roundAccuracy);
         double carbohydratesPercent = MathUtils.round(
                 percentStatisticProcessor.calculate(carbohydrates, totalCalories), roundAccuracy);
+        double alcoholCaloriesPercent = MathUtils.round((100 - (proteinsPercent + fatsPercent + carbohydratesPercent)), roundAccuracy);
 
         macronutrientsPercents.put(PROTEINS_MACRONUTRIENT_NAME, proteinsPercent);
         macronutrientsPercents.put(FATS_MACRONUTRIENT_NAME, fatsPercent);
         macronutrientsPercents.put(CARBOHYDRATES_MACRONUTRIENT_NAME, carbohydratesPercent);
+        macronutrientsPercents.put(ALCOHOL_NAME, alcoholCaloriesPercent);
 
         return additionalStatisticInfo
                 .setMode(modeStatisticProcessor.calculate(products, modeCount))
