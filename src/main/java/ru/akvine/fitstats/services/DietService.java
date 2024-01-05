@@ -16,6 +16,7 @@ import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.Macronutrients;
+import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.services.listeners.AddDietRecordEvent;
@@ -36,6 +37,7 @@ public class DietService {
     private final DietSettingService dietSettingService;
     private final ClientService clientService;
     private final ProductService productService;
+    private final BiometricService biometricService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final static int SINGLE_ELEMENT = 0;
@@ -224,6 +226,11 @@ public class DietService {
                 .setRemainingProteins(remainingProteins)
                 .setRemainingFats(remainingFats)
                 .setRemainingCarbohydrates(remainingCarbohydrates);
+    }
+
+    public void changeDiet(ChangeDiet changeDiet) {
+        BiometricBean biometricBean = biometricService.getByClientUuid(changeDiet.getClientUuid());
+        dietSettingService.changeDiet(biometricBean, changeDiet);
     }
 
     public List<DietRecordExport> findByDateRange(String clientUuid,

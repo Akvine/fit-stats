@@ -10,9 +10,12 @@ import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DeleteRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DisplayRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.ListRecordRequest;
+import ru.akvine.fitstats.controllers.rest.dto.diet.ChangeDietRequest;
 import ru.akvine.fitstats.controllers.rest.meta.DietControllerMeta;
+import ru.akvine.fitstats.controllers.rest.validators.DietValidator;
 import ru.akvine.fitstats.services.DietService;
 import ru.akvine.fitstats.services.dto.diet.*;
+import ru.akvine.fitstats.services.dto.diet.ChangeDiet;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.List;
 public class DietController implements DietControllerMeta {
     private final DietConverter dietConverter;
     private final DietService dietService;
+    private final DietValidator dietValidator;
 
     @Override
     public Response add(@Valid AddRecordRequest request) {
@@ -50,5 +54,13 @@ public class DietController implements DietControllerMeta {
         Display display = dietConverter.convertToDisplay(request);
         DietDisplay dietDisplay = dietService.display(display);
         return dietConverter.convertToDietDisplayResponse(dietDisplay);
+    }
+
+    @Override
+    public Response change(@Valid ChangeDietRequest request) {
+        dietValidator.verifyUpdateDietRequest(request);
+        ChangeDiet changeDiet = dietConverter.convertToChangeDiet(request);
+        dietService.changeDiet(changeDiet);
+        return new SuccessfulResponse();
     }
 }

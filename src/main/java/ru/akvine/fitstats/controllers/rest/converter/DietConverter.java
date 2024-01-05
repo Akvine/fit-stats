@@ -4,13 +4,14 @@ import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.diet.*;
+import ru.akvine.fitstats.controllers.rest.dto.diet.ChangeDietRequest;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DietRecordDto;
+import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.services.dto.diet.*;
-import ru.akvine.fitstats.utils.MathUtils;
+import ru.akvine.fitstats.services.dto.diet.ChangeDiet;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,13 @@ public class DietConverter {
         return new Display()
                 .setDate(request.getDate())
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid());
+    }
+
+    public ChangeDiet convertToChangeDiet(ChangeDietRequest request) {
+        Preconditions.checkNotNull(request, "ChangeDietRequest is null");
+        return new ChangeDiet()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setDiet(Diet.valueOf(request.getDietType()));
     }
 
     private DietRecordDto buildDietRecordDto(DietRecordBean dietRecordBean) {

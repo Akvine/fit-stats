@@ -9,6 +9,7 @@ import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DeleteRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DisplayRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.ListRecordRequest;
+import ru.akvine.fitstats.controllers.rest.dto.diet.ChangeDietRequest;
 
 import javax.validation.Valid;
 
@@ -25,4 +26,7 @@ public interface DietControllerMeta {
 
     @GetMapping(value = "/display")
     Response display(@Valid @RequestBody DisplayRequest request);
+
+    @PostMapping(value = "/change")
+    Response change(@Valid @RequestBody ChangeDietRequest request);
 }

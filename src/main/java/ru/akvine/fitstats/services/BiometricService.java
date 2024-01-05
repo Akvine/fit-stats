@@ -82,6 +82,10 @@ public class BiometricService {
         return savedBiometricBean;
     }
 
+    public BiometricBean getByClientUuid(String clientUuid) {
+        return new BiometricBean(verifyExistsAndGet(clientUuid));
+    }
+
     public void deleteForClient(Long clientId) {
         Preconditions.checkNotNull(clientId, "clientId is null");
         logger.info("Delete biometric data for client with id = {}", clientId);
