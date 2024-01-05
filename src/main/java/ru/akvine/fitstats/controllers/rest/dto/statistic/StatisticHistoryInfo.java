@@ -12,4 +12,5 @@ public class StatisticHistoryInfo {
     private String macronutrient;
     private Map<String, Double> history;
     private double average;
+    private double median;
 }

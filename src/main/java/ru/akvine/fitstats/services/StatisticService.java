@@ -180,7 +180,7 @@ public class StatisticService {
         Map<String, DietStatisticHistory> statisticHistoryMap;
 
         Map<String, Double> macronutrientHistory;
-        double average;
+        double average, median;
 
         List<DietRecordEntity> records = dietRecordRepository.findAll();
         switch (duration) {
@@ -259,11 +259,16 @@ public class StatisticService {
                 .mapToDouble(Double::doubleValue)
                 .average()
                 .orElse(0), roundAccuracy);
+        median = MathUtils.round(
+                availableStatisticProcessors.get("median").calculate(new ArrayList<>(macronutrientHistory
+                        .values())), roundAccuracy);
+
         return new StatisticHistoryResult()
                 .setMacronutrient(macronutrient)
                 .setDuration(duration)
                 .setHistory(macronutrientHistory)
-                .setAverage(average);
+                .setAverage(average)
+                .setMedian(median);
     }
 
     private Map<String, DietStatisticHistory> calculatePerPastDays(List<DietRecordEntity> entities) {

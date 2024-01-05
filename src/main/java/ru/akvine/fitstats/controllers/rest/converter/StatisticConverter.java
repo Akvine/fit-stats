@@ -91,6 +91,7 @@ public class StatisticConverter {
                         .setDuration(statisticHistoryResult.getDuration().toString())
                         .setMacronutrient(statisticHistoryResult.getMacronutrient().toString())
                         .setHistory(statisticHistoryResult.getHistory())
-                        .setAverage(statisticHistoryResult.getAverage()));
+                        .setAverage(statisticHistoryResult.getAverage())
+                        .setMedian(statisticHistoryResult.getMedian()));
     }
 }

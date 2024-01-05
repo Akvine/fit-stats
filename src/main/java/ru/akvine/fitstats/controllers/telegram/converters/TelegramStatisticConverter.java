@@ -61,7 +61,8 @@ public class TelegramStatisticConverter {
         StringBuilder sb = new StringBuilder();
         sb.append("Период: ").append(statisticHistoryResult.getDuration()).append(NEXT_LINE);
         sb.append("Макронутриент: ").append(statisticHistoryResult.getMacronutrient()).append(NEXT_LINE);
-        sb.append("Среднее: ").append(MathUtils.round(statisticHistoryResult.getAverage(), 2)).append(NEXT_LINE);
+        sb.append("Среднее: ").append(MathUtils.round(statisticHistoryResult.getAverage(), defaultRoundAccuracy)).append(NEXT_LINE);
+        sb.append("Медиана: ").append(MathUtils.round(statisticHistoryResult.getMedian(), defaultRoundAccuracy)).append(NEXT_LINE);
 
         statisticHistoryResult
                 .getHistory()

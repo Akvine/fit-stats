@@ -13,5 +13,6 @@ public class StatisticHistoryResult {
     private Duration duration;
     private Macronutrient macronutrient;
     private double average;
+    private double median;
     private Map<String, Double> history;
 }
