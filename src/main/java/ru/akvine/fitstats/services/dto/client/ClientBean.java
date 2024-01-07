@@ -26,7 +26,6 @@ public class ClientBean extends SoftBean {
     @Nullable
     @ToString.Exclude
     private String hash;
-    private Diet diet;
 
     public ClientBean(ClientEntity clientEntity) {
         this.id = clientEntity.getId();
