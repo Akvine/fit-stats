@@ -25,6 +25,6 @@ public class WeightRecordEntity extends BaseEntity  {
     @ManyToOne
     private ClientEntity client;
 
-    @Column(name = "VALUE", nullable = false)
+    @Column(name = "WEIGHT_VALUE", nullable = false)
     private String value;
 }

@@ -20,7 +20,7 @@ public class OtpCounterEntity {
     @Column(name = "LOGIN", nullable = false)
     private String login;
 
-    @Column(name = "VALUE", nullable = false)
+    @Column(name = "OTP_VALUE", nullable = false)
     private long value = 1L;
 
     @Column(name = "LAST_UPDATED", nullable = false)
