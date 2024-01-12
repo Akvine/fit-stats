@@ -20,6 +20,7 @@ import javax.servlet.http.Cookie;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static ru.akvine.api.rest.TestConstants.SESSION_COOKIE_NAME;
 
 @SpringBootTest(classes = {TestConfiguration.class})
 @AutoConfigureMockMvc
@@ -27,7 +28,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureTestEntityManager
 @AutoConfigureCache
 public abstract class ApiBaseTest {
-    private static final String SESSION_COOKIE_NAME = "SESSION";
 
     @Autowired
     protected MockMvc mvc;

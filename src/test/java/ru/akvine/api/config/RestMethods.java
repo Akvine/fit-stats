@@ -4,4 +4,7 @@ public class RestMethods {
     public RestMethods() {throw new IllegalStateException("Can't call RestMethods constructor");}
 
     public static final String REGISTRATION_START = "/registration/start";
+    public static final String REGISTRATION_CHECK = "/registration/check";
+    public static final String REGISTRATION_NEWOTP = "/registration/newotp";
+    public static final String REGISTRATION_FINISH = "/registration/finish";
 }

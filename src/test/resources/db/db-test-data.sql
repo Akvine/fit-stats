@@ -1,1 +1,3 @@
-INSERT INTO CLIENT_ENTITY (ID, UUID, FIRST_NAME, SECOND_NAME, EMAIL, HASH, CREATED_DATE, IS_DELETED) VALUES (-1, 'uuid_1', 'first_name_1', 'second_name_1', 'email_1', 'hash', '2024-01-04', 0);
+INSERT INTO CLIENT_ENTITY (ID, UUID, FIRST_NAME, SECOND_NAME, EMAIL, HASH, CREATED_DATE, IS_DELETED) VALUES (-1, 'client_uuid_1', 'first_name_1', 'second_name_1', 'client_email_1@mail.com', 'hash', '2024-01-04', 0);
+INSERT INTO CLIENT_ENTITY (ID, UUID, FIRST_NAME, SECOND_NAME, EMAIL, HASH, CREATED_DATE, IS_DELETED) VALUES (-2, 'client_uuid_2', 'first_name_2', 'second_name_2', 'client_email_2@mail.com', 'hash', '2024-01-04', 0);
+INSERT INTO CLIENT_ENTITY (ID, UUID, FIRST_NAME, SECOND_NAME, EMAIL, HASH, CREATED_DATE, IS_DELETED) VALUES (-3, 'client_uuid_3', 'first_name_3', 'second_name_3', 'client_email_3@mail.com', 'hash', '2024-01-04', 0);

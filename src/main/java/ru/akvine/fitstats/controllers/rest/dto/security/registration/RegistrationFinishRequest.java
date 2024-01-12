@@ -3,12 +3,14 @@ package ru.akvine.fitstats.controllers.rest.dto.security.registration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import ru.akvine.fitstats.controllers.rest.dto.security.LoginRequest;
 
 import javax.validation.constraints.NotBlank;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Accessors(chain = true)
 public class RegistrationFinishRequest extends LoginRequest {
     @NotBlank
     @ToString.Exclude
