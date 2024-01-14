@@ -89,6 +89,9 @@ public class ProductService {
         if (updateProduct.getVolume() != null) {
             productEntity.setVolume(updateProduct.getVolume());
         }
+        if (updateProduct.getVol() != null) {
+            productEntity.setVol(updateProduct.getVol());
+        }
 
         if (macronutrientsUpdated) {
             productEntity.setCalories(

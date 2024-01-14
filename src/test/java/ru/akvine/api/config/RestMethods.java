@@ -7,4 +7,11 @@ public class RestMethods {
     public static final String REGISTRATION_CHECK = "/registration/check";
     public static final String REGISTRATION_NEWOTP = "/registration/newotp";
     public static final String REGISTRATION_FINISH = "/registration/finish";
+
+    public static final String AUTH_START = "/auth/start";
+    public static final String AUTH_FINISH = "/auth/finish";
+
+    public static final String WEIGHT_RECORD_LIST = "/weight/record/list";
+    public static final String WEIGHT_RECORD_CHANGE = "/weight/record/change";
+    public static final String WEIGHT_RECORD_DELETE = "/weight/record/delete";
 }

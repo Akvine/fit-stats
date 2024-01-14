@@ -18,6 +18,8 @@ import java.util.List;
 public class ProductSpecification {
 
     public static Specification<ProductEntity> build(Filter filter) {
+
+        // TODO: добавить вывод неудаленных продуктов. Сейчас выводятся все, даже удаленные
         Specification<ProductEntity> specification;
 
         specification = withFilterName(filter.getFilterName());

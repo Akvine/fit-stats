@@ -26,11 +26,11 @@ public class TestConstants {
     public static final String CLIENT_EMAIL_EXISTS_1 = "client_email_1@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_2 = "client_email_2@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_3 = "client_email_3@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_4 = "client_email_4@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_5 = "client_email_5@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_6 = "client_email_6@mail.com";
 
     public static final String INVALID_EMAIL = "invalid email";
 
-    public static final String VALID_PASSWORD = "jhNxm139ssF!93";
-
-    public static final int ZERO = 0;
-    public static final int INVALID_AGE = 150;
+    public static final String VALID_PASSWORD = "aBcDeF1234";
 }

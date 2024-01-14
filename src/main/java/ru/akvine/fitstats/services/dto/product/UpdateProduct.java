@@ -32,6 +32,9 @@ public class UpdateProduct {
     private Double carbohydrates;
 
     @Nullable
+    private Double vol;
+
+    @Nullable
     private Double volume;
 
     @Nullable

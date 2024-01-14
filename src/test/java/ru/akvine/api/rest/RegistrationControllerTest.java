@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.akvine.api.rest.TestConstants.*;
 
-@DisplayName("Registration start")
+@DisplayName("Registration controller")
 public class RegistrationControllerTest extends ApiBaseTest {
 
     @Test

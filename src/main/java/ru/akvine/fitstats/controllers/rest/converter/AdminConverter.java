@@ -81,12 +81,13 @@ public class AdminConverter {
         return new UpdateProduct()
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .setUuid(request.getUuid())
-                .setMeasurement(StringUtils.isBlank(request.getMeasurement()) ? null : VolumeMeasurement.valueOf(request.getMeasurement()))
+                .setMeasurement(StringUtils.isBlank(request.getMeasurement()) ? null : VolumeMeasurement.safeValueOf(request.getMeasurement()))
                 .setTitle(request.getTitle())
                 .setProducer(request.getProducer())
                 .setProteins(request.getProteins())
                 .setFats(request.getFats())
                 .setCarbohydrates(request.getCarbohydrates())
+                .setVol(request.getVol())
                 .setVolume(request.getVolume());
     }
 

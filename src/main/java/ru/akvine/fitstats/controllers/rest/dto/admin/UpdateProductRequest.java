@@ -21,6 +21,8 @@ public class UpdateProductRequest extends SecretRequest {
 
     private Double carbohydrates;
 
+    private Double vol;
+
     private Double volume;
 
     private String measurement;
