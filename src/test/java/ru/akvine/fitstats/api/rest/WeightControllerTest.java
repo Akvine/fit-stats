@@ -1,8 +1,8 @@
-package ru.akvine.api.rest;
+package ru.akvine.fitstats.api.rest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.akvine.api.config.RestMethods;
+import ru.akvine.fitstats.api.config.RestMethods;
 import ru.akvine.fitstats.controllers.rest.dto.weight.ChangeWeightRequest;
 import ru.akvine.fitstats.controllers.rest.dto.weight.DeleteWeightRequest;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static ru.akvine.api.rest.TestConstants.*;
+import static ru.akvine.fitstats.api.rest.TestConstants.*;
 
 @DisplayName("Weight controller")
 public class WeightControllerTest extends ApiBaseTest {

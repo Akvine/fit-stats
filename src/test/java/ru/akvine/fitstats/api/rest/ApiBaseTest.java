@@ -1,4 +1,4 @@
-package ru.akvine.api.rest;
+package ru.akvine.fitstats.api.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -15,8 +15,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import ru.akvine.api.config.RestMethods;
-import ru.akvine.api.config.TestConfiguration;
+import ru.akvine.fitstats.api.config.RestMethods;
+import ru.akvine.fitstats.api.config.TestConfiguration;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthCredentialsRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthFinishRequest;
 import ru.akvine.fitstats.entities.security.OtpInfo;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.akvine.api.rest.TestConstants.*;
+import static ru.akvine.fitstats.api.rest.TestConstants.*;
 
 @SpringBootTest(classes = {TestConfiguration.class})
 @AutoConfigureMockMvc

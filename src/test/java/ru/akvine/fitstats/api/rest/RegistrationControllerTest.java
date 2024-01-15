@@ -1,9 +1,9 @@
-package ru.akvine.api.rest;
+package ru.akvine.fitstats.api.rest;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.ResultMatcher;
-import ru.akvine.api.config.RestMethods;
+import ru.akvine.fitstats.api.config.RestMethods;
 import ru.akvine.fitstats.controllers.rest.dto.security.registration.RegistrationCheckOtpRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.registration.RegistrationFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.registration.RegistrationNewOtpRequest;
@@ -15,7 +15,7 @@ import javax.servlet.http.Cookie;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.akvine.api.rest.TestConstants.*;
+import static ru.akvine.fitstats.api.rest.TestConstants.*;
 
 @DisplayName("Registration controller")
 public class RegistrationControllerTest extends ApiBaseTest {

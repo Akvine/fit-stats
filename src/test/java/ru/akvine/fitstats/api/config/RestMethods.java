@@ -1,4 +1,4 @@
-package ru.akvine.api.config;
+package ru.akvine.fitstats.api.config;
 
 public class RestMethods {
     public RestMethods() {throw new IllegalStateException("Can't call RestMethods constructor");}

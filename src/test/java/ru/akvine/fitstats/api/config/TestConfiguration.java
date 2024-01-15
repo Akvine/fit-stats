@@ -1,4 +1,4 @@
-package ru.akvine.api.config;
+package ru.akvine.fitstats.api.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

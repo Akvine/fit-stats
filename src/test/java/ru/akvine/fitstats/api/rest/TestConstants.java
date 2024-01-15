@@ -1,4 +1,4 @@
-package ru.akvine.api.rest;
+package ru.akvine.fitstats.api.rest;
 
 public class TestConstants {
     private TestConstants() {
