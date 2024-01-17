@@ -19,16 +19,21 @@ public class ProductSpecification {
 
     public static Specification<ProductEntity> build(Filter filter) {
 
-        // TODO: добавить вывод неудаленных продуктов. Сейчас выводятся все, даже удаленные
-        Specification<ProductEntity> specification;
-
-        specification = withFilterName(filter.getFilterName());
+        Specification<ProductEntity> specification = notDeleted();
+        specification = specification.and(withFilterName(filter.getFilterName()));
 
         if (filter.getMacronutrientFilterParts() != null) {
             specification = specification.and(withMacronutrientFilter(filter.getMacronutrientFilterParts()));
         }
 
         return specification;
+    }
+
+    private static Specification<ProductEntity> notDeleted() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.and(
+                criteriaBuilder.isFalse(root.get("deleted")),
+                criteriaBuilder.isNull(root.get("deletedDate"))
+        );
     }
 
     private static Specification<ProductEntity> withFilterName(String filter) {
