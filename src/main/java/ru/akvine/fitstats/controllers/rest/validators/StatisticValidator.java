@@ -3,16 +3,16 @@ package ru.akvine.fitstats.controllers.rest.validators;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.akvine.fitstats.controllers.rest.dto.statistic.*;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateAdditionalStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveStatisticRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.StatisticHistoryRequest;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.validators.DurationValidator;
 import ru.akvine.fitstats.validators.MacronutrientValidator;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -27,6 +27,7 @@ public class StatisticValidator {
     private int limit;
 
     private final DurationValidator durationValidator;
+    private final DateRangeInfoValidator dateRangeInfoValidator;
     private final MacronutrientValidator macronutrientValidator;
 
     public void verifyCalculateDescriptiveStatisticRequest(CalculateDescriptiveStatisticRequest request) {
@@ -49,7 +50,7 @@ public class StatisticValidator {
             }
         });
         verifyRoundAccuracy(request.getRoundAccuracy());
-        verifyDateRangeRequest(request);
+        dateRangeInfoValidator.verifyDateRangeRequest(request);
     }
 
     public void verifyCalculateAdditionalStatisticRequest(CalculateAdditionalStatisticRequest request) {
@@ -68,7 +69,7 @@ public class StatisticValidator {
             }
         }
         verifyRoundAccuracy(request.getRoundAccuracy());
-        verifyDateRangeRequest(request);
+        dateRangeInfoValidator.verifyDateRangeRequest(request);
     }
 
     public void verifyStatisticHistoryRequest(StatisticHistoryRequest request) {
@@ -82,36 +83,6 @@ public class StatisticValidator {
             throw new ValidationException(
                     CommonErrorCodes.Validation.Statistic.ROUND_ACCURACY_INVALID_ERROR,
                     "Accuracy round can't be less than 0");
-        }
-    }
-
-    private void verifyDateRangeRequest(DateRangeRequest dateRangeRequest) {
-        DateRangeInfo dateRangeInfo = dateRangeRequest.getDateRangeInfo();
-        LocalDate startDate = dateRangeInfo.getStartDate();
-        LocalDate endDate = dateRangeInfo.getEndDate();
-        String duration = dateRangeInfo.getDuration();
-
-        if (StringUtils.isBlank(duration) && startDate == null && endDate == null) {
-            throw new ValidationException(
-                    CommonErrorCodes.Validation.Statistic.DATE_RANGE_VALUES_EMPTY,
-                    "Date range fields startDate, endDate and duration is empty. Need to fill duration or startDate with endDate");
-        }
-
-        if (startDate != null
-                && endDate != null
-                && startDate.isAfter(endDate)) {
-            throw new ValidationException(
-                    CommonErrorCodes.Validation.Statistic.START_DATE_AFTER_END_DATE_ERROR,
-                    "Start date can't be after end date!");
-        }
-
-        if (startDate != null && endDate != null && StringUtils.isNotBlank(duration)) {
-            throw new ValidationException(
-                    CommonErrorCodes.Validation.Statistic.ILLEGAL_DATE_RANGE_STATE_ERROR,
-                    "Start date, end date and duration is fill! Need to fill duration or startDate with endDate");
-        }
-        if (StringUtils.isNotBlank(duration)) {
-            durationValidator.validate(duration);
         }
     }
 }

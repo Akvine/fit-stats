@@ -129,5 +129,11 @@ public class CommonErrorCodes {
             String WEIGHT_CHANGE_ERROR = "weight.change.error";
             String WEIGHT_INVALID_ERROR = "weight.invalid.error";
         }
+
+        interface Diet {
+            String ALL_PARAMETERS_PRESENTED_ERROR = "all.parameters.presented.error";
+            String PARAMETERS_NOT_PRESENTED_ERROR = "parameters.notPresented.error";
+            String DATE_PARSE_ERROR = "date.parse.error";
+        }
     }
 }

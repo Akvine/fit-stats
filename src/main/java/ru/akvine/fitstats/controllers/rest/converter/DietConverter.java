@@ -1,14 +1,16 @@
 package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.diet.*;
-import ru.akvine.fitstats.controllers.rest.dto.diet.ChangeDietRequest;
+import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeInfo;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DietRecordDto;
 import ru.akvine.fitstats.enums.Diet;
+import ru.akvine.fitstats.enums.Duration;
+import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.diet.*;
-import ru.akvine.fitstats.services.dto.diet.ChangeDiet;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
@@ -49,6 +51,16 @@ public class DietConverter {
 
     public DeleteRecord convertToDeleteRecord(DeleteRecordRequest request) {
         Preconditions.checkNotNull(request, "deleteRecordRequest is null");
+
+        DateRangeInfo dateRangeInfo = request.getDateRangeInfo();
+        if (dateRangeInfo != null) {
+            return new DeleteRecord()
+                    .setDateRange(new DateRange()
+                            .setDuration(StringUtils.isBlank(dateRangeInfo.getDuration()) ? null : Duration.valueOf(dateRangeInfo.getDuration()))
+                            .setStartDate(request.getDateRangeInfo().getStartDate())
+                            .setEndDate(request.getDateRangeInfo().getEndDate()))
+                    .setClientUuid(SecurityUtils.getCurrentUser().getUuid());
+        }
         return new DeleteRecord()
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .setRecordUuid(request.getUuid());

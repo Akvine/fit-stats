@@ -3,6 +3,7 @@ package ru.akvine.fitstats.services;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
+import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.diet.*;
@@ -24,8 +26,12 @@ import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static ru.akvine.fitstats.enums.Duration.*;
+import static ru.akvine.fitstats.utils.DateUtils.*;
+import static ru.akvine.fitstats.utils.DateUtils.getYearRange;
 import static ru.akvine.fitstats.utils.DietUtils.calculateMacronutrients;
 import static ru.akvine.fitstats.utils.DietUtils.transformPer100;
 
@@ -168,19 +174,12 @@ public class DietService {
         clientService.verifyExistsByUuidAndGet(clientUuid);
 
         String dietRecordUuid = deleteRecord.getRecordUuid();
-        DietRecordEntity dietRecordEntity;
-        if (dietRecordUuid.length() < length) {
-            List<DietRecordEntity> records = verifyExistsByPartialUuidAndGet(dietRecordUuid, clientUuid);
-            if (records.size() != 1) {
-                throw new DietRecordsNotUniqueResultException("Diet records by uuid = [" + dietRecordUuid + "] is not contains single element!");
-            }
-            dietRecordEntity = records.get(SINGLE_ELEMENT);
+        DateRange dateRange = deleteRecord.getDateRange();
+        if (StringUtils.isNotBlank(dietRecordUuid)) {
+           deleteRecordByUuid(dietRecordUuid, clientUuid);
         } else {
-            dietRecordEntity = verifyExistsByUuidAndGet(dietRecordUuid, clientUuid);
+            deleteRecordsByDateRange(dateRange, clientUuid);
         }
-
-        dietRecordRepository.delete(dietRecordEntity);
-        logger.info("Successful delete record with uuid = {} for client with uuid = {}", deleteRecord.getRecordUuid(), deleteRecord.getClientUuid());
     }
 
     public DietDisplay display(Display display) {
@@ -259,5 +258,50 @@ public class DietService {
         Preconditions.checkNotNull(uuid, "uuid is null");
         Preconditions.checkNotNull(clientUuid, "clientUuid is null");
         return dietRecordRepository.findByPartialUuid(uuid, clientUuid);
+    }
+
+    private void deleteRecordByUuid(String dietRecordUuid, String clientUuid) {
+        DietRecordEntity dietRecordEntity;
+        if (dietRecordUuid.length() < length) {
+            List<DietRecordEntity> records = verifyExistsByPartialUuidAndGet(dietRecordUuid, clientUuid);
+            if (records.size() != 1) {
+                throw new DietRecordsNotUniqueResultException("Diet records by uuid = [" + dietRecordUuid + "] is not contains single element!");
+            }
+            dietRecordEntity = records.get(SINGLE_ELEMENT);
+        } else {
+            dietRecordEntity = verifyExistsByUuidAndGet(dietRecordUuid, clientUuid);
+        }
+
+
+        dietRecordRepository.delete(dietRecordEntity);
+        logger.info("Successful delete record with uuid = {} for client with uuid = {}", dietRecordUuid, clientUuid);
+    }
+
+    private void deleteRecordsByDateRange(DateRange dateRange, String clientUuid) {
+        DateRange findDateRange;
+        if (dateRange.getDuration() != null) {
+            switch (Objects.requireNonNull(dateRange.getDuration())) {
+                case DAY:
+                    findDateRange = getDayRange();
+                    break;
+                case WEEK:
+                    findDateRange = getWeekRange();
+                    break;
+                case MONTH:
+                    findDateRange = getMonthRange();
+                    break;
+                default:
+                    findDateRange = getYearRange();
+            }
+        } else {
+            findDateRange = new DateRange(dateRange.getStartDate(), dateRange.getEndDate());
+        }
+
+        List<DietRecordEntity> records = dietRecordRepository.findByDateRange(
+                clientUuid,
+                findDateRange.getStartDate(),
+                findDateRange.getEndDate());
+        dietRecordRepository.deleteAll(records);
+        logger.info("Successful delete records for client with uuid = {}", clientUuid);
     }
 }
