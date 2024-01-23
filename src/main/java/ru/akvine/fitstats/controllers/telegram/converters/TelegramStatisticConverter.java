@@ -75,9 +75,9 @@ public class TelegramStatisticConverter {
 
     private String buildAdditionalStatisticResponse(AdditionalStatisticInfo additionalStatisticInfo) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Процент жиров в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("fats")).append(NEXT_LINE);
-        sb.append("Процент белка в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("proteins")).append(NEXT_LINE);
-        sb.append("Процент углеводов в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("carbohydrates")).append(NEXT_LINE);
+        sb.append("Процент калорий жиров в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("fats")).append(NEXT_LINE);
+        sb.append("Процент калорий от белка в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("proteins")).append(NEXT_LINE);
+        sb.append("Процент калорий углеводов в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("carbohydrates")).append(NEXT_LINE);
         sb.append("Процент калорий от алкоголя в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("alcohol")).append(NEXT_LINE);
         return sb.toString();
     }
