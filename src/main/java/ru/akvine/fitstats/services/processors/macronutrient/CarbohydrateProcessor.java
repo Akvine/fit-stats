@@ -2,6 +2,7 @@ package ru.akvine.fitstats.services.processors.macronutrient;
 
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.entities.DietRecordEntity;
+import ru.akvine.fitstats.enums.Macronutrient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +15,7 @@ public class CarbohydrateProcessor implements MacronutrientProcessor {
     }
 
     @Override
-    public String getType() {
-        return "carbohydrates";
+    public Macronutrient getType() {
+        return Macronutrient.CARBOHYDRATES;
     }
 }

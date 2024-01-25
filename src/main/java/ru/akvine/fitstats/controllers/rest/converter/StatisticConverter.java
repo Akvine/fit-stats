@@ -15,6 +15,7 @@ import ru.akvine.fitstats.utils.SecurityUtils;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class StatisticConverter {
@@ -29,10 +30,14 @@ public class StatisticConverter {
         String duration = request
                 .getDateRangeInfo()
                 .getDuration();
-        Map<String, List<String>> indicatorsWithMacronutrients = new LinkedHashMap<>();
+        Map<String, List<Macronutrient>> indicatorsWithMacronutrients = new LinkedHashMap<>();
         request
                 .getIndicators()
-                .forEach(indicator -> indicatorsWithMacronutrients.put(indicator, request.getMacronutrients()));
+                .forEach(indicator -> indicatorsWithMacronutrients.put(indicator, request
+                        .getMacronutrients()
+                        .stream()
+                        .map(Macronutrient::safeValueOf)
+                        .collect(Collectors.toList())));
         return DescriptiveStatistic
                 .builder()
                 .clientUuid(SecurityUtils.getCurrentUser().getUuid())

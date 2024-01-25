@@ -48,7 +48,7 @@ public class StatisticService {
     private final ModeStatisticProcessor modeStatisticProcessor;
     private final PercentStatisticProcessor percentStatisticProcessor;
     private final Map<String, StatisticProcessor> availableStatisticProcessors;
-    private final Map<String, MacronutrientProcessor> availableMacronutrientProcessors;
+    private final Map<Macronutrient, MacronutrientProcessor> availableMacronutrientProcessors;
 
     @Value("${round.accuracy}")
     private int roundAccuracy;
@@ -99,7 +99,7 @@ public class StatisticService {
                                 double statisticValue = availableStatisticProcessors
                                         .get(indicator)
                                         .calculate(macronutrientsValues);
-                                statsInfo.put(macronutrient, MathUtils.round(statisticValue, roundAccuracy));
+                                statsInfo.put(macronutrient.name().toLowerCase(), MathUtils.round(statisticValue, roundAccuracy));
                             });
                     indicatorStatistics.put(indicator, statsInfo);
                 });

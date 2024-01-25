@@ -81,7 +81,8 @@ public class TelegramProductConverter {
             sb.append("4. Белка: ").append(MathUtils.round(products.get(i).getProteins(), roundAccuracy)).append(NEXT_LINE);
             sb.append("5. Жиров: ").append(MathUtils.round(products.get(i).getFats(), roundAccuracy)).append(NEXT_LINE);
             sb.append("6. Углеводов: ").append(MathUtils.round(products.get(i).getCarbohydrates(), roundAccuracy)).append(NEXT_LINE);
-            sb.append("7. Калории: ").append(MathUtils.round(products.get(i).getCalories(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("7. Процент крепости: ").append(MathUtils.round(products.get(i).getVol(), roundAccuracy)).append(NEXT_LINE);
+            sb.append("8. Калории: ").append(MathUtils.round(products.get(i).getCalories(), roundAccuracy)).append(NEXT_LINE);
             if (i == lastElementIndex) {
                 sb.append("======================");
             }
