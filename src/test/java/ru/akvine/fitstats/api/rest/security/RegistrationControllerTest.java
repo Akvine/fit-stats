@@ -1,9 +1,10 @@
-package ru.akvine.fitstats.api.rest;
+package ru.akvine.fitstats.api.rest.security;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.ResultMatcher;
 import ru.akvine.fitstats.api.config.RestMethods;
+import ru.akvine.fitstats.api.rest.ApiBaseTest;
 import ru.akvine.fitstats.controllers.rest.dto.security.registration.RegistrationCheckOtpRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.registration.RegistrationFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.registration.RegistrationNewOtpRequest;

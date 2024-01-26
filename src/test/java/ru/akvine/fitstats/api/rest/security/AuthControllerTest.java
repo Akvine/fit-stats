@@ -1,10 +1,11 @@
-package ru.akvine.fitstats.api.rest;
+package ru.akvine.fitstats.api.rest.security;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
 import ru.akvine.fitstats.api.config.RestMethods;
+import ru.akvine.fitstats.api.rest.ApiBaseTest;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthCredentialsRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthNewOtpRequest;
