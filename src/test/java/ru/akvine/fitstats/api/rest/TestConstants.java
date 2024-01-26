@@ -29,6 +29,11 @@ public class TestConstants {
     public static final String CLIENT_EMAIL_EXISTS_4 = "client_email_4@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_5 = "client_email_5@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_6 = "client_email_6@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_7 = "client_email_7@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_8 = "client_email_8@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_9 = "client_email_9@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_10 = "client_email_10@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_11 = "client_email_11@mail.com";
 
     public static final String INVALID_EMAIL = "invalid email";
 

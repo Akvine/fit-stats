@@ -9,6 +9,7 @@ public class RestMethods {
     public static final String REGISTRATION_FINISH = "/registration/finish";
 
     public static final String AUTH_START = "/auth/start";
+    public static final String AUTH_NEW_OTP = "/auth/newotp";
     public static final String AUTH_FINISH = "/auth/finish";
 
     public static final String WEIGHT_RECORD_LIST = "/weight/record/list";
