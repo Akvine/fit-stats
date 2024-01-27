@@ -34,6 +34,8 @@ public class TestConstants {
     public static final String CLIENT_EMAIL_EXISTS_9 = "client_email_9@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_10 = "client_email_10@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_11 = "client_email_11@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_12 = "client_email_12@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_13 = "client_email_13@mail.com";
 
     public static final String INVALID_EMAIL = "invalid email";
 

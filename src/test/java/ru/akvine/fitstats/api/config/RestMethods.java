@@ -12,6 +12,8 @@ public class RestMethods {
     public static final String AUTH_NEW_OTP = "/auth/newotp";
     public static final String AUTH_FINISH = "/auth/finish";
 
+    public static final String PRODUCTS = "/products";
+
     public static final String WEIGHT_RECORD_LIST = "/weight/record/list";
     public static final String WEIGHT_RECORD_CHANGE = "/weight/record/change";
     public static final String WEIGHT_RECORD_DELETE = "/weight/record/delete";

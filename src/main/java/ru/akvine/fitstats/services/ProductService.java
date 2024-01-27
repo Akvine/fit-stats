@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    private static final String EMPTY_SPACE = " ";
-
     @Value("${uuid.length}")
     private int uuidLength;
 
