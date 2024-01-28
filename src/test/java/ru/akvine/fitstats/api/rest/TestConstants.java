@@ -36,8 +36,17 @@ public class TestConstants {
     public static final String CLIENT_EMAIL_EXISTS_11 = "client_email_11@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_12 = "client_email_12@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_13 = "client_email_13@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_14 = "client_email_14@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_15 = "client_email_15@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_16 = "client_email_16@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_17 = "client_email_17@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_18 = "client_email_18@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_19 = "client_email_19@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_20 = "client_email_20@mail.com";
 
     public static final String INVALID_EMAIL = "invalid email";
 
     public static final String VALID_PASSWORD = "aBcDeF1234";
+
+    public static final String CLIENT_UUID_20 = "client_uuid_20";
 }

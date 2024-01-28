@@ -30,6 +30,7 @@ public class DietController implements DietControllerMeta {
 
     @Override
     public Response add(@Valid AddRecordRequest request) {
+        // TODO: добавить валидацию на поле volume + написать тесты
         AddDietRecordStart addDietRecordStart = dietConverter.convertToDietRecordBean(request);
         AddDietRecordFinish addDietRecordFinish = dietService.add(addDietRecordStart);
         return dietConverter.convertDietRecordResponse(addDietRecordFinish);

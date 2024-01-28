@@ -41,6 +41,14 @@ public class DateRangeInfoValidator {
                     CommonErrorCodes.Validation.Statistic.ILLEGAL_DATE_RANGE_STATE_ERROR,
                     "Start date, end date and duration is fill! Need to fill duration or startDate with endDate");
         }
+
+        if ((startDate != null && endDate == null) || (endDate != null && startDate == null)) {
+            // TODO: отвязать ошибки парсинга от Statistic, т.к. может использоваться не только при расчете статистики
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Statistic.DATE_RANGE_VALUES_EMPTY,
+                    "Start or date field is empty!");
+        }
+
         if (StringUtils.isNotBlank(duration)) {
             durationValidator.validate(duration);
         }

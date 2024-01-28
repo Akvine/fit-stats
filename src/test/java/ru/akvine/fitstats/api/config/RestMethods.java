@@ -14,6 +14,12 @@ public class RestMethods {
 
     public static final String PRODUCTS = "/products";
 
+    public static final String DIET_RECORDS_ADD = "/diet/records/add";
+    public static final String DIET_RECORDS_LIST = "/diet/records/list";
+    public static final String DIET_RECORDS_DELETE = "/diet/records/delete";
+    public static final String DIET_DISPLAY = "/diet/display";
+    public static final String DIET_CHANGE = "/diet/change";
+
     public static final String WEIGHT_RECORD_LIST = "/weight/record/list";
     public static final String WEIGHT_RECORD_CHANGE = "/weight/record/change";
     public static final String WEIGHT_RECORD_DELETE = "/weight/record/delete";
