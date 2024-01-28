@@ -3,6 +3,7 @@ package ru.akvine.fitstats.controllers.rest.validators;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import ru.akvine.fitstats.controllers.rest.dto.diet.AddRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.ChangeDietRequest;
 import ru.akvine.fitstats.controllers.rest.dto.diet.DeleteRecordRequest;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeInfo;
@@ -15,6 +16,14 @@ import ru.akvine.fitstats.validators.DietBaseValidator;
 public class DietValidator {
     private final DietBaseValidator dietBaseValidator;
     private final DateRangeInfoValidator dateRangeInfoValidator;
+
+    public void verifyAddDietRecordRequest(AddRecordRequest request) {
+        if (request.getVolume() < 0) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Diet.DIET_VOLUME_INVALID_ERROR,
+                    "Volume can't be less or equals 0");
+        }
+    }
 
     public void verifyUpdateDietRequest(ChangeDietRequest request) {
         dietBaseValidator.validate(request.getDietType());

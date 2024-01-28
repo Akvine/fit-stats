@@ -46,6 +46,20 @@ public class DietControllerTest extends ApiBaseTest {
                 .andExpect(jsonPath("$.code").value(CommonErrorCodes.Validation.FIELD_NOT_PRESENTED_ERROR));
     }
 
+    @DisplayName("FAIL - volume less than 0")
+    @Test
+    public void testDietAdd_fail_volumeLessThanZero() throws Exception {
+        String sessionId = doAuth(CLIENT_EMAIL_EXISTS_14).getValue();
+        AddRecordRequest request = new AddRecordRequest()
+                .setProductUuid("product_uuid_1")
+                .setVolume(-5);
+
+        doPost(RestMethods.DIET_RECORDS_ADD, sessionId, request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(REQUEST_STATUS_FAIL))
+                .andExpect(jsonPath("$.code").value(CommonErrorCodes.Validation.Diet.DIET_VOLUME_INVALID_ERROR));
+    }
+
     @DisplayName("SUCCESS - add diet")
     @Test
     public void testDietAdd_success() throws Exception {

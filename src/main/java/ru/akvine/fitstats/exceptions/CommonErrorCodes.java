@@ -133,7 +133,7 @@ public class CommonErrorCodes {
         interface Diet {
             String ALL_PARAMETERS_PRESENTED_ERROR = "all.parameters.presented.error";
             String PARAMETERS_NOT_PRESENTED_ERROR = "parameters.notPresented.error";
-            String DATE_PARSE_ERROR = "date.parse.error";
+            String DIET_VOLUME_INVALID_ERROR = "diet.volume.invalid.error";
         }
     }
 }
