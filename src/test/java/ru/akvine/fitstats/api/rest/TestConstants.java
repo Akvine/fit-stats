@@ -22,6 +22,8 @@ public class TestConstants {
     public static final String CLIENT_EMAIL_NOT_EXISTS_1 = "client_email_not_exists1@gmail.com";
     public static final String CLIENT_EMAIL_NOT_EXISTS_2 = "client_email_not_exists2@gmail.com";
     public static final String CLIENT_EMAIL_NOT_EXISTS_3 = "client_email_not_exists3@gmail.com";
+    public static final String CLIENT_EMAIL_NOT_EXISTS_4 = "client_email_not_exists4@gmail.com";
+    public static final String CLIENT_EMAIL_NOT_EXISTS_5 = "client_email_not_exists5@gmail.com";
 
     public static final String CLIENT_EMAIL_EXISTS_1 = "client_email_1@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_2 = "client_email_2@mail.com";
@@ -43,10 +45,16 @@ public class TestConstants {
     public static final String CLIENT_EMAIL_EXISTS_18 = "client_email_18@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_19 = "client_email_19@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_20 = "client_email_20@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_21 = "client_email_21@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_22 = "client_email_22@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_23 = "client_email_23@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_24 = "client_email_24@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_25 = "client_email_25@mail.com";
 
     public static final String INVALID_EMAIL = "invalid email";
 
     public static final String VALID_PASSWORD = "aBcDeF1234";
+    public static final String INVALID_PASSWORD = "invPas";
 
     public static final String CLIENT_UUID_20 = "client_uuid_20";
 }

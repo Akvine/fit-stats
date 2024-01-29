@@ -12,6 +12,11 @@ public class RestMethods {
     public static final String AUTH_NEW_OTP = "/auth/newotp";
     public static final String AUTH_FINISH = "/auth/finish";
 
+    public static final String ACCESS_RESTORE_START = "/access/restore/start";
+    public static final String ACCESS_RESTORE_NEWOTP = "/access/restore/newotp";
+    public static final String ACCESS_RESTORE_CHECK = "/access/restore/check";
+    public static final String ACCESS_RESTORE_FINISH = "/access/restore/finish";
+
     public static final String PRODUCTS = "/products";
 
     public static final String DIET_RECORDS_ADD = "/diet/records/add";

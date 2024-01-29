@@ -52,7 +52,7 @@ public class AccessRestoreController implements AccessRestoreControllerMeta {
 
     @Override
     public Response finish(@Valid AccessRestoreFinishRequest request, HttpServletRequest httpServletRequest) {
-        accessRestoreValidator.verifyAccessRestore(request);
+        accessRestoreValidator.verifyAccessRestoreFinish(request);
         AccessRestoreActionRequest actionRequest = accessRestoreConverter.convertToAccessRestoreActionRequest(request, httpServletRequest);
         ClientBean clientBean = accessRestoreActionService.finishAccessRestore(actionRequest);
         SecurityUtils.authenticate(clientBean);
