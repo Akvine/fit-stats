@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 
 @Component
 public class PasswordValidator implements Validator<String> {
-    private static int DEFAULT_PWD_MIN_LENGTH = 8;
-    private static int DEFAULT_PWD_MAX_LENGTH = 20;
+    private static final int DEFAULT_PWD_MIN_LENGTH = 8;
+    private static final int DEFAULT_PWD_MAX_LENGTH = 20;
 
     private static final Pattern bigPattern = Pattern.compile("[A-Z]+");
     private static final Pattern smallPattern = Pattern.compile("[a-z]+");
