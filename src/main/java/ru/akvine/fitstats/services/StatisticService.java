@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.Macronutrient;
+import ru.akvine.fitstats.enums.StatisticType;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
@@ -46,7 +47,7 @@ public class StatisticService {
     private final ClientService clientService;
     private final ModeStatisticProcessor modeStatisticProcessor;
     private final PercentStatisticProcessor percentStatisticProcessor;
-    private final Map<String, StatisticProcessor> availableStatisticProcessors;
+    private final Map<StatisticType, StatisticProcessor> availableStatisticProcessors;
     private final Map<Macronutrient, MacronutrientProcessor> availableMacronutrientProcessors;
 
     @Value("${round.accuracy}")
@@ -100,7 +101,7 @@ public class StatisticService {
                                         .calculate(macronutrientsValues);
                                 statsInfo.put(macronutrient.name().toLowerCase(), MathUtils.round(statisticValue, roundAccuracy));
                             });
-                    indicatorStatistics.put(indicator, statsInfo);
+                    indicatorStatistics.put(indicator.toString().toLowerCase(), statsInfo);
                 });
         return new DescriptiveStatisticInfo()
                 .setStatisticInfo(indicatorStatistics);
@@ -259,7 +260,7 @@ public class StatisticService {
                 .average()
                 .orElse(0), roundAccuracy);
         median = MathUtils.round(
-                availableStatisticProcessors.get("median").calculate(new ArrayList<>(macronutrientHistory
+                availableStatisticProcessors.get(StatisticType.MEDIAN).calculate(new ArrayList<>(macronutrientHistory
                         .values())), roundAccuracy);
 
         return new StatisticHistoryResult()

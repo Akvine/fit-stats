@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.services.processors.statistic.main;
 
 import org.springframework.stereotype.Component;
+import ru.akvine.fitstats.enums.StatisticType;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class MaxStatisticProcessor implements StatisticProcessor {
     }
 
     @Override
-    public String getType() {
-        return "max";
+    public StatisticType getType() {
+        return StatisticType.MAX;
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.*;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.Macronutrient;
+import ru.akvine.fitstats.enums.StatisticType;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.statistic.*;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
@@ -30,10 +31,10 @@ public class StatisticConverter {
         String duration = request
                 .getDateRangeInfo()
                 .getDuration();
-        Map<String, List<Macronutrient>> indicatorsWithMacronutrients = new LinkedHashMap<>();
+        Map<StatisticType, List<Macronutrient>> indicatorsWithMacronutrients = new LinkedHashMap<>();
         request
                 .getIndicators()
-                .forEach(indicator -> indicatorsWithMacronutrients.put(indicator, request
+                .forEach(indicator -> indicatorsWithMacronutrients.put(StatisticType.safeValueOf(indicator), request
                         .getMacronutrients()
                         .stream()
                         .map(Macronutrient::safeValueOf)
