@@ -50,6 +50,10 @@ public class TestConstants {
     public static final String CLIENT_EMAIL_EXISTS_23 = "client_email_23@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_24 = "client_email_24@mail.com";
     public static final String CLIENT_EMAIL_EXISTS_25 = "client_email_25@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_26 = "client_email_26@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_27 = "client_email_27@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_28 = "client_email_28@mail.com";
+    public static final String CLIENT_EMAIL_EXISTS_29 = "client_email_29@mail.com";
 
     public static final String INVALID_EMAIL = "invalid email";
 

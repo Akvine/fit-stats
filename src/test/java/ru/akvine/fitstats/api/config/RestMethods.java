@@ -19,6 +19,9 @@ public class RestMethods {
 
     public static final String PRODUCTS = "/products";
 
+    public static final String TELEGRAM_AUTH_CODE_GENERATE = "/telegram/auth/code/generate";
+    public static final String TELEGRAM_AUTH_CODE_GET = "/telegram/auth/code/get";
+
     public static final String DIET_RECORDS_ADD = "/diet/records/add";
     public static final String DIET_RECORDS_LIST = "/diet/records/list";
     public static final String DIET_RECORDS_DELETE = "/diet/records/delete";
