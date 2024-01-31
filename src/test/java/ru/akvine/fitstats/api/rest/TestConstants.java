@@ -62,4 +62,9 @@ public class TestConstants {
     public static final String INVALID_PASSWORD = "invPas";
 
     public static final String CLIENT_UUID_20 = "client_uuid_20";
+
+    public static final String PRODUCT_UUID_3 = "product_uuid_3";
+    public static final String PRODUCT_UUID_4 = "product_uuid_4";
+
+    public static final String SECRET = "test_secret";
 }

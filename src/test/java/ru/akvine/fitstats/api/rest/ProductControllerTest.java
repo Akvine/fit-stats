@@ -96,7 +96,7 @@ public class ProductControllerTest extends ApiBaseTest {
         doPost(RestMethods.PRODUCTS, sessionId, request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_FAIL))
-                .andExpect(jsonPath("$.code").value(CommonErrorCodes.GENERAL_ERROR));
+                .andExpect(jsonPath("$.code").value(CommonErrorCodes.Validation.FIELD_INVALID_ERROR));
     }
 
     @DisplayName("SUCCESS - add product")
@@ -167,7 +167,7 @@ public class ProductControllerTest extends ApiBaseTest {
         doGet(RestMethods.PRODUCTS, sessionId, request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_FAIL))
-                .andExpect(jsonPath("$.code").value(CommonErrorCodes.GENERAL_ERROR));
+                .andExpect(jsonPath("$.code").value(CommonErrorCodes.Validation.FIELD_INVALID_ERROR));
     }
 
     @DisplayName("SUCCESS - list all products by macronutrient filter")

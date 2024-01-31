@@ -106,6 +106,7 @@ public class AdminConverter {
                 .setCalories(MathUtils.round(productBean.getCalories(), PRODUCT_ROUND_VALUE_ACCURACY))
                 .setCarbohydrates(MathUtils.round(productBean.getCarbohydrates(), PRODUCT_ROUND_VALUE_ACCURACY))
                 .setMeasurement(productBean.getMeasurement().toString())
+                .setVol(productBean.getVol())
                 .setVolume(productBean.getVolume());
     }
 

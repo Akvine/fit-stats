@@ -31,4 +31,8 @@ public class RestMethods {
     public static final String WEIGHT_RECORD_LIST = "/weight/record/list";
     public static final String WEIGHT_RECORD_CHANGE = "/weight/record/change";
     public static final String WEIGHT_RECORD_DELETE = "/weight/record/delete";
+
+    public static final String ADMIN_PRODUCTS_EXPORT = "/admin/products/export";
+    public static final String ADMIN_PRODUCTS_UPDATE = "/admin/products/update";
+    public static final String ADMIN_PRODUCTS_DELETE = "/admin/products/delete";
 }

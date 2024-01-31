@@ -45,6 +45,7 @@ public class CommonErrorCodes {
 
     public interface Validation {
         String FIELD_NOT_PRESENTED_ERROR = "field.not.presented.error";
+        String FIELD_INVALID_ERROR = "field.invalid.error";
 
         String FILE_SIZE_INVALID_ERROR = "file.size.invalid.error";
         String FILE_CONTENT_TYPE_INVALID_ERROR = "file.content-type.invalid.error";

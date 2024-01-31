@@ -126,6 +126,12 @@ public class AdminValidator {
                     "Volume is less than 0. Field name: volume");
         }
 
+        if (updateProductRequest.getVol() != null && (updateProductRequest.getVol() < 0 || updateProductRequest.getVol() > 100)) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR,
+                    "VOL is less than 0 or greater than 100. Field name: volume");
+        }
+
         if (StringUtils.isNotBlank(updateProductRequest.getMeasurement())) {
             volumeMeasurementValidator.validate(updateProductRequest.getMeasurement());
         }
