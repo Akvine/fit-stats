@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
 import ru.akvine.fitstats.repositories.security.BlockedCredentialsRepository;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.time.LocalDateTime;
@@ -20,11 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class BlockingService {
     private final BlockedCredentialsRepository blockedCredentialsRepository;
+    private final PropertyParseService propertyParseService;
 
     private ConcurrentHashMap<String, BlockTime> blockedCache = new ConcurrentHashMap<>();
 
-    @Value("${security.otp.block.time.minutes}")
-    private int otpBlockTimeMinutes;
+    @Value("security.otp.block.time.minutes")
+    private String otpBlockTimeMinutes;
 
     @Nullable
     public LocalDateTime getUnblockDate(String login) {
@@ -55,7 +57,7 @@ public class BlockingService {
     }
 
     public long setBlock(String login) {
-        BlockTime newBlock = new BlockTime(otpBlockTimeMinutes);
+        BlockTime newBlock = new BlockTime(propertyParseService.parseLong(otpBlockTimeMinutes));
         String cacheKey = login;
         blockedCache.put(cacheKey, newBlock);
 

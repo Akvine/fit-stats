@@ -18,6 +18,7 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
 import ru.akvine.fitstats.services.dto.security.registration.RegistrationActionRequest;
 import ru.akvine.fitstats.services.dto.security.registration.RegistrationActionResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import java.time.LocalDateTime;
 
@@ -27,13 +28,14 @@ import java.time.LocalDateTime;
 public class RegistrationActionService extends OtpActionService<RegistrationActionEntity> {
     private final RegistrationActionRepository registrationActionRepository;
     private final ClientService clientService;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${security.otp.action.lifetime.seconds}")
-    private int otpActionLifetimeSeconds;
-    @Value("${security.otp.max.invalid.attempts}")
-    private int optMaxInvalidAttempts;
-    @Value("${security.otp.max.new.generation.per.action}")
-    private int otpMaxNewGenerationPerAction;
+    @Value("security.otp.action.lifetime.seconds")
+    private String otpActionLifetimeSeconds;
+    @Value("security.otp.max.invalid.attempts")
+    private String optMaxInvalidAttempts;
+    @Value("security.otp.max.new.generation.per.action")
+    private String otpMaxNewGenerationPerAction;
 
     public RegistrationActionResult startRegistration(RegistrationActionRequest request) {
         Preconditions.checkNotNull(request, "registrationActionRequest is null");
@@ -142,13 +144,13 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
 
     protected RegistrationActionEntity createNewActionAndSendOtp(String login, String sessionId) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime actionExpiredAt = now.plusSeconds(otpActionLifetimeSeconds);
+        LocalDateTime actionExpiredAt = now.plusSeconds(propertyParseService.parseInteger(otpActionLifetimeSeconds));
 
         OtpActionEntity otp = new OtpActionEntity()
                 .setStartedDate(now)
                 .setActionExpiredAt(actionExpiredAt)
-                .setOtpInvalidAttemptsLeft(optMaxInvalidAttempts)
-                .setOtpCountLeft(otpMaxNewGenerationPerAction);
+                .setOtpInvalidAttemptsLeft(propertyParseService.parseInteger(optMaxInvalidAttempts))
+                .setOtpCountLeft(propertyParseService.parseInteger(otpMaxNewGenerationPerAction));
 
         RegistrationActionEntity registrationAction = new RegistrationActionEntity()
                 .setLogin(login)

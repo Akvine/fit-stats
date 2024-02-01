@@ -12,7 +12,7 @@ import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorCsvW
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
-import ru.akvine.fitstats.repositories.ProductRepository;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.VolumeMeasurementValidator;
 import ru.akvine.fitstats.validators.file.FileValidator;
@@ -26,23 +26,26 @@ import static java.util.stream.Collectors.toMap;
 
 @Component
 public class AdminValidator {
-    @Value("${admin.secret}")
+    @Value("admin.secret")
     private String secret;
-    @Value("${file.converter.max-rows.limit}")
-    private int maxRowsLimit;
+    @Value("file.converter.max-rows.limit")
+    private String maxRowsLimit;
 
     private final VolumeMeasurementValidator volumeMeasurementValidator;
     private final ConverterTypeValidator converterTypeValidator;
     private final Map<FileType, FileValidator> availableFileValidators;
     private final AdminValidatorCsvWrapper adminValidatorCsvWrapper;
+    private final PropertyParseService propertyParseService;
 
     public AdminValidator(VolumeMeasurementValidator volumeMeasurementValidator,
                           ConverterTypeValidator converterTypeValidator,
                           List<FileValidator> fileValidators,
-                          AdminValidatorCsvWrapper adminValidatorCsvWrapper) {
+                          AdminValidatorCsvWrapper adminValidatorCsvWrapper,
+                          PropertyParseService propertyParseService) {
         this.volumeMeasurementValidator = volumeMeasurementValidator;
         this.adminValidatorCsvWrapper = adminValidatorCsvWrapper;
         this.converterTypeValidator = converterTypeValidator;
+        this.propertyParseService = propertyParseService;
         this.availableFileValidators = fileValidators
                 .stream()
                 .collect(toMap(FileValidator::getType, identity()));
@@ -68,7 +71,7 @@ public class AdminValidator {
 
     public List<InvalidProductRow> verifyImportProducts(ImportProducts importProducts) {
         int rowsCount = importProducts.getRecords().size();
-        if (rowsCount > maxRowsLimit) {
+        if (rowsCount > propertyParseService.parseInteger(maxRowsLimit)) {
             String message = String.format("File rows count = [%s] greater than limit [%s]!", rowsCount, maxRowsLimit);
             throw new ValidationException(
                     CommonErrorCodes.Validation.FILE_MAX_ROWS_COUNT_INVALID_ERROR,
@@ -143,7 +146,8 @@ public class AdminValidator {
     }
 
     public void verifySecret(String secret) {
-        if (!this.secret.equals(secret)) {
+        String adminSecret = propertyParseService.get(this.secret);
+        if (!adminSecret.equals(secret)) {
             throw new BadCredentialsException("Bad credentials!");
         }
     }

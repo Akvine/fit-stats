@@ -15,6 +15,7 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionRequest;
 import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionResult;
 import ru.akvine.fitstats.services.dto.security.OtpCreateNewAction;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.services.security.PasswordRequiredActionService;
 
 import java.time.LocalDateTime;
@@ -25,13 +26,14 @@ import java.time.LocalDateTime;
 public class ProfileChangePasswordActionService extends PasswordRequiredActionService<ProfileChangePasswordActionEntity> {
     private final ProfileChangePasswordActionRepository profileChangePasswordActionRepository;
     private final PasswordService passwordService;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${security.otp.action.lifetime.seconds}")
-    private int otpActionLifetimeSeconds;
-    @Value("${security.otp.max.invalid.attempts}")
-    private int otpMaxInvalidAttempts;
-    @Value("${security.otp.password.max.invalid.attempts}")
-    private int otpPasswordMaxInvalidAttempts;
+    @Value("security.otp.action.lifetime.seconds")
+    private String otpActionLifetimeSeconds;
+    @Value("security.otp.max.invalid.attempts")
+    private String otpMaxInvalidAttempts;
+    @Value("security.otp.password.max.invalid.attempts")
+    private String otpPasswordMaxInvalidAttempts;
 
     public ProfileChangePasswordActionResult startChangePassword(ProfileChangePasswordActionRequest request) {
         Preconditions.checkNotNull(request, "request is null!");
@@ -86,7 +88,7 @@ public class ProfileChangePasswordActionService extends PasswordRequiredActionSe
     @Override
     protected ProfileChangePasswordActionEntity createNewActionAndSendOtp(OtpCreateNewAction otpCreateNewAction) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime actionExpiredAt = now.plusSeconds(otpActionLifetimeSeconds);
+        LocalDateTime actionExpiredAt = now.plusSeconds(propertyParseService.parseInteger(otpActionLifetimeSeconds));
 
         String newHash = passwordService.encodePassword(otpCreateNewAction.getNewValue());
 
@@ -94,13 +96,13 @@ public class ProfileChangePasswordActionService extends PasswordRequiredActionSe
         changePasswordAction.setLogin(otpCreateNewAction.getLogin());
         changePasswordAction.setSessionId(otpCreateNewAction.getSessionId());
         changePasswordAction.setNewHash(newHash);
-        changePasswordAction.setPwdInvalidAttemptsLeft(otpPasswordMaxInvalidAttempts);
+        changePasswordAction.setPwdInvalidAttemptsLeft(propertyParseService.parseInteger(otpPasswordMaxInvalidAttempts));
 
         OtpActionEntity otp = new OtpActionEntity()
                 .setStartedDate(now)
                 .setActionExpiredAt(actionExpiredAt)
-                .setOtpInvalidAttemptsLeft(otpMaxInvalidAttempts)
-                .setOtpCountLeft(otpMaxInvalidAttempts);
+                .setOtpInvalidAttemptsLeft(propertyParseService.parseInteger(otpMaxInvalidAttempts))
+                .setOtpCountLeft(propertyParseService.parseInteger(otpMaxInvalidAttempts));
         changePasswordAction.setOtpAction(otp);
 
         return updateNewOtpAndSendToClient(changePasswordAction);

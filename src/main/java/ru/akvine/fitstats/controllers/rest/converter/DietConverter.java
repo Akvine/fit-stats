@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import ru.akvine.fitstats.enums.Diet;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.diet.*;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
@@ -20,9 +22,12 @@ import java.util.stream.Collectors;
 import static ru.akvine.fitstats.utils.MathUtils.round;
 
 @Component
+@RequiredArgsConstructor
 public class DietConverter {
-    @Value("${round.accuracy}")
-    private int roundAccuracy;
+    private final PropertyParseService propertyParseService;
+
+    @Value("round.accuracy")
+    private String roundAccuracy;
 
     public AddDietRecordStart convertToDietRecordBean(AddRecordRequest request) {
         Preconditions.checkNotNull(request, "addRecordRequest is null");
@@ -97,30 +102,32 @@ public class DietConverter {
     }
 
     private DietRecordDto buildDietRecordDto(DietRecordBean dietRecordBean) {
+        int accuracy = propertyParseService.parseInteger(roundAccuracy);
         return new DietRecordDto()
                 .setUuid(dietRecordBean.getUuid())
                 .setProductUuid(dietRecordBean.getProductBean().getUuid())
                 .setProductTitle(dietRecordBean.getProductBean().getTitle())
                 .setProteins(dietRecordBean.getProteins())
-                .setFats(round(dietRecordBean.getFats(), roundAccuracy))
-                .setCarbohydrates(round(dietRecordBean.getCarbohydrates(), roundAccuracy))
-                .setVol(round(dietRecordBean.getVol(), roundAccuracy))
-                .setCalories(round(dietRecordBean.getCalories(), roundAccuracy))
+                .setFats(round(dietRecordBean.getFats(), accuracy))
+                .setCarbohydrates(round(dietRecordBean.getCarbohydrates(), accuracy))
+                .setVol(round(dietRecordBean.getVol(), accuracy))
+                .setCalories(round(dietRecordBean.getCalories(), accuracy))
                 .setVolume(dietRecordBean.getVolume())
                 .setMeasurement(dietRecordBean.getProductBean().getMeasurement().toString());
     }
 
     private DietRecordDto buildDietRecordDto(AddDietRecordFinish dietRecordFinish) {
         Preconditions.checkNotNull(dietRecordFinish, "dietRecordFinish is null");
+        int accuracy = propertyParseService.parseInteger(roundAccuracy);
         return new DietRecordDto()
                 .setUuid(dietRecordFinish.getUuid())
                 .setProductUuid(dietRecordFinish.getProductUuid())
                 .setProductTitle(dietRecordFinish.getProductTitle())
-                .setProteins(round(dietRecordFinish.getProteins(), roundAccuracy))
-                .setFats(round(dietRecordFinish.getFats(), roundAccuracy))
-                .setCarbohydrates(round(dietRecordFinish.getCarbohydrates(), roundAccuracy))
-                .setVol(round(dietRecordFinish.getVol(), roundAccuracy))
-                .setCalories(round(dietRecordFinish.getCalories(), roundAccuracy))
+                .setProteins(round(dietRecordFinish.getProteins(), accuracy))
+                .setFats(round(dietRecordFinish.getFats(), accuracy))
+                .setCarbohydrates(round(dietRecordFinish.getCarbohydrates(), accuracy))
+                .setVol(round(dietRecordFinish.getVol(), accuracy))
+                .setCalories(round(dietRecordFinish.getCalories(), accuracy))
                 .setVolume(dietRecordFinish.getVolume())
                 .setMeasurement(dietRecordFinish.getVolumeMeasurement().toString());
     }

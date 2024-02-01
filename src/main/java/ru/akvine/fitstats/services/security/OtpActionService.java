@@ -12,6 +12,7 @@ import ru.akvine.fitstats.entities.security.OtpInfo;
 import ru.akvine.fitstats.exceptions.security.*;
 import ru.akvine.fitstats.repositories.security.ActionRepository;
 import ru.akvine.fitstats.services.notification.NotificationProvider;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import java.time.LocalDateTime;
 
@@ -24,9 +25,11 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
     protected OtpService otpService;
     @Autowired
     protected NotificationProvider notificationProvider;
+    @Autowired
+    protected PropertyParseService propertyParseService;
 
-    @Value("${security.otp.new.delay.seconds}")
-    private long otpDelaySeconds;
+    @Value("security.otp.new.delay.seconds")
+    private String otpDelaySeconds;
 
     public <R> R generateNewOtp(String payload) {
         Preconditions.checkNotNull(payload, "payload is null");
@@ -145,7 +148,10 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
     }
 
     private boolean newOtpDelayIsNotPassed(T passwordChangeAction) {
-        LocalDateTime generationAllowedTime = passwordChangeAction.getOtpAction().getOtpLastUpdate().plusSeconds(otpDelaySeconds);
+        LocalDateTime generationAllowedTime = passwordChangeAction
+                .getOtpAction()
+                .getOtpLastUpdate()
+                .plusSeconds(propertyParseService.parseLong(otpDelaySeconds));
         return LocalDateTime.now().isBefore(generationAllowedTime);
     }
 

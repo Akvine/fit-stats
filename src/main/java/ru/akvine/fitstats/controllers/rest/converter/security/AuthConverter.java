@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.controllers.rest.converter.security;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,15 +11,19 @@ import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthResponse;
 import ru.akvine.fitstats.services.dto.security.auth.AuthActionRequest;
 import ru.akvine.fitstats.services.dto.security.auth.AuthActionResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Component
+@RequiredArgsConstructor
 public class AuthConverter {
 
-    @Value("${security.otp.new.delay.seconds}")
-    private int otpNewDelaySeconds;
+    private final PropertyParseService propertyParseService;
+
+    @Value("security.otp.new.delay.seconds")
+    private String otpNewDelaySeconds;
 
     public AuthActionRequest convertToAuthActionRequest(AuthCredentialsRequest request, HttpServletRequest httpServletRequest) {
         Preconditions.checkNotNull(request, "authCredentialsRequest is null");
@@ -48,7 +53,7 @@ public class AuthConverter {
                 .setOtpNumber(result.getOtp().getOtpNumber())
                 .setOtpCountLeft(result.getOtp().getOtpCountLeft())
                 .setOtpLastUpdate(result.getOtp().getOtpLastUpdate().toString())
-                .setNewOtpDelay(otpNewDelaySeconds)
+                .setNewOtpDelay(propertyParseService.parseInteger(otpNewDelaySeconds))
                 .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
         return new AuthResponse().setOtp(otpActionResponse);
     }

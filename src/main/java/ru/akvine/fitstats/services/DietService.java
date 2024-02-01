@@ -22,6 +22,7 @@ import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.diet.*;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.services.listeners.AddDietRecordEvent;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDate;
@@ -45,11 +46,12 @@ public class DietService {
     private final ProductService productService;
     private final BiometricService biometricService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final PropertyParseService propertyParseService;
 
     private final static int SINGLE_ELEMENT = 0;
 
-    @Value("${uuid.length}")
-    private int length;
+    @Value("uuid.length")
+    private String length;
 
     @Transactional
     public AddDietRecordFinish add(AddDietRecordStart addDietRecordStart) {
@@ -60,7 +62,7 @@ public class DietService {
         ClientEntity clientEntity = clientService.verifyExistsByUuidAndGet(clientUuid);
         String productUuid = addDietRecordStart.getProductUuid();
         ProductEntity productEntity;
-        if (productUuid.length() < length) {
+        if (productUuid.length() < propertyParseService.parseInteger(length)) {
             List<ProductEntity> products = productService.verifyExistsByPartialUuidAndGet(productUuid);
             if (products.size() != 1) {
                 throw new ProductsNotUniqueResultException("Products by uuid = [" + productUuid + "] is not contains single element!");
@@ -84,7 +86,7 @@ public class DietService {
                 addDietRecordStart.getVolume());
 
         DietRecordEntity dietRecordEntity = new DietRecordEntity()
-                .setUuid(UUIDGenerator.uuidWithoutDashes(length))
+                .setUuid(UUIDGenerator.uuidWithoutDashes(propertyParseService.parseInteger(length)))
                 .setProteins(consumedMacronutrients.getProteins())
                 .setFats(consumedMacronutrients.getFats())
                 .setCarbohydrates(consumedMacronutrients.getCarbohydrates())
@@ -127,7 +129,7 @@ public class DietService {
         ProductEntity productEntity = productService.findByUuid(productUuid);
 
         DietRecordEntity dietRecordEntity = new DietRecordEntity()
-                .setUuid(UUIDGenerator.uuidWithoutDashes(length))
+                .setUuid(UUIDGenerator.uuidWithoutDashes(propertyParseService.parseInteger(length)))
                 .setProteins(dietRecordBean.getProteins())
                 .setFats(dietRecordBean.getFats())
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
@@ -262,7 +264,7 @@ public class DietService {
 
     private void deleteRecordByUuid(String dietRecordUuid, String clientUuid) {
         DietRecordEntity dietRecordEntity;
-        if (dietRecordUuid.length() < length) {
+        if (dietRecordUuid.length() < propertyParseService.parseInteger(length)) {
             List<DietRecordEntity> records = verifyExistsByPartialUuidAndGet(dietRecordUuid, clientUuid);
             if (records.size() != 1) {
                 throw new DietRecordsNotUniqueResultException("Diet records by uuid = [" + dietRecordUuid + "] is not contains single element!");

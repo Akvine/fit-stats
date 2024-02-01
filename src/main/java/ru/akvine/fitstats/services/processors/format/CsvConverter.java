@@ -1,12 +1,14 @@
 package ru.akvine.fitstats.services.processors.format;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.exceptions.util.CsvException;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.ReflectionUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -15,9 +17,12 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class CsvConverter implements Converter {
-    @Value("${csv.file.converter.separator}")
-    private char csvDelimiter;
+    private final PropertyParseService propertyParseService;
+
+    @Value("csv.file.converter.separator")
+    private String csvDelimiter;
 
     private final static int START_INDEX = 0;
     private final static String ROW_NUMBER_HEADER = "rowNumber";
@@ -27,7 +32,7 @@ public class CsvConverter implements Converter {
         Preconditions.checkNotNull(records, "records is null");
         Preconditions.checkNotNull(clazz, "class is null");
 
-        CSVFormat format = CSVFormat.DEFAULT.builder().setDelimiter(csvDelimiter).build();
+        CSVFormat format = CSVFormat.DEFAULT.builder().setDelimiter(propertyParseService.parseChar(csvDelimiter)).build();
         ReflectionUtils.getFieldNames(clazz);
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();

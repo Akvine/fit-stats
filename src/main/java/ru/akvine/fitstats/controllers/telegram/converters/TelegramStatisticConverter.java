@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.controllers.telegram.converters;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -12,15 +13,18 @@ import ru.akvine.fitstats.services.dto.statistic.AdditionalStatistic;
 import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistory;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.DateUtils;
 import ru.akvine.fitstats.utils.MathUtils;
 
 @Component
+@RequiredArgsConstructor
 public class TelegramStatisticConverter {
     private static final String NEXT_LINE = "\n";
+    private final PropertyParseService propertyParseService;
 
-    @Value("${round.accuracy}")
-    private int defaultRoundAccuracy;
+    @Value("round.accuracy")
+    private String defaultRoundAccuracy;
 
     public StatisticHistory convertToStatisticHistory(TelegramStatisticHistoryRequest telegramStatisticHistoryRequest) {
         Preconditions.checkNotNull(telegramStatisticHistoryRequest, "telegramStatisticHistoryRequest is null");
@@ -44,7 +48,7 @@ public class TelegramStatisticConverter {
         return AdditionalStatistic.builder()
                 .modeCount(withoutMode)
                 .clientUuid(request.getClientUuid())
-                .roundAccuracy(defaultRoundAccuracy)
+                .roundAccuracy(propertyParseService.parseInteger(defaultRoundAccuracy))
                 .dateRange(DateUtils.getYearRange())
                 .build();
     }
@@ -58,11 +62,12 @@ public class TelegramStatisticConverter {
     }
 
     private String buildStatisticHistoryResponse(StatisticHistoryResult statisticHistoryResult) {
+        int accuracy = propertyParseService.parseInteger(defaultRoundAccuracy);
         StringBuilder sb = new StringBuilder();
         sb.append("Период: ").append(statisticHistoryResult.getDuration()).append(NEXT_LINE);
         sb.append("Макронутриент: ").append(statisticHistoryResult.getMacronutrient()).append(NEXT_LINE);
-        sb.append("Среднее: ").append(MathUtils.round(statisticHistoryResult.getAverage(), defaultRoundAccuracy)).append(NEXT_LINE);
-        sb.append("Медиана: ").append(MathUtils.round(statisticHistoryResult.getMedian(), defaultRoundAccuracy)).append(NEXT_LINE);
+        sb.append("Среднее: ").append(MathUtils.round(statisticHistoryResult.getAverage(), accuracy)).append(NEXT_LINE);
+        sb.append("Медиана: ").append(MathUtils.round(statisticHistoryResult.getMedian(), accuracy)).append(NEXT_LINE);
 
         statisticHistoryResult
                 .getHistory()

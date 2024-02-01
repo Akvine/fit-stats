@@ -8,6 +8,7 @@ import ru.akvine.fitstats.enums.NotificationProviderType;
 import ru.akvine.fitstats.services.notification.NotificationProvider;
 import ru.akvine.fitstats.services.notification.dummy.DummyNotificationProvider;
 import ru.akvine.fitstats.services.notification.dummy.LogNotificationService;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.validators.NotificationValidator;
 
 import java.util.List;
@@ -18,9 +19,11 @@ import static java.util.stream.Collectors.toMap;
 
 @Configuration
 public class NotificationConfig {
-    @Value("${security.dummy.notification.provider.enabled}")
-    private boolean dummyProviderEnabled;
-    @Value("${security.notification.provider.type}")
+    private final PropertyParseService propertyParseService;
+
+    @Value("security.dummy.notification.provider.enabled")
+    private String dummyProviderEnabled;
+    @Value("security.notification.provider.type")
     private String notificationProviderType;
 
     private final Map<NotificationProviderType, NotificationProvider> availableNotificationProviders;
@@ -28,8 +31,10 @@ public class NotificationConfig {
 
     @Autowired
     public NotificationConfig(List<NotificationProvider> notificationProviders,
-                              NotificationValidator notificationValidator) {
+                              NotificationValidator notificationValidator,
+                              PropertyParseService propertyParseService) {
         this.notificationValidator = notificationValidator;
+        this.propertyParseService = propertyParseService;
         this.availableNotificationProviders = notificationProviders
                 .stream()
                 .collect(toMap(NotificationProvider::getType, identity()));
@@ -37,18 +42,20 @@ public class NotificationConfig {
 
     @Bean
     public NotificationProvider notificationProvider() {
-        notificationValidator.validate(notificationProviderType);
-        NotificationProviderType type = NotificationProviderType.valueOf(notificationProviderType);
+        String providerType = propertyParseService.get(notificationProviderType);
+        notificationValidator.validate(providerType);
+        NotificationProviderType type = NotificationProviderType.valueOf(providerType);
 
         NotificationProvider notificationProvider = availableNotificationProviders.get(type);
-        if (dummyProviderEnabled && notificationProvider instanceof DummyNotificationProvider) {
+        boolean isDummyProviderEnabled = propertyParseService.parseBoolean(dummyProviderEnabled);
+        if (isDummyProviderEnabled && notificationProvider instanceof DummyNotificationProvider) {
             return notificationProvider;
         }
-        if (!dummyProviderEnabled && notificationProvider instanceof DummyNotificationProvider) {
+        if (!isDummyProviderEnabled && notificationProvider instanceof DummyNotificationProvider) {
             throw new IllegalStateException("Dummy notification provider can't be used in non-testing environment!");
         }
 
-        if (dummyProviderEnabled && !(notificationProvider instanceof DummyNotificationProvider)) {
+        if (isDummyProviderEnabled && !(notificationProvider instanceof DummyNotificationProvider)) {
             throw new IllegalStateException("Real notification provider can't be used in testing environment!");
         }
 

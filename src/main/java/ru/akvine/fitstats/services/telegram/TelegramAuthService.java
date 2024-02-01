@@ -15,6 +15,7 @@ import ru.akvine.fitstats.services.ClientService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.telegram.TelegramAuthCode;
 import ru.akvine.fitstats.services.dto.telegram.TelegramSubscriptionBean;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.RandomCodeGenerator;
 
 import java.time.LocalDateTime;
@@ -25,11 +26,12 @@ public class TelegramAuthService {
     private final ClientService clientService;
     private final TelegramAuthRepository telegramAuthCodeRepository;
     private final TelegramSubscriptionService telegramSubscriptionService;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${telegram.bot.authcode.length}")
-    private int authCodeLength;
-    @Value("${telegram.bot.authcode.lifetime.seconds}")
-    private int authCodeLifetimeSeconds;
+    @Value("telegram.bot.authcode.length")
+    private String authCodeLength;
+    @Value("telegram.bot.authcode.lifetime.seconds")
+    private String authCodeLifetimeSeconds;
 
     @Transactional
     public TelegramAuthCode generate(String clientUuid) {
@@ -37,9 +39,9 @@ public class TelegramAuthService {
         ClientEntity client = clientService.verifyExistsByUuidAndGet(clientUuid);
 
         telegramAuthCodeRepository.deleteAllByClientId(client.getId());
-        String code = RandomCodeGenerator.generateNewRandomCode(authCodeLength);
+        String code = RandomCodeGenerator.generateNewRandomCode(propertyParseService.parseInteger(authCodeLength));
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiredAt = now.plusSeconds(authCodeLifetimeSeconds);
+        LocalDateTime expiredAt = now.plusSeconds(propertyParseService.parseInteger(authCodeLifetimeSeconds));
 
         TelegramAuthCodeEntity telegramAuthCodeEntity = new TelegramAuthCodeEntity()
                 .setCode(code)

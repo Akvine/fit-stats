@@ -16,6 +16,7 @@ import ru.akvine.fitstats.services.ClientService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionRequest;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import java.time.LocalDateTime;
 
@@ -23,15 +24,16 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Slf4j
 public class AccessRestoreActionService extends OtpActionService<AccessRestoreActionEntity> {
-    @Value("${security.otp.action.lifetime.seconds}")
-    private int otpActionLifetimeSeconds;
-    @Value("${security.otp.max.invalid.attempts}")
-    private int optMaxInvalidAttempts;
-    @Value("${security.otp.max.new.generation.per.action}")
-    private int otpMaxNewGenerationPerAction;
+    @Value("security.otp.action.lifetime.seconds")
+    private String otpActionLifetimeSeconds;
+    @Value("security.otp.max.invalid.attempts")
+    private String optMaxInvalidAttempts;
+    @Value("security.otp.max.new.generation.per.action")
+    private String otpMaxNewGenerationPerAction;
 
     private final AccessRestoreActionRepository accessRestoreActionRepository;
     private final ClientService clientService;
+    private final PropertyParseService propertyParseService;
 
     public AccessRestoreActionResult startAccessRestore(AccessRestoreActionRequest accessRestoreActionRequest) {
         Preconditions.checkNotNull(accessRestoreActionRequest, "accessRestoreActionRequest is null");
@@ -185,14 +187,14 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
 
     private AccessRestoreActionEntity createNewActionAndSendOtp(String login, String sessionId) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime actionExpiredAt = now.plusSeconds(otpActionLifetimeSeconds);
+        LocalDateTime actionExpiredAt = now.plusSeconds(propertyParseService.parseInteger(otpActionLifetimeSeconds));
 
         OtpInfo otpInfo = otpService.getOneTimePassword(login);
         OtpActionEntity otpAction = new OtpActionEntity()
                 .setStartedDate(now)
                 .setActionExpiredAt(actionExpiredAt)
-                .setOtpInvalidAttemptsLeft(optMaxInvalidAttempts)
-                .setOtpCountLeft(otpMaxNewGenerationPerAction)
+                .setOtpInvalidAttemptsLeft(propertyParseService.parseInteger(optMaxInvalidAttempts))
+                .setOtpCountLeft(propertyParseService.parseInteger(otpMaxNewGenerationPerAction))
                 .setNewOtpValue(otpInfo, now);
 
         AccessRestoreActionEntity accessRestoreAction = new AccessRestoreActionEntity()

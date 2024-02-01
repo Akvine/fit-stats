@@ -15,6 +15,7 @@ import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.DurationValidator;
 import ru.akvine.fitstats.validators.PasswordValidator;
@@ -36,9 +37,10 @@ public class ProfileValidator {
     private final Map<FileType, FileValidator> availableFileValidators;
     private final ClientService clientService;
     private final PasswordValidator passwordValidator;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${file.converter.max-rows.limit}")
-    private int maxRowsLimit;
+    @Value("file.converter.max-rows.limit")
+    private String maxRowsLimit;
 
     @Autowired
     public ProfileValidator(DurationValidator durationValidator,
@@ -46,8 +48,10 @@ public class ProfileValidator {
                             PhysicalActivitiesValidator physicalActivitiesValidator,
                             List<FileValidator> fileValidators,
                             ClientService clientService,
-                            PasswordValidator passwordValidator) {
+                            PasswordValidator passwordValidator,
+                            PropertyParseService propertyParseService) {
         this.clientService = clientService;
+        this.propertyParseService = propertyParseService;
         this.passwordValidator = passwordValidator;
         this.durationValidator = durationValidator;
         this.converterTypeValidator = converterTypeValidator;
@@ -99,6 +103,7 @@ public class ProfileValidator {
         // TODO : Сделать валидацию строчек на корректность данных
 
         int rowsCount = importRecords.getRecords().size();
+        int maxRowsLimit = propertyParseService.parseInteger(this.maxRowsLimit);
         if (rowsCount > maxRowsLimit) {
             String message = String.format("File rows count = [%s] greater than limit [%s]!", rowsCount, maxRowsLimit);
             throw new ValidationException(

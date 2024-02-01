@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.controllers.rest.converter.security;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.security.OtpActionResponse;
@@ -10,14 +11,18 @@ import ru.akvine.fitstats.controllers.rest.dto.security.access_restore.AccessRes
 import ru.akvine.fitstats.controllers.rest.dto.security.access_restore.AccessRestoreStartRequest;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionRequest;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Component
+@RequiredArgsConstructor
 public class AccessRestoreConverter {
-    @Value("${security.otp.new.delay.seconds}")
-    private int otpNewDelaySeconds;
+    private final PropertyParseService propertyParseService;
+
+    @Value("security.otp.new.delay.seconds")
+    private String otpNewDelaySeconds;
 
     public AccessRestoreActionRequest convertToAccessRestoreActionRequest(AccessRestoreStartRequest request,
                                                                           HttpServletRequest httpServletRequest) {
@@ -59,7 +64,7 @@ public class AccessRestoreConverter {
                 .setOtpCountLeft(result.getOtp().getOtpCountLeft())
                 .setOtpNumber(result.getOtp().getOtpNumber())
                 .setOtpLastUpdate(result.getOtp().getOtpLastUpdate() != null ? result.getOtp().getOtpLastUpdate().toString() : null)
-                .setNewOtpDelay(otpNewDelaySeconds)
+                .setNewOtpDelay(propertyParseService.parseLong(otpNewDelaySeconds))
                 .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
 
         return new AccessRestoreResponse()

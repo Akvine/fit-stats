@@ -15,6 +15,7 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.security.OtpCreateNewAction;
 import ru.akvine.fitstats.services.dto.security.auth.AuthActionRequest;
 import ru.akvine.fitstats.services.dto.security.auth.AuthActionResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import java.time.LocalDateTime;
 
@@ -23,15 +24,16 @@ import java.time.LocalDateTime;
 @Slf4j
 public class AuthActionService extends PasswordRequiredActionService<AuthActionEntity> {
     private final AuthActionRepository authActionRepository;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${security.otp.action.lifetime.seconds}")
-    private int otpActionLifetimeSeconds;
-    @Value("${security.otp.password.max.invalid.attempts}")
-    private int otpPasswordMaxInvalidAttempts;
-    @Value("${security.otp.max.invalid.attempts}")
-    private int otpMaxInvalidAttempts;
-    @Value("${security.otp.max.new.generation.per.action}")
-    private int otpMaxNewGenerationPerAction;
+    @Value("security.otp.action.lifetime.seconds")
+    private String otpActionLifetimeSeconds;
+    @Value("security.otp.password.max.invalid.attempts")
+    private String otpPasswordMaxInvalidAttempts;
+    @Value("security.otp.max.invalid.attempts")
+    private String otpMaxInvalidAttempts;
+    @Value("security.otp.max.new.generation.per.action")
+    private String otpMaxNewGenerationPerAction;
 
     public AuthActionResult startAuth(AuthActionRequest request) {
         Preconditions.checkNotNull(request, "authActionRequest is null");
@@ -94,18 +96,18 @@ public class AuthActionService extends PasswordRequiredActionService<AuthActionE
     protected AuthActionEntity createNewActionAndSendOtp(OtpCreateNewAction otpCreateNewAction) {
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime actionExpiredAt = now.plusSeconds(otpActionLifetimeSeconds);
+        LocalDateTime actionExpiredAt = now.plusSeconds(propertyParseService.parseInteger(otpActionLifetimeSeconds));
 
         AuthActionEntity authActionEntity = new AuthActionEntity()
                 .setLogin(otpCreateNewAction.getLogin())
                 .setSessionId(otpCreateNewAction.getSessionId())
-                .setPwdInvalidAttemptsLeft(otpPasswordMaxInvalidAttempts);
+                .setPwdInvalidAttemptsLeft(propertyParseService.parseInteger(otpPasswordMaxInvalidAttempts));
 
         OtpActionEntity otp = new OtpActionEntity()
                 .setStartedDate(now)
                 .setActionExpiredAt(actionExpiredAt)
-                .setOtpInvalidAttemptsLeft(otpMaxInvalidAttempts)
-                .setOtpCountLeft(otpMaxNewGenerationPerAction);
+                .setOtpInvalidAttemptsLeft(propertyParseService.parseInteger(otpMaxInvalidAttempts))
+                .setOtpCountLeft(propertyParseService.parseInteger(otpMaxNewGenerationPerAction));
         authActionEntity.setOtpAction(otp);
 
         if (!otpCreateNewAction.isCredentialsValid()) {

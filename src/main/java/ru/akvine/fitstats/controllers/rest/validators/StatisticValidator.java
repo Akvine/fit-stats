@@ -10,32 +10,32 @@ import ru.akvine.fitstats.controllers.rest.dto.statistic.CalculateDescriptiveSta
 import ru.akvine.fitstats.controllers.rest.dto.statistic.StatisticHistoryRequest;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.validators.DurationValidator;
 import ru.akvine.fitstats.validators.MacronutrientValidator;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class StatisticValidator {
-    @Value("${processors.supported.indicators}")
-    private List<String> supportedIndicators;
-    @Value("${processors.supported.macronutrients}")
-    private List<String> supportedMacronutrients;
-    @Value("${product.statistic.mode.count.limit}")
-    private int limit;
+    @Value("processors.supported.indicators")
+    private String supportedIndicators;
+    @Value("processors.supported.macronutrients")
+    private String supportedMacronutrients;
+    @Value("product.statistic.mode.count.limit")
+    private String limit;
 
     private final DurationValidator durationValidator;
     private final DateRangeInfoValidator dateRangeInfoValidator;
     private final MacronutrientValidator macronutrientValidator;
+    private final PropertyParseService propertyParseService;
 
     public void verifyCalculateDescriptiveStatisticRequest(CalculateDescriptiveStatisticRequest request) {
         Preconditions.checkNotNull(request, "calculateStatisticRequest is null");
 
         request.getIndicators().forEach(indicator -> {
             String indicatorLower = indicator.toLowerCase();
-            if (!supportedIndicators.contains(indicatorLower)) {
+            if (!propertyParseService.parseToList(supportedIndicators).contains(indicatorLower)) {
                 throw new ValidationException(
                         CommonErrorCodes.Validation.Statistic.INDICATOR_NOT_SUPPORTED_ERROR,
                         "Indicator with type = [" + indicator + "] not supported!");
@@ -43,7 +43,7 @@ public class StatisticValidator {
         });
         request.getMacronutrients().forEach(macronutrient -> {
             String macronutrientLower = macronutrient.toLowerCase();
-            if (!supportedMacronutrients.contains(macronutrientLower)) {
+            if (!propertyParseService.parseToList(supportedMacronutrients).contains(macronutrientLower)) {
                 throw new ValidationException(
                         CommonErrorCodes.Validation.Statistic.MACRONUTRIENT_NOT_SUPPORTED_ERROR,
                         "Macronutrient with type = [" + macronutrient + "] not supported!");
@@ -57,7 +57,7 @@ public class StatisticValidator {
         Preconditions.checkNotNull(request, "calculateAdditionalStatisticRequest is null");
 
         if (request.getModeCount() != null) {
-            if (request.getModeCount() > limit) {
+            if (request.getModeCount() > propertyParseService.parseInteger(limit)) {
                 throw new ValidationException(
                         CommonErrorCodes.Validation.Statistic.MODE_COUNT_INVALID_ERROR,
                         "Mode count can't be more than limit count. Limit count = [" + limit + "]. Field invalid: modeCount");

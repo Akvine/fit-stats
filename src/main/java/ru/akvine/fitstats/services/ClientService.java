@@ -15,6 +15,7 @@ import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.services.telegram.TelegramAuthService;
 import ru.akvine.fitstats.services.telegram.TelegramDietNotificationSubscriptionService;
 import ru.akvine.fitstats.utils.DietUtils;
@@ -26,8 +27,8 @@ import java.time.LocalDateTime;
 @Slf4j
 @RequiredArgsConstructor
 public class ClientService {
-    @Value("${uuid.length}")
-    private int length;
+    @Value("uuid.length")
+    private String length;
 
     private final ClientRepository clientRepository;
     private final BiometricService biometricService;
@@ -36,6 +37,7 @@ public class ClientService {
     private final PasswordService passwordService;
     private final TelegramAuthRepository telegramAuthRepository;
     private final TelegramDietNotificationSubscriptionService telegramDietNotificationSubscriptionService;
+    private final PropertyParseService propertyParseService;
 
     public ClientBean register(ClientRegister clientRegister) {
         Preconditions.checkNotNull(clientRegister, "clientRegister is null");
@@ -48,7 +50,7 @@ public class ClientService {
         Diet diet = clientRegister.getDiet();
 
         ClientEntity clientEntity = new ClientEntity()
-                .setUuid(UUIDGenerator.uuidWithoutDashes(length))
+                .setUuid(UUIDGenerator.uuidWithoutDashes(propertyParseService.parseInteger(length)))
                 .setEmail(clientRegister.getEmail())
                 .setHash(passwordHash)
                 .setFirstName(clientRegister.getFirstName())

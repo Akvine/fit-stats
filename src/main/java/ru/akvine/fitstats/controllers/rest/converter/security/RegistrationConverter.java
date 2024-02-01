@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.controllers.rest.converter.security;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.security.OtpActionResponse;
@@ -8,14 +9,18 @@ import ru.akvine.fitstats.controllers.rest.dto.security.registration.*;
 import ru.akvine.fitstats.enums.*;
 import ru.akvine.fitstats.services.dto.security.registration.RegistrationActionRequest;
 import ru.akvine.fitstats.services.dto.security.registration.RegistrationActionResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Component
+@RequiredArgsConstructor
 public class RegistrationConverter {
-    @Value("${security.otp.new.delay.seconds}")
-    private int otpNewDelaySeconds;
+    private final PropertyParseService propertyParseService;
+
+    @Value("security.otp.new.delay.seconds")
+    private String otpNewDelaySeconds;
 
     public RegistrationActionRequest convertToRegistrationActionRequest(RegistrationStartRequest request,
                                                                         HttpServletRequest httpServletRequest) {
@@ -76,7 +81,7 @@ public class RegistrationConverter {
                 .setOtpCountLeft(result.getOtp().getOtpCountLeft())
                 .setOtpNumber(result.getOtp().getOtpNumber())
                 .setOtpLastUpdate(result.getOtp().getOtpLastUpdate() != null ? result.getOtp().getOtpLastUpdate().toString() : null)
-                .setNewOtpDelay(otpNewDelaySeconds)
+                .setNewOtpDelay(propertyParseService.parseLong(otpNewDelaySeconds))
                 .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
 
         return new RegistrationResponse()

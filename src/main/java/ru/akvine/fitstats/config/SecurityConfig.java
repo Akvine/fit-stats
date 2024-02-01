@@ -1,5 +1,6 @@
 package ru.akvine.fitstats.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,16 +11,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.akvine.fitstats.config.security.RestAuthenticationEntryPoint;
 import ru.akvine.fitstats.config.security.RestSuccessLogoutHandler;
-import ru.akvine.fitstats.services.notification.NotificationProvider;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-    @Value("${spring.session.cookie-name}")
+    private final PropertyParseService propertyParseService;
+
+    @Value("spring.session.cookie-name")
     private String sessionCookieName;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        String cookieName = propertyParseService.get(sessionCookieName);
         http
                 .csrf().disable()
                 .cors().disable()
@@ -33,7 +38,7 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint())
                 .and()
                 .logout()
-                .deleteCookies(sessionCookieName)
+                .deleteCookies(cookieName)
                 .logoutSuccessHandler(restSuccessLogoutHandler())
                 .invalidateHttpSession(true);
         return http.build();

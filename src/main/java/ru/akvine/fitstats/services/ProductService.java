@@ -15,6 +15,7 @@ import ru.akvine.fitstats.repositories.specifications.ProductSpecification;
 import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.DietUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
 
@@ -27,16 +28,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${uuid.length}")
-    private int uuidLength;
+    @Value("uuid.length")
+    private String uuidLength;
 
     public ProductBean add(ProductBean productBean) {
         Preconditions.checkNotNull(productBean, "productBean is null");
         logger.info("Try to add product by product bean = [{}]", productBean);
 
         ProductEntity productEntity = new ProductEntity()
-                .setUuid(StringUtils.isBlank(productBean.getUuid()) ? UUIDGenerator.uuidWithoutDashes(uuidLength) : productBean.getUuid())
+                .setUuid(StringUtils.isBlank(productBean.getUuid()) ?
+                        UUIDGenerator.uuidWithoutDashes(propertyParseService.parseInteger(uuidLength)) : productBean.getUuid())
                 .setTitle(productBean.getTitle())
                 .setProducer(productBean.getProducer())
                 .setProteins(productBean.getProteins())

@@ -2,11 +2,13 @@ package ru.akvine.fitstats.controllers.rest.converter.parser;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.exceptions.profile.CsvParseException;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,11 +18,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class CsvParser implements Parser {
-    @Value("${csv.file.converter.separator}")
-    private char separator;
-    @Value("${csv.file.converter.skip.lines.count}")
-    private int skipLinesCount;
+
+    private final PropertyParseService propertyParseService;
+
+    @Value("csv.file.converter.separator")
+    private String separator;
+    @Value("csv.file.converter.skip.lines.count")
+    private String skipLinesCount;
 
     @Override
     public List<?> parse(MultipartFile file, Class clazz) {
@@ -28,8 +34,8 @@ public class CsvParser implements Parser {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             CsvToBean<?> csvToBean = new CsvToBeanBuilder<>(reader)
                     .withType(clazz)
-                    .withSkipLines(skipLinesCount)
-                    .withSeparator(separator)
+                    .withSkipLines(propertyParseService.parseInteger(skipLinesCount))
+                    .withSeparator(propertyParseService.parseChar(separator))
                     .withIgnoreQuotations(true)
                     .withIgnoreLeadingWhiteSpace(true)
                     .build();

@@ -15,6 +15,7 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
 import ru.akvine.fitstats.services.dto.security.OtpCreateNewAction;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.services.security.PasswordRequiredActionService;
 
 import java.time.LocalDateTime;
@@ -24,13 +25,14 @@ import java.time.LocalDateTime;
 @Slf4j
 public class ProfileDeleteActionService extends PasswordRequiredActionService<ProfileDeleteActionEntity> {
     private final ProfileDeleteActionRepository profileDeleteActionRepository;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${security.otp.action.lifetime.seconds}")
-    private int otpActionLifetimeSeconds;
-    @Value("${security.otp.max.invalid.attempts}")
-    private int otpMaxInvalidAttempts;
-    @Value("${security.otp.max.new.generation.per.action}")
-    private int otpMaxNewGenerationPerAction;
+    @Value("security.otp.action.lifetime.seconds")
+    private String otpActionLifetimeSeconds;
+    @Value("security.otp.max.invalid.attempts")
+    private String otpMaxInvalidAttempts;
+    @Value("security.otp.max.new.generation.per.action")
+    private String otpMaxNewGenerationPerAction;
 
     public ProfileDeleteActionResult startDelete(ProfileDeleteActionRequest profileDeleteActionRequest) {
         Preconditions.checkNotNull(profileDeleteActionRequest, "profileDeleteActionRequest is null");
@@ -133,18 +135,18 @@ public class ProfileDeleteActionService extends PasswordRequiredActionService<Pr
     @Override
     protected ProfileDeleteActionEntity createNewActionAndSendOtp(OtpCreateNewAction otpCreateNewAction) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime actionExpiredAt = now.plusSeconds(otpActionLifetimeSeconds);
+        LocalDateTime actionExpiredAt = now.plusSeconds(propertyParseService.parseInteger(otpActionLifetimeSeconds));
 
         ProfileDeleteActionEntity profileDeleteActionEntity = new ProfileDeleteActionEntity()
                 .setLogin(otpCreateNewAction.getLogin())
                 .setSessionId(otpCreateNewAction.getSessionId())
-                .setPwdInvalidAttemptsLeft(otpMaxInvalidAttempts);
+                .setPwdInvalidAttemptsLeft(propertyParseService.parseInteger(otpMaxInvalidAttempts));
 
         OtpActionEntity otp = new OtpActionEntity()
                 .setStartedDate(now)
                 .setActionExpiredAt(actionExpiredAt)
-                .setOtpInvalidAttemptsLeft(otpMaxInvalidAttempts)
-                .setOtpCountLeft(otpMaxNewGenerationPerAction);
+                .setOtpInvalidAttemptsLeft(propertyParseService.parseInteger(otpMaxInvalidAttempts))
+                .setOtpCountLeft(propertyParseService.parseInteger(otpMaxNewGenerationPerAction));
         profileDeleteActionEntity.setOtpAction(otp);
 
         if (!otpCreateNewAction.isCredentialsValid()) {

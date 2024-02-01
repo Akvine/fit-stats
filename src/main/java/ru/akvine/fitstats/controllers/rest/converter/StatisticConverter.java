@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import ru.akvine.fitstats.enums.StatisticType;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.statistic.*;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.util.LinkedHashMap;
@@ -19,11 +21,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class StatisticConverter {
-    @Value("${round.accuracy}")
-    private int defaultRoundAccuracy;
-    @Value("${product.statistic.mode.count.limit}")
-    private int limit;
+    private final PropertyParseService propertyParseService;
+
+    @Value("round.accuracy")
+    private String defaultRoundAccuracy;
+    @Value("product.statistic.mode.count.limit")
+    private String limit;
 
     public DescriptiveStatistic convertToDescriptiveStatistic(CalculateDescriptiveStatisticRequest request) {
         Preconditions.checkNotNull(request, "calculateDescriptiveStatisticRequest is null");
@@ -47,7 +52,7 @@ public class StatisticConverter {
                         .setStartDate(request.getDateRangeInfo().getStartDate())
                         .setEndDate(request.getDateRangeInfo().getEndDate()))
                 .indicatorsWithMacronutrients(indicatorsWithMacronutrients)
-                .roundAccuracy(request.getRoundAccuracy() == null ? defaultRoundAccuracy : request.getRoundAccuracy())
+                .roundAccuracy(request.getRoundAccuracy() == null ? propertyParseService.parseInteger(defaultRoundAccuracy) : request.getRoundAccuracy())
                 .build();
     }
 
@@ -67,12 +72,12 @@ public class StatisticConverter {
         return AdditionalStatistic
                 .builder()
                 .clientUuid(SecurityUtils.getCurrentUser().getUuid())
-                .modeCount(request.getModeCount() != null ? request.getModeCount() : limit)
+                .modeCount(request.getModeCount() != null ? request.getModeCount() : propertyParseService.parseInteger(limit))
                 .dateRange(new DateRange()
                         .setDuration(StringUtils.isBlank(duration) ? null : Duration.valueOf(duration))
                         .setStartDate(request.getDateRangeInfo().getStartDate())
                         .setEndDate(request.getDateRangeInfo().getEndDate()))
-                .roundAccuracy(request.getRoundAccuracy() == null ? defaultRoundAccuracy : request.getRoundAccuracy())
+                .roundAccuracy(request.getRoundAccuracy() == null ? propertyParseService.parseInteger(defaultRoundAccuracy) : request.getRoundAccuracy())
                 .build();
     }
 

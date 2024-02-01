@@ -36,6 +36,7 @@ import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePass
 import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,12 +54,15 @@ public class ProfileConverter {
     private static final String POINT = ".";
 
     private final Map<ConverterType, Parser> availableParsers;
+    private final PropertyParseService propertyParseService;
 
-    @Value("${security.otp.new.delay.seconds}")
-    private int otpNewDelaySeconds;
+    @Value("security.otp.new.delay.seconds")
+    private String otpNewDelaySeconds;
 
     @Autowired
-    public ProfileConverter(List<Parser> parsers) {
+    public ProfileConverter(List<Parser> parsers,
+                            PropertyParseService propertyParseService) {
+        this.propertyParseService = propertyParseService;
         this.availableParsers =
                 parsers
                         .stream()
@@ -159,7 +163,7 @@ public class ProfileConverter {
                 .setOtpNumber(result.getOtp().getOtpNumber())
                 .setOtpCountLeft(result.getOtp().getOtpCountLeft())
                 .setOtpLastUpdate(result.getOtp().getOtpLastUpdate().toString())
-                .setNewOtpDelay(otpNewDelaySeconds)
+                .setNewOtpDelay(propertyParseService.parseLong(otpNewDelaySeconds))
                 .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
 
         return new ProfileDeleteResponse()
@@ -196,7 +200,7 @@ public class ProfileConverter {
                 .setOtpNumber(result.getOtp().getOtpNumber())
                 .setOtpCountLeft(result.getOtp().getOtpCountLeft())
                 .setOtpLastUpdate(result.getOtp().getOtpLastUpdate().toString())
-                .setNewOtpDelay(otpNewDelaySeconds)
+                .setNewOtpDelay(propertyParseService.parseLong(otpNewDelaySeconds))
                 .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
 
         return new ProfileChangeEmailResponse()
@@ -236,7 +240,7 @@ public class ProfileConverter {
                 .setOtpNumber(result.getOtp().getOtpNumber())
                 .setOtpCountLeft(result.getOtp().getOtpCountLeft())
                 .setOtpLastUpdate(result.getOtp().getOtpLastUpdate().toString())
-                .setNewOtpDelay(otpNewDelaySeconds)
+                .setNewOtpDelay(propertyParseService.parseLong(otpNewDelaySeconds))
                 .setOtpInvalidAttemptsLeft(result.getOtp().getOtpInvalidAttemptsLeft());
 
         return new ProfileChangePasswordResponse()

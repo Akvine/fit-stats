@@ -12,6 +12,7 @@ import ru.akvine.fitstats.entities.security.OtpInfo;
 import ru.akvine.fitstats.repositories.security.OtpCounterRepository;
 import ru.akvine.fitstats.services.notification.NotificationProvider;
 import ru.akvine.fitstats.services.notification.dummy.ConstantNotificationService;
+import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.OneTimePasswordGenerator;
 
 import java.time.LocalDateTime;
@@ -23,30 +24,36 @@ import java.time.temporal.ChronoUnit;
 public class OtpService {
     private final NotificationProvider notificationProvider;
     private final OtpCounterRepository otpCounterRepository;
+    private final PropertyParseService propertyParseService;
 
     private static final String DUMMY_CODE = "1";
 
-    @Value("${security.otp.length}")
-    private int otpLength;
-    @Value("${security.dummy.notification.provider.enabled}")
-    private boolean dummyEnabled;
-    @Value("${security.otp.max.invalid.attempts}")
-    private int otpMaxInvalidAttempts;
-    @Value("${security.otp.lifetime.seconds}")
-    private long otpLifetimeSeconds;
+    @Value("security.otp.length")
+    private String otpLength;
+    @Value("security.dummy.notification.provider.enabled")
+    private String dummyEnabled;
+    @Value("security.otp.max.invalid.attempts")
+    private String otpMaxInvalidAttempts;
+    @Value("security.otp.lifetime.seconds")
+    private String otpLifetimeSeconds;
 
     public OtpInfo getOneTimePassword(String login) {
         Preconditions.checkNotNull(login, "login is null");
 
         String value;
-        if (dummyEnabled && notificationProvider instanceof ConstantNotificationService) {
-            value = StringUtils.repeat(DUMMY_CODE, otpLength);
+        boolean isDummyEnabled = propertyParseService.parseBoolean(dummyEnabled);
+        if (isDummyEnabled && notificationProvider instanceof ConstantNotificationService) {
+            value = StringUtils.repeat(DUMMY_CODE, propertyParseService.parseInteger(otpLength));
         } else {
-            value = OneTimePasswordGenerator.generate(otpLength);
+            value = OneTimePasswordGenerator.generate(propertyParseService.parseInteger(otpLength));
         }
         int orderNumber = (int) getNextOtpNumber(login);
         logger.info("Otp №{} has been generated for client with email = {}", orderNumber, login);
-        return new OtpInfo(otpMaxInvalidAttempts, otpLifetimeSeconds, orderNumber, value);
+        return new OtpInfo(
+                propertyParseService.parseInteger(otpMaxInvalidAttempts),
+                propertyParseService.parseLong(otpLifetimeSeconds),
+                orderNumber,
+                value);
     }
 
     @Transactional
