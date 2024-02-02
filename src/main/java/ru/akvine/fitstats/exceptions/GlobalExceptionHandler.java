@@ -193,6 +193,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({OtpAuthRequiredException.class})
     public ResponseEntity<ErrorResponse> handleOtpAuthRequiredException(OtpAuthRequiredException exception) {
+        logger.info("Otp auth required exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Security.OTP_AUTH_REQUIRED,
                 exception.getMessage()
@@ -202,6 +203,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({BlockedCredentialsException.class})
     public ResponseEntity<ErrorResponse> handleBlockedCredentialsException(BlockedCredentialsException exception) {
+        logger.info("Blocked credentials exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Security.BLOCKED_ERROR,
                 exception.getMessage()
@@ -211,6 +213,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({WeightRecordNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleWeightRecordNotFoundException(WeightRecordNotFoundException exception) {
+        logger.info("Weight record not found exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Weight.WEIGHT_RECORD_NOT_FOUND_ERROR,
                 exception.getMessage()
@@ -220,6 +223,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({TelegramAuthCodeNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleTelegramAuthCodeNotFoundException(TelegramAuthCodeNotFoundException exception) {
+        logger.info("Telegram auth code not found exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Telegram.TELEGRAM_AUTH_CODE_NOT_FOUND_ERROR,
                 exception.getMessage()
@@ -229,6 +233,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({ProductsNotUniqueResultException.class})
     public ResponseEntity<ErrorResponse> handleProductsNotUniqueResultException(ProductsNotUniqueResultException exception) {
+        logger.info("Products not unique result exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Diet.PRODUCTS_NOT_UNIQUE_RESULT_ERROR,
                 exception.getMessage()
@@ -238,6 +243,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({DietRecordsNotUniqueResultException.class})
     public ResponseEntity<ErrorResponse> handleDietRecordsNotUniqueResultException(DietRecordsNotUniqueResultException exception) {
+        logger.info("Diet records not unique result exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 Diet.DIET_RECORDS_NOT_UNIQUE_RESULT_ERROR,
                 exception.getMessage()
@@ -247,6 +253,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({IllegalArgumentException.class})
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
+        logger.info("Illegal argument exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(Validation.FIELD_INVALID_ERROR, "Field is not presented!");
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
