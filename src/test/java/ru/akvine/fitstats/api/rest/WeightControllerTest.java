@@ -31,7 +31,7 @@ public class WeightControllerTest extends ApiBaseTest {
     public void testList_success() throws Exception {
         String sessionId = doAuth(CLIENT_EMAIL_EXISTS_4).getValue();
 
-        doPost(RestMethods.WEIGHT_RECORD_LIST, sessionId, null)
+        doPost(RestMethods.WEIGHT_RECORD_LIST, sessionId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_SUCCESS))
                 .andExpect(jsonPath("$.info").exists())

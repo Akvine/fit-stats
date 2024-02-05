@@ -64,6 +64,10 @@ public abstract class ApiBaseTest {
         return doPost(link, null);
     }
 
+    protected ResultActions doPost(String link, String sessionId) throws Exception {
+        return doPost(link, sessionId, null);
+    }
+
     protected ResultActions doPost(String link, Object request) throws Exception {
         return doPost(link, null, request);
     }
@@ -79,6 +83,14 @@ public abstract class ApiBaseTest {
             postRequest.cookie(new Cookie(SESSION_COOKIE_NAME, sessionId));
         }
         return mvc.perform(postRequest);
+    }
+
+    protected ResultActions doGet(String link) throws Exception {
+        return doGet(link, null);
+    }
+
+    protected ResultActions doGet(String link, String sessionId) throws Exception {
+        return doGet(link, sessionId, null);
     }
 
     protected ResultActions doGet(String link, String sessionId, Object request) throws Exception {

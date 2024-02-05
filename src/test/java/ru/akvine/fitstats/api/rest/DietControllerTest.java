@@ -253,9 +253,7 @@ public class DietControllerTest extends ApiBaseTest {
     @DisplayName("FAIL - no session")
     @Test
     public void testDietDisplay_fail_noSession() throws Exception {
-        String sessionId = doAuth(CLIENT_EMAIL_EXISTS_18).getValue();
-
-        doPost(RestMethods.DIET_DISPLAY, sessionId)
+        doGet(RestMethods.DIET_DISPLAY)
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_FAIL))
                 .andExpect(jsonPath("$.code").value(CommonErrorCodes.NO_SESSION));

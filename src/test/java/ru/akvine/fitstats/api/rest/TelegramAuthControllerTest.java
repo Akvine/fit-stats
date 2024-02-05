@@ -26,7 +26,7 @@ public class TelegramAuthControllerTest extends ApiBaseTest {
     public void testAuthCodeGenerate_success_case1() throws Exception {
         String sessionId = doAuth(CLIENT_EMAIL_EXISTS_26).getValue();
 
-        doPost(RestMethods.TELEGRAM_AUTH_CODE_GENERATE, sessionId, null)
+        doPost(RestMethods.TELEGRAM_AUTH_CODE_GENERATE, sessionId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_SUCCESS))
                 .andExpect(jsonPath("$.code").exists());
@@ -46,7 +46,7 @@ public class TelegramAuthControllerTest extends ApiBaseTest {
     public void testAuthCodeGet_fail_telegramAuthCodeNotExists() throws Exception {
         String sessionId = doAuth(CLIENT_EMAIL_EXISTS_27).getValue();
 
-        doPost(RestMethods.TELEGRAM_AUTH_CODE_GET, sessionId, null)
+        doPost(RestMethods.TELEGRAM_AUTH_CODE_GET, sessionId)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_FAIL))
                 .andExpect(jsonPath("$.code").value(CommonErrorCodes.Telegram.TELEGRAM_AUTH_CODE_NOT_FOUND_ERROR));
@@ -57,7 +57,7 @@ public class TelegramAuthControllerTest extends ApiBaseTest {
     public void testAuthCodeGet_fail_telegramAuthCodeExpired() throws Exception {
         String sessionId = doAuth(CLIENT_EMAIL_EXISTS_28).getValue();
 
-        doPost(RestMethods.TELEGRAM_AUTH_CODE_GET, sessionId, null)
+        doPost(RestMethods.TELEGRAM_AUTH_CODE_GET, sessionId)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_FAIL))
                 .andExpect(jsonPath("$.code").value(CommonErrorCodes.Telegram.TELEGRAM_AUTH_CODE_NOT_FOUND_ERROR));
@@ -68,7 +68,7 @@ public class TelegramAuthControllerTest extends ApiBaseTest {
     public void testAuthCodeGet_success() throws Exception {
         String sessionId = doAuth(CLIENT_EMAIL_EXISTS_29).getValue();
 
-        doPost(RestMethods.TELEGRAM_AUTH_CODE_GET, sessionId, null)
+        doPost(RestMethods.TELEGRAM_AUTH_CODE_GET, sessionId)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(REQUEST_STATUS_SUCCESS))
                 .andExpect(jsonPath("$.code").value("generated_code_2"))
