@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +14,7 @@ import ru.akvine.fitstats.repositories.specifications.ProductSpecification;
 import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
-import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.DietUtils;
-import ru.akvine.fitstats.utils.UUIDGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,10 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final PropertyParseService propertyParseService;
-
-    @Value("uuid.length")
-    private String uuidLength;
+    private final ProductUuidGeneratorService productUuidGeneratorService;
 
     public ProductBean add(ProductBean productBean) {
         Preconditions.checkNotNull(productBean, "productBean is null");
@@ -39,7 +33,7 @@ public class ProductService {
 
         ProductEntity productEntity = new ProductEntity()
                 .setUuid(StringUtils.isBlank(productBean.getUuid()) ?
-                        UUIDGenerator.uuidWithoutDashes(propertyParseService.parseInteger(uuidLength)) : productBean.getUuid())
+                        productUuidGeneratorService.generate() : productBean.getUuid())
                 .setTitle(productBean.getTitle())
                 .setProducer(productBean.getProducer())
                 .setProteins(productBean.getProteins())
