@@ -9,6 +9,6 @@ public class Macronutrients {
     private final double proteins;
     private final double fats;
     private final double carbohydrates;
-    private final double vol;
+    private final double alcohol;
     private final double calories;
 }

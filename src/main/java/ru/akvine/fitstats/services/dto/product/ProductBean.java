@@ -19,6 +19,7 @@ public class ProductBean extends SoftBean {
     private double fats;
     private double carbohydrates;
     private double calories;
+    private double alcohol;
     private double vol;
     private double volume;
     private VolumeMeasurement measurement;
@@ -32,6 +33,7 @@ public class ProductBean extends SoftBean {
         this.fats = productEntity.getFats();
         this.carbohydrates = productEntity.getCarbohydrates();
         this.calories = productEntity.getCalories();
+        this.alcohol = productEntity.getAlcohol();
         this.volume = productEntity.getVolume();
         this.vol = productEntity.getVol();
         this.measurement = productEntity.getMeasurement();

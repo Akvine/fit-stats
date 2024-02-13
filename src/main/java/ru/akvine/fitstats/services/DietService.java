@@ -30,11 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static ru.akvine.fitstats.enums.Duration.*;
 import static ru.akvine.fitstats.utils.DateUtils.*;
-import static ru.akvine.fitstats.utils.DateUtils.getYearRange;
-import static ru.akvine.fitstats.utils.DietUtils.calculateMacronutrients;
-import static ru.akvine.fitstats.utils.DietUtils.transformPer100;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +41,7 @@ public class DietService {
     private final ClientService clientService;
     private final ProductService productService;
     private final BiometricService biometricService;
+    private final MacronutrientsCalculationService macronutrientsCalculationService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final PropertyParseService propertyParseService;
 
@@ -72,17 +69,11 @@ public class DietService {
             productEntity = productService.verifyExistsAndGet(productUuid);
         }
 
-        Macronutrients macronutrientsPer100 = transformPer100(
+        Macronutrients consumedMacronutrients = macronutrientsCalculationService.calculate(
                 productEntity.getProteins(),
                 productEntity.getFats(),
                 productEntity.getCarbohydrates(),
                 productEntity.getVol(),
-                productEntity.getVolume());
-        Macronutrients consumedMacronutrients = calculateMacronutrients(
-                macronutrientsPer100.getProteins(),
-                macronutrientsPer100.getFats(),
-                macronutrientsPer100.getCarbohydrates(),
-                macronutrientsPer100.getVol(),
                 addDietRecordStart.getVolume());
 
         DietRecordEntity dietRecordEntity = new DietRecordEntity()
@@ -91,7 +82,7 @@ public class DietService {
                 .setFats(consumedMacronutrients.getFats())
                 .setCarbohydrates(consumedMacronutrients.getCarbohydrates())
                 .setCalories(consumedMacronutrients.getCalories())
-                .setVol(consumedMacronutrients.getVol())
+                .setAlcohol(consumedMacronutrients.getAlcohol())
                 .setVolume(addDietRecordStart.getVolume())
                 .setDate(addDietRecordStart.getDate())
                 .setTime(addDietRecordStart.getTime())
@@ -114,7 +105,7 @@ public class DietService {
                 .setFats(dietRecordBean.getFats())
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
                 .setCalories(dietRecordBean.getCalories())
-                .setVol(dietRecordBean.getVol())
+                .setAlcohol(dietRecordBean.getAlcohol())
                 .setVolume(dietRecordBean.getVolume())
                 .setVolumeMeasurement(dietRecordBean.getProductBean().getMeasurement());
     }
@@ -133,7 +124,7 @@ public class DietService {
                 .setProteins(dietRecordBean.getProteins())
                 .setFats(dietRecordBean.getFats())
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
-                .setVol(dietRecordBean.getVol())
+                .setAlcohol(dietRecordBean.getAlcohol())
                 .setCalories(dietRecordBean.getCalories())
                 .setVolume(dietRecordBean.getVolume())
                 .setDate(dietRecordBean.getDate())
@@ -178,7 +169,7 @@ public class DietService {
         String dietRecordUuid = deleteRecord.getRecordUuid();
         DateRange dateRange = deleteRecord.getDateRange();
         if (StringUtils.isNotBlank(dietRecordUuid)) {
-           deleteRecordByUuid(dietRecordUuid, clientUuid);
+            deleteRecordByUuid(dietRecordUuid, clientUuid);
         } else {
             deleteRecordsByDateRange(dateRange, clientUuid);
         }

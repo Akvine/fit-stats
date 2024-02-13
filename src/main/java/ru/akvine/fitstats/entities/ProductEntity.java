@@ -36,6 +36,9 @@ public class ProductEntity extends SoftBaseEntity {
     @Column(name = "CARBOHYDRATES", nullable = false)
     private double carbohydrates;
 
+    @Column(name = "ALCOHOL", nullable = false)
+    private double alcohol;
+
     @Column(name = "CALORIES", nullable = false)
     private double calories;
 

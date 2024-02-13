@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final MacronutrientsCalculationService macronutrientsCalculationService;
     private final ProductUuidGeneratorService productUuidGeneratorService;
 
     public ProductBean add(ProductBean productBean) {
@@ -39,15 +40,17 @@ public class ProductService {
                 .setProteins(productBean.getProteins())
                 .setFats(productBean.getFats())
                 .setCarbohydrates(productBean.getCarbohydrates())
+                .setAlcohol(productBean.getAlcohol())
                 .setVol(productBean.getVol())
                 .setCalories(productBean.getCalories())
                 .setVolume(productBean.getVolume())
                 .setMeasurement(productBean.getMeasurement())
-                .setCalories(DietUtils.calculateCalories(
+                .setCalories(macronutrientsCalculationService.calculateCalories(
                         productBean.getProteins(),
                         productBean.getFats(),
                         productBean.getCarbohydrates(),
-                        productBean.getVol()));
+                        productBean.getAlcohol()
+                ));
 
         ProductBean savedProductBean = new ProductBean(productRepository.save(productEntity));
         logger.info("Successful save product bean = [{}]", savedProductBean);
