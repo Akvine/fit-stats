@@ -31,16 +31,31 @@ public class ProductConverter {
 
     public ProductBean convertToProductBean(AddProductRequest request) {
         Preconditions.checkNotNull(request, "addProductRequest is null");
-        return new ProductBean()
+        ProductBean productBean = new ProductBean()
                 .setProteins(request.getProteins())
                 .setFats(request.getFats())
                 .setCarbohydrates(request.getCarbohydrates())
-                .setAlcohol(request.getVol() * ALCOHOL_COEFFICIENT)
-                .setVol(request.getVol())
                 .setTitle(request.getTitle())
                 .setProducer(request.getProducer())
                 .setVolume(DEFAULT_PRODUCT_VOLUME)
                 .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()));
+
+
+        Double vol = request.getVol();
+        Double alcohol = request.getAlcohol();
+        if (vol == null && alcohol == null) {
+            return productBean
+                    .setAlcohol(0)
+                    .setVol(0);
+        } else if (vol != null && alcohol == null) {
+            return productBean
+                    .setVol(vol)
+                    .setAlcohol(vol * ALCOHOL_COEFFICIENT);
+        } else {
+            return productBean
+                    .setVol(alcohol / ALCOHOL_COEFFICIENT)
+                    .setAlcohol(alcohol);
+        }
     }
 
     public ProductResponse convertToProductResponse(ProductBean productBean) {
@@ -74,6 +89,7 @@ public class ProductConverter {
                 .setProteins(MathUtils.round(productBean.getProteins(), PRODUCT_ROUND_VALUE_ACCURACY))
                 .setFats(MathUtils.round(productBean.getFats(), PRODUCT_ROUND_VALUE_ACCURACY))
                 .setCalories(MathUtils.round(productBean.getCalories(), PRODUCT_ROUND_VALUE_ACCURACY))
+                .setAlcohol(MathUtils.round(productBean.getAlcohol(), PRODUCT_ROUND_VALUE_ACCURACY))
                 .setCarbohydrates(MathUtils.round(productBean.getCarbohydrates(), PRODUCT_ROUND_VALUE_ACCURACY))
                 .setVol(MathUtils.round(productBean.getVol(), propertyParseService.parseInteger(roundAccuracy)))
                 .setMeasurement(productBean.getMeasurement().toString())

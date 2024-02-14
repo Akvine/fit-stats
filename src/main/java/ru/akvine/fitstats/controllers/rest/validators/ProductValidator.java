@@ -46,15 +46,25 @@ public class ProductValidator {
                     CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
                     "Carbohydrates is less than 0. Field name: carbohydrates");
         }
-        if (request.getVol() > 100) {
+        if (request.getVol() != null && request.getVol() > 100) {
             throw new ValidationException(
                     CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
                     "VOL is greater than 100. Field name: vol");
         }
-        if (request.getVol() < 0) {
+        if (request.getVol() != null && request.getAlcohol() != null) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
+                    "VOL and alcohol are presented. Send only VOL or alcohol");
+        }
+        if (request.getVol() != null && request.getVol() < 0) {
             throw new ValidationException(
                     CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
                     "VOL is less than 0. Field name: vol");
+        }
+        if (request.getAlcohol() != null && request.getAlcohol() < 0) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Product.MACRONUTRIENT_VALUE_INVALID_ERROR,
+                    "Alcohol is less than 0. Field name: alcohol");
         }
 
         volumeMeasurementValidator.validate(request.getVolumeMeasurement());

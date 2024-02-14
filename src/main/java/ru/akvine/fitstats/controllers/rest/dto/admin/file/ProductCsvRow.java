@@ -32,11 +32,14 @@ public class ProductCsvRow {
     private String calories;
 
     @CsvBindByPosition(position = 8)
-    private String vol;
+    private String alcohol;
 
     @CsvBindByPosition(position = 9)
-    private String volume;
+    private String vol;
 
     @CsvBindByPosition(position = 10)
+    private String volume;
+
+    @CsvBindByPosition(position = 11)
     private String measurement;
 }

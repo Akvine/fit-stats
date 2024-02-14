@@ -73,7 +73,7 @@ public class DietService {
                 productEntity.getProteins(),
                 productEntity.getFats(),
                 productEntity.getCarbohydrates(),
-                productEntity.getVol(),
+                productEntity.getAlcohol(),
                 addDietRecordStart.getVolume());
 
         DietRecordEntity dietRecordEntity = new DietRecordEntity()
@@ -83,6 +83,7 @@ public class DietService {
                 .setCarbohydrates(consumedMacronutrients.getCarbohydrates())
                 .setCalories(consumedMacronutrients.getCalories())
                 .setAlcohol(consumedMacronutrients.getAlcohol())
+                .setVol(productEntity.getVol())
                 .setVolume(addDietRecordStart.getVolume())
                 .setDate(addDietRecordStart.getDate())
                 .setTime(addDietRecordStart.getTime())
@@ -106,6 +107,7 @@ public class DietService {
                 .setCarbohydrates(dietRecordBean.getCarbohydrates())
                 .setCalories(dietRecordBean.getCalories())
                 .setAlcohol(dietRecordBean.getAlcohol())
+                .setVol(dietRecordBean.getVol())
                 .setVolume(dietRecordBean.getVolume())
                 .setVolumeMeasurement(dietRecordBean.getProductBean().getMeasurement());
     }
@@ -127,6 +129,7 @@ public class DietService {
                 .setAlcohol(dietRecordBean.getAlcohol())
                 .setCalories(dietRecordBean.getCalories())
                 .setVolume(dietRecordBean.getVolume())
+                .setVol(dietRecordBean.getVol())
                 .setDate(dietRecordBean.getDate())
                 .setTime(dietRecordBean.getTime())
                 .setClient(clientEntity)

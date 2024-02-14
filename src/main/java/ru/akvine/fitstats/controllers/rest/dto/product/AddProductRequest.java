@@ -20,7 +20,9 @@ public class AddProductRequest {
 
     private double carbohydrates;
 
-    private double vol;
+    private Double alcohol;
+
+    private Double vol;
 
     @NotBlank
     private String volumeMeasurement;

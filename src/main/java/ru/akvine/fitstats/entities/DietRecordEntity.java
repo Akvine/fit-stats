@@ -45,6 +45,9 @@ public class DietRecordEntity extends BaseEntity {
     @Column(name = "ALCOHOL", nullable = false)
     private double alcohol;
 
+    @Column(name = "VOL", nullable = false)
+    private double vol;
+
     @Column(name = "VOLUME", nullable = false)
     private double volume;
 

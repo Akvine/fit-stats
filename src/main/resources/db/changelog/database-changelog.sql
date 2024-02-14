@@ -387,3 +387,13 @@ CREATE TABLE TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY (
   CONSTRAINT TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
 );
 CREATE SEQUENCE SEQ_TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY START WITH 1 INCREMENT BY 1000;
+
+--changeset lymar-sa:FIT-STATS-1-24
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'PRODUCT_ENTITY' and upper(column_name) = 'ALCOHOL' AND table_schema = 'public'
+ALTER TABLE PRODUCT_ENTITY ADD ALCOHOL DOUBLE PRECISION NOT NULL DEFAULT 0;
+
+--changeset lymar-sa:FIT-STATS-1-25
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'DIET_RECORD_ENTITY' and upper(column_name) = 'ALCOHOL' AND table_schema = 'public'
+ALTER TABLE DIET_RECORD_ENTITY ADD ALCOHOL DOUBLE PRECISION NOT NULL DEFAULT 0;

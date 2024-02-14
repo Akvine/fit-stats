@@ -17,6 +17,7 @@ public class ProductExport {
     private double fats;
     private double carbohydrates;
     private double calories;
+    private double alcohol;
     private double vol;
     private double volume;
     private VolumeMeasurement measurement;
@@ -28,7 +29,8 @@ public class ProductExport {
         this.proteins = round(productBean.getProteins(), 2);
         this.fats = round(productBean.getFats(), 2);
         this.carbohydrates = round(productBean.getCarbohydrates(), 2);
-        this.calories = round(productBean.getCarbohydrates(), 2);
+        this.calories = round(productBean.getCalories(), 2);
+        this.alcohol = round(productBean.getAlcohol(), 2);
         this.vol = round(productBean.getVol(), 2);
         this.volume = round(productBean.getVolume(), 2);
         this.measurement = productBean.getMeasurement();

@@ -43,6 +43,7 @@ public class TelegramProductConverter {
                 .setProteins(request.getProteins())
                 .setVolume(DEFAULT_PRODUCT_VOLUME)
                 .setCarbohydrates(request.getCarbohydrates())
+                .setAlcohol(request.getVol() * 0.8)
                 .setVol(request.getVol())
                 .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()));
     }

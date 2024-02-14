@@ -93,11 +93,12 @@ public class ProductService {
 
         if (macronutrientsUpdated) {
             productEntity.setCalories(
-                    DietUtils.calculateCalories(
+                    macronutrientsCalculationService.calculateCalories(
                             productEntity.getProteins(),
                             productEntity.getFats(),
                             productEntity.getCarbohydrates(),
-                            productEntity.getVol())
+                            productEntity.getAlcohol()
+                    )
             );
         }
 

@@ -32,7 +32,7 @@ public class ProductControllerTest extends ApiBaseTest {
                 .setProteins(3.5)
                 .setCarbohydrates(2.5)
                 .setFats(1.0)
-                .setVol(5)
+                .setVol(5D)
                 .setVolumeMeasurement("G");
 
         doPost(RestMethods.PRODUCTS, sessionId, request)
@@ -51,7 +51,7 @@ public class ProductControllerTest extends ApiBaseTest {
                 .setProteins(3.5)
                 .setCarbohydrates(2.5)
                 .setFats(1.0)
-                .setVol(5)
+                .setVol(5D)
                 .setVolumeMeasurement("G");
 
         doPost(RestMethods.PRODUCTS, sessionId, request)
@@ -71,7 +71,7 @@ public class ProductControllerTest extends ApiBaseTest {
                 .setProteins(3.5)
                 .setCarbohydrates(2.5)
                 .setFats(1.0)
-                .setVol(5);
+                .setVol(5D);
 
         doPost(RestMethods.PRODUCTS, sessionId, request)
                 .andExpect(status().isBadRequest())
@@ -90,7 +90,7 @@ public class ProductControllerTest extends ApiBaseTest {
                 .setProteins(3.5)
                 .setCarbohydrates(2.5)
                 .setFats(1.0)
-                .setVol(5)
+                .setVol(5D)
                 .setVolumeMeasurement("invalid measurement");
 
         doPost(RestMethods.PRODUCTS, sessionId, request)
@@ -110,7 +110,7 @@ public class ProductControllerTest extends ApiBaseTest {
                 .setProteins(3.5)
                 .setCarbohydrates(2.5)
                 .setFats(1.0)
-                .setVol(5)
+                .setVol(5D)
                 .setVolumeMeasurement("G");
 
         doPost(RestMethods.PRODUCTS, sessionId, request)
