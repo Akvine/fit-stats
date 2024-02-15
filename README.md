@@ -13,6 +13,7 @@ Application for fitness statistic tracking and taking into account various indic
 * Calories
 * Proteins
 * Fats
+* Alcohol
 * Carbohydrates
 
 The application supports integration with the telegram bot
