@@ -14,5 +14,6 @@ public class DietStatisticHistory {
     private double proteins;
     private double fats;
     private double carbohydrates;
+    private double alcohol;
     private double calories;
 }

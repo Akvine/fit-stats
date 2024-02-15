@@ -4,6 +4,7 @@ public enum Macronutrient {
     PROTEINS,
     FATS,
     CARBOHYDRATES,
+    ALCOHOL,
     CALORIES;
 
     public static Macronutrient safeValueOf(String value) {
@@ -16,6 +17,7 @@ public enum Macronutrient {
             case "proteins": return PROTEINS;
             case "fats": return FATS;
             case "carbohydrates": return CARBOHYDRATES;
+            case "alcohol": return ALCOHOL;
             default: throw new IllegalStateException("Macronutrient with value = [" + value + "] is not supported!");
         }
     }

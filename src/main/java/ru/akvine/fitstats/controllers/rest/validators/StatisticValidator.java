@@ -57,15 +57,16 @@ public class StatisticValidator {
         Preconditions.checkNotNull(request, "calculateAdditionalStatisticRequest is null");
 
         if (request.getModeCount() != null) {
-            if (request.getModeCount() > propertyParseService.parseInteger(limit)) {
+            int limitCount = propertyParseService.parseInteger(limit);
+            if (request.getModeCount() > limitCount) {
                 throw new ValidationException(
                         CommonErrorCodes.Validation.Statistic.MODE_COUNT_INVALID_ERROR,
-                        "Mode count can't be more than limit count. Limit count = [" + limit + "]. Field invalid: modeCount");
+                        "Mode count can't be more than limit count. Limit count = [" + limitCount + "]. Field invalid: modeCount");
             }
             if (request.getModeCount() < 0) {
                 throw new ValidationException(
                         CommonErrorCodes.Validation.Statistic.MODE_COUNT_INVALID_ERROR,
-                        "Mode count can't be less 0. Limit count = [" + limit + "]. Field invalid: modeCount");
+                        "Mode count can't be less 0. Limit count = [" + limitCount + "]. Field invalid: modeCount");
             }
         }
         verifyRoundAccuracy(request.getRoundAccuracy());

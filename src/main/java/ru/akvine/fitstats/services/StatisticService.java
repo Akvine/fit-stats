@@ -38,9 +38,10 @@ public class StatisticService {
     private static final String CARBOHYDRATES_MACRONUTRIENT_NAME = "carbohydrates";
     private static final String ALCOHOL_NAME = "alcohol";
 
-    private static final int FATS_MACRONUTRIENT_CALORIES_COEFFICIENT = 9;
-    private static final int PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT = 4;
-    private static final int CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT = 4;
+    private static final double FATS_MACRONUTRIENT_CALORIES_COEFFICIENT = 9.3;
+    private static final double PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT = 4.1;
+    private static final double CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT = 4.1;
+    private static final double ALCOHOL_MACRONUTRIENT_CALORIES_COEFFICIENT = 7.1;
 
     private static final int MONTH_AVERAGE_COUNT = 30;
 
@@ -150,6 +151,12 @@ public class StatisticService {
                 .stream()
                 .map(value -> value * CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT)
                 .collect(Collectors.toList());
+        List<Double> alcohol = availableMacronutrientProcessors
+                .get(Macronutrient.ALCOHOL)
+                .extract(records)
+                .stream()
+                .map(value -> value * ALCOHOL_MACRONUTRIENT_CALORIES_COEFFICIENT)
+                .collect(Collectors.toList());
         double totalCalories = availableMacronutrientProcessors
                 .get(Macronutrient.CALORIES)
                 .extract(records)
@@ -163,12 +170,12 @@ public class StatisticService {
                 percentStatisticProcessor.calculate(fatsValues, totalCalories), roundAccuracy);
         double carbohydratesPercent = MathUtils.round(
                 percentStatisticProcessor.calculate(carbohydrates, totalCalories), roundAccuracy);
-        double alcoholCaloriesPercent = MathUtils.round((100 - (proteinsPercent + fatsPercent + carbohydratesPercent)), roundAccuracy);
+        double alcoholPercent = MathUtils.round(percentStatisticProcessor.calculate(alcohol, totalCalories), roundAccuracy);
 
         macronutrientsPercents.put(PROTEINS_MACRONUTRIENT_NAME, proteinsPercent);
         macronutrientsPercents.put(FATS_MACRONUTRIENT_NAME, fatsPercent);
         macronutrientsPercents.put(CARBOHYDRATES_MACRONUTRIENT_NAME, carbohydratesPercent);
-        macronutrientsPercents.put(ALCOHOL_NAME, alcoholCaloriesPercent);
+        macronutrientsPercents.put(ALCOHOL_NAME, alcoholPercent);
 
         return additionalStatisticInfo
                 .setMode(modeStatisticProcessor.calculate(products, modeCount))
@@ -241,6 +248,18 @@ public class StatisticService {
                                 LinkedHashMap::new
                         ));
                 break;
+            case ALCOHOL:
+                macronutrientHistory = statisticHistoryMap
+                        .entrySet()
+                        .stream()
+                        .sorted(Map.Entry.<String, DietStatisticHistory>comparingByKey().reversed())
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> entry.getValue().getAlcohol(),
+                                (existing, replacement) -> existing,
+                                LinkedHashMap::new
+                        ));
+                break;
             case CALORIES:
                 macronutrientHistory = statisticHistoryMap
                         .entrySet()
@@ -290,6 +309,7 @@ public class StatisticService {
                                         entity.getProteins(),
                                         entity.getFats(),
                                         entity.getCarbohydrates(),
+                                        entity.getAlcohol(),
                                         entity.getCalories()
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
@@ -297,6 +317,7 @@ public class StatisticService {
                                         MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
                                         MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
                                         MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
                                         MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
@@ -316,6 +337,7 @@ public class StatisticService {
                                         entity.getProteins(),
                                         entity.getFats(),
                                         entity.getCarbohydrates(),
+                                        entity.getAlcohol(),
                                         entity.getCalories()
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
@@ -323,6 +345,7 @@ public class StatisticService {
                                         MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
                                         MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
                                         MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
                                         MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
@@ -342,6 +365,7 @@ public class StatisticService {
                                         entity.getProteins(),
                                         entity.getFats(),
                                         entity.getCarbohydrates(),
+                                        entity.getAlcohol(),
                                         entity.getCalories()
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
@@ -349,6 +373,7 @@ public class StatisticService {
                                         MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
                                         MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
                                         MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
                                         MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
@@ -368,6 +393,7 @@ public class StatisticService {
                                         entity.getProteins(),
                                         entity.getFats(),
                                         entity.getCarbohydrates(),
+                                        entity.getAlcohol(),
                                         entity.getCalories()
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
@@ -375,6 +401,7 @@ public class StatisticService {
                                         MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
                                         MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
                                         MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
                                         MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
