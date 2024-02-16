@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.akvine.fitstats.api.rest.TestConstants.*;
 
 @DisplayName("Admin controller")
-public class AdminControllerTest extends ApiBaseTest {
+public class AdminProductControllerTest extends ApiBaseTest {
     @Test
     @DisplayName("FAIL - no session")
     public void testProductExport_fail_noSession() throws Exception {

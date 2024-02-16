@@ -13,21 +13,21 @@ import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 
 import javax.validation.Valid;
 
-@RequestMapping(value = "/admin")
-public interface AdminControllerMeta {
+@RequestMapping(value = "/admin/products")
+public interface AdminProductControllerMeta {
 
-    @PostMapping(value = "/products/export")
+    @PostMapping(value = "/export")
     ResponseEntity productsExport(@Valid @RequestBody ExportProductsRequest exportProductsRequest);
 
-    @PostMapping(value = "/products/import")
+    @PostMapping(value = "/import")
     Response productsImport(
             @RequestParam(value = "secret") String secret,
             @RequestParam(value = "converterType", defaultValue = "CSV") String converterType,
             @RequestParam(value = "file") MultipartFile file);
 
-    @PostMapping(value = "/products/update")
+    @PostMapping(value = "/update")
     Response productUpdate(@Valid @RequestBody UpdateProductRequest request);
 
-    @PostMapping(value = "/products/delete")
+    @PostMapping(value = "/delete")
     Response productDelete(@Valid @RequestBody DeleteProductRequest request);
 }

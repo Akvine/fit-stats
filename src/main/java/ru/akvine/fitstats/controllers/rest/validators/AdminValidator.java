@@ -145,6 +145,28 @@ public class AdminValidator {
         verifySecret(request.getSecret());
     }
 
+    public void verifyBlockClientRequest(BlockClientRequest request) {
+        Preconditions.checkNotNull(request, "blockClientRequest is null");
+        verifySecret(request.getSecret());
+
+        if (StringUtils.isBlank(request.getEmail()) && StringUtils.isBlank(request.getUuid())) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.FIELD_NOT_PRESENTED_ERROR,
+                    "Uuid or email not presented. Must present uuid or email");
+        }
+    }
+
+    public void verifyUnblockClientRequest(UnblockClientRequest request) {
+        Preconditions.checkNotNull(request, "unblockClientRequest is null");
+        verifySecret(request.getSecret());
+
+        if (StringUtils.isBlank(request.getEmail()) && StringUtils.isBlank(request.getUuid())) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.FIELD_NOT_PRESENTED_ERROR,
+                    "Uuid or email not presented. Must present uuid or email");
+        }
+    }
+
     public void verifySecret(String secret) {
         String adminSecret = propertyParseService.get(this.secret);
         if (!adminSecret.equals(secret)) {

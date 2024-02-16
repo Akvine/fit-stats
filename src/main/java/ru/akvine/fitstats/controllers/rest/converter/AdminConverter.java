@@ -15,11 +15,17 @@ import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
+import ru.akvine.fitstats.services.dto.admin.BlockClientFinish;
+import ru.akvine.fitstats.services.dto.admin.BlockClientStart;
+import ru.akvine.fitstats.services.dto.admin.UnblockClient;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
+import ru.akvine.fitstats.utils.DateUtils;
 import ru.akvine.fitstats.utils.MathUtils;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +38,8 @@ public class AdminConverter {
     private static final String HEADER_PREFIX = "attachment; filename=";
     private static final String DEFAULT_FILE_NAME = "file";
     private static final String POINT = ".";
+
+    private static final int ONE_HUNDRED_YEARS_BLOCK_TIME = 100;
 
     private final Map<ConverterType, Parser> availableParsers;
 
@@ -94,6 +102,47 @@ public class AdminConverter {
     public ProductResponse convertToProductResponse(ProductBean productBean) {
         Preconditions.checkNotNull(productBean, "productBean is null");
         return new ProductResponse().setProduct(buildProductDto(productBean));
+    }
+
+    public BlockClientStart convertToBlockClientStart(BlockClientRequest request) {
+        Preconditions.checkNotNull(request, "blockClientRequest is null");
+        BlockClientStart start = new BlockClientStart();
+
+        String email = request.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            start.setEmail(email);
+        } else {
+            start.setUuid(request.getUuid());
+        }
+
+        if (request.getDate() == null) {
+            start.setMinutes(DateUtils.getMinutes(ONE_HUNDRED_YEARS_BLOCK_TIME));
+        } else {
+            start.setMinutes(LocalDateTime.now().until(request.getDate(), ChronoUnit.MINUTES));
+        }
+
+        return start;
+    }
+
+    public BlockClientResponse convertToBlockClientResponse(BlockClientFinish finish) {
+        Preconditions.checkNotNull(finish, "blockClientFinish is null");
+        return new BlockClientResponse()
+                .setEmail(finish.getEmail())
+                .setDateTime(finish.getDateTime())
+                .setMinutes(finish.getMinutes());
+    }
+
+    public UnblockClient convertToUnblockClient(UnblockClientRequest request) {
+        Preconditions.checkNotNull(request, "unblockClientRequest");
+        UnblockClient unblockClient = new UnblockClient();
+
+        String email = request.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            unblockClient.setEmail(email);
+        } else {
+            unblockClient.setUuid(request.getUuid());
+        }
+        return unblockClient;
     }
 
     private ProductDto buildProductDto(ProductBean productBean) {

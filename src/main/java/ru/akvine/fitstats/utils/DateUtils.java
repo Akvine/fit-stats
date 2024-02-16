@@ -5,8 +5,10 @@ import ru.akvine.fitstats.services.dto.DateRange;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
 public class DateUtils {
@@ -35,6 +37,17 @@ public class DateUtils {
             throw new IllegalArgumentException("date can't be blank!");
         }
         return LocalDate.from(dateTimeFormatter.parse(date));
+    }
+
+    public static long getMinutes(int years) {
+        int daysInYear = 365;
+        int minutesInDay = 24 * 60;
+
+        return (long) years * daysInYear * minutesInDay;
+    }
+
+    public static long getMinutes(LocalDateTime dateTime) {
+        return ChronoUnit.MINUTES.between(LocalDateTime.MIN, dateTime);
     }
 
     public static DateRange getDayRange() {

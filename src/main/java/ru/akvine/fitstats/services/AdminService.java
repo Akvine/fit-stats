@@ -2,17 +2,23 @@ package ru.akvine.fitstats.services;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
+import ru.akvine.fitstats.services.dto.admin.BlockClientFinish;
+import ru.akvine.fitstats.services.dto.admin.BlockClientStart;
 import ru.akvine.fitstats.services.dto.admin.ProductExport;
+import ru.akvine.fitstats.services.dto.admin.UnblockClient;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.services.processors.format.Converter;
+import ru.akvine.fitstats.services.security.BlockingService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,12 +30,18 @@ import static java.util.stream.Collectors.toMap;
 @Slf4j
 public class AdminService {
     private final ProductService productService;
+    private final BlockingService blockingService;
+    private final ClientService clientService;
     private final Map<ConverterType, Converter> availableConverters;
 
     @Autowired
     public AdminService(ProductService productService,
+                        BlockingService blockingService,
+                        ClientService clientService,
                         List<Converter> converters) {
         this.productService = productService;
+        this.blockingService = blockingService;
+        this.clientService = clientService;
         this.availableConverters = converters
                 .stream()
                 .collect(toMap(Converter::getType, identity()));
@@ -80,5 +92,42 @@ public class AdminService {
     public void deleteProduct(String productUuid) {
         Preconditions.checkNotNull(productUuid, "product uuid is null");
         productService.deleteByUuid(productUuid);
+    }
+
+    public BlockClientFinish blockClient(BlockClientStart start) {
+        Preconditions.checkNotNull(start, "blockClientStart is null");
+        long minutes = start.getMinutes();
+
+        String email = start.getEmail();
+        if (StringUtils.isBlank(email)) {
+            email = clientService
+                    .getByUuid(start.getUuid())
+                    .getEmail();
+        }
+
+        LocalDateTime blockDate = LocalDateTime.now().plusMinutes(minutes);
+        logger.info("Block client with email = {} until date = {}", email, blockDate);
+        blockingService.setBlock(email, minutes);
+
+        logger.info("Successful block client with email = {} until date = {}", email, blockDate);
+        return new BlockClientFinish()
+                .setEmail(email)
+                .setDateTime(blockDate)
+                .setMinutes(minutes);
+    }
+
+    public void unblockClient(UnblockClient unblockClient) {
+        Preconditions.checkNotNull(unblockClient, "unblockClient is null");
+
+        String email = unblockClient.getEmail();
+        if (StringUtils.isBlank(email)) {
+            email = clientService
+                    .getByUuid(unblockClient.getUuid())
+                    .getEmail();
+        }
+
+        logger.info("Unblock client with email = {} ", email);
+        blockingService.removeBlock(email);
+        logger.info("Successful unblock client with email = {}", email);
     }
 }

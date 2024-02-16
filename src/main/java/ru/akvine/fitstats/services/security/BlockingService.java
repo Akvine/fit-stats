@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
+import ru.akvine.fitstats.exceptions.security.BlockedCredentialsException;
 import ru.akvine.fitstats.repositories.security.BlockedCredentialsRepository;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
 
@@ -55,9 +56,12 @@ public class BlockingService {
             return blockFromCache.end;
         }
     }
-
     public long setBlock(String login) {
-        BlockTime newBlock = new BlockTime(propertyParseService.parseLong(otpBlockTimeMinutes));
+        return setBlock(login, propertyParseService.parseLong(otpBlockTimeMinutes));
+    }
+
+    public long setBlock(String login, Long minutes) {
+        BlockTime newBlock = new BlockTime(minutes);
         String cacheKey = login;
         blockedCache.put(cacheKey, newBlock);
 
@@ -69,6 +73,18 @@ public class BlockingService {
         BlockedCredentialsEntity savedBlockedCredentials = blockedCredentialsRepository.save(newBlockedCredentials);
         logger.info("Client with email = {} has been blocked!", login);
         return savedBlockedCredentials.getId();
+    }
+
+    public boolean removeBlock(String login) {
+        BlockedCredentialsEntity blockedCredentialsEntity = blockedCredentialsRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new BlockedCredentialsException("Not exists block record for client with email = [" + login + "]"));
+
+        blockedCredentialsRepository.delete(blockedCredentialsEntity);
+        blockedCache.remove(login);
+
+        logger.info("Successful remove block for client with email = {}", login);
+        return true;
     }
 
     @Scheduled(fixedDelayString = "${security.blocked.credentials.expired.cache.fixedDelay.milliseconds}")

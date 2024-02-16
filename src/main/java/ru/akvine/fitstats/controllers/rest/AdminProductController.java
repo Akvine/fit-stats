@@ -9,13 +9,12 @@ import ru.akvine.fitstats.controllers.rest.converter.AdminConverter;
 import ru.akvine.fitstats.controllers.rest.dto.admin.*;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
-import ru.akvine.fitstats.controllers.rest.meta.AdminControllerMeta;
+import ru.akvine.fitstats.controllers.rest.meta.AdminProductControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.AdminValidator;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.services.AdminService;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
-import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class AdminController implements AdminControllerMeta {
+public class AdminProductController implements AdminProductControllerMeta {
     private final AdminValidator adminValidator;
     private final AdminConverter adminConverter;
     private final AdminService adminService;
