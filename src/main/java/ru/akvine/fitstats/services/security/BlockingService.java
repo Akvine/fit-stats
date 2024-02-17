@@ -87,6 +87,10 @@ public class BlockingService {
         return true;
     }
 
+    public List<BlockedCredentialsEntity> list() {
+        return blockedCredentialsRepository.findAll();
+    }
+
     @Scheduled(fixedDelayString = "${security.blocked.credentials.expired.cache.fixedDelay.milliseconds}")
     public void clearExpiredInCache() {
         boolean[] headerPrinted = new boolean[1];

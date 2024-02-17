@@ -15,6 +15,7 @@ import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
+import ru.akvine.fitstats.services.dto.admin.BlockClientEntry;
 import ru.akvine.fitstats.services.dto.admin.BlockClientFinish;
 import ru.akvine.fitstats.services.dto.admin.BlockClientStart;
 import ru.akvine.fitstats.services.dto.admin.UnblockClient;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -132,6 +134,16 @@ public class AdminConverter {
                 .setMinutes(finish.getMinutes());
     }
 
+    public ListBlockClientResponse convertToListBlockClientResponse(List<BlockClientEntry> blocked) {
+        Preconditions.checkNotNull(blocked, "blockedClientEntries is null");
+        return new ListBlockClientResponse()
+                .setCount(blocked.size())
+                .setList(blocked
+                        .stream()
+                        .map(this::buildBlockClientDto)
+                        .collect(Collectors.toList()));
+    }
+
     public UnblockClient convertToUnblockClient(UnblockClientRequest request) {
         Preconditions.checkNotNull(request, "unblockClientRequest");
         UnblockClient unblockClient = new UnblockClient();
@@ -157,6 +169,14 @@ public class AdminConverter {
                 .setMeasurement(productBean.getMeasurement().toString())
                 .setVol(productBean.getVol())
                 .setVolume(productBean.getVolume());
+    }
+
+    private BlockClientDto buildBlockClientDto(BlockClientEntry entry) {
+        return new BlockClientDto()
+                .setEmail(entry.getEmail())
+                .setMinutes(entry.getMinutes())
+                .setBlockStartDate(entry.getBlockStartDate())
+                .setBlockEndDate(entry.getBlockEndDate());
     }
 
     private String resolveHeaderType(String filename, ConverterType converterType) {

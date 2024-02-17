@@ -8,9 +8,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
-public class BlockClientRequest extends SecretRequest {
-    private String uuid;
+public class BlockClientDto {
     private String email;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime date;
+    private LocalDateTime blockStartDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime blockEndDate;
+    private long minutes;
 }

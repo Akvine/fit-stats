@@ -11,11 +11,14 @@ import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 import ru.akvine.fitstats.controllers.rest.meta.AdminClientControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.AdminValidator;
 import ru.akvine.fitstats.services.AdminService;
+import ru.akvine.fitstats.services.dto.admin.BlockClientEntry;
 import ru.akvine.fitstats.services.dto.admin.BlockClientFinish;
 import ru.akvine.fitstats.services.dto.admin.BlockClientStart;
 import ru.akvine.fitstats.services.dto.admin.UnblockClient;
+import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -31,6 +34,12 @@ public class AdminClientController implements AdminClientControllerMeta {
         BlockClientStart start = adminConverter.convertToBlockClientStart(request);
         BlockClientFinish finish = adminService.blockClient(start);
         return adminConverter.convertToBlockClientResponse(finish);
+    }
+
+    @Override
+    public Response list() {
+        List<BlockClientEntry> blocked = adminService.listBlocked(SecurityUtils.getCurrentUser().getName());
+        return adminConverter.convertToListBlockClientResponse(blocked);
     }
 
     @Override

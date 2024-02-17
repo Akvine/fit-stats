@@ -7,16 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
+import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
-import ru.akvine.fitstats.services.dto.admin.BlockClientFinish;
-import ru.akvine.fitstats.services.dto.admin.BlockClientStart;
-import ru.akvine.fitstats.services.dto.admin.ProductExport;
-import ru.akvine.fitstats.services.dto.admin.UnblockClient;
+import ru.akvine.fitstats.services.dto.admin.*;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.services.processors.format.Converter;
 import ru.akvine.fitstats.services.security.BlockingService;
+import ru.akvine.fitstats.utils.DateUtils;
+import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -114,6 +114,23 @@ public class AdminService {
                 .setEmail(email)
                 .setDateTime(blockDate)
                 .setMinutes(minutes);
+    }
+
+    public List<BlockClientEntry> listBlocked(String email) {
+        logger.info("List blocked clients by client with email = {}", email);
+
+        List<BlockedCredentialsEntity> list = blockingService.list();
+        return list.stream().map(obj -> {
+            LocalDateTime start = obj.getBlockStartDate();
+            LocalDateTime end = obj.getBlockEndDate();
+            String blockedEmail = obj.getLogin();
+            long minutes = DateUtils.getMinutes(start, end);
+            return new BlockClientEntry()
+                    .setEmail(blockedEmail)
+                    .setBlockStartDate(start)
+                    .setBlockEndDate(end)
+                    .setMinutes(minutes);
+        }).collect(Collectors.toList());
     }
 
     public void unblockClient(UnblockClient unblockClient) {

@@ -14,6 +14,9 @@ public interface AdminClientControllerMeta {
     @PostMapping(value = "/block")
     Response block(@Valid @RequestBody BlockClientRequest request);
 
+    @PostMapping(value = "/block/list")
+    Response list();
+
     @PostMapping(value = "/unblock")
     Response unblock(@Valid @RequestBody UnblockClientRequest request);
 

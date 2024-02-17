@@ -50,6 +50,10 @@ public class DateUtils {
         return ChronoUnit.MINUTES.between(LocalDateTime.MIN, dateTime);
     }
 
+    public static long getMinutes(LocalDateTime fromDate, LocalDateTime toDate) {
+        return ChronoUnit.MINUTES.between(fromDate, toDate);
+    }
+
     public static DateRange getDayRange() {
         LocalDate today = LocalDate.now();
         return new DateRange(today, today);
