@@ -1,31 +1,32 @@
-package ru.akvine.fitstats.services.telegram;
+package ru.akvine.fitstats.controllers.telegram.bot;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import java.io.Serializable;
 
-@Service
+@Component
+@Slf4j
 @RequiredArgsConstructor
-public class TelegramLongPoolingMessageProcessor implements MessageProcessor {
+public class TelegramMessageProcessor {
     @Value("telegram.bot.enabled")
-    private String enabled;
+    private String enabledPropertyName;
 
-    private final TelegramLongPollingBot bot;
     private final PropertyParseService propertyParseService;
+    private final TelegramWebhookBot telegramWebhookBot;
 
-    @Override
     public BotApiMethod<? extends Serializable> processIncomingMessage(Update update) {
-        boolean isEnabled = propertyParseService.parseBoolean(enabled);
+        boolean isEnabled = propertyParseService.parseBoolean(enabledPropertyName);
         if (!isEnabled) {
+            logger.debug("Telegram statistic bot disabled");
             return null;
         }
-        bot.onUpdateReceived(update);
-        return null;
+        return telegramWebhookBot.onWebhookUpdateReceived(update);
     }
 }

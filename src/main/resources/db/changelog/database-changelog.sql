@@ -1,6 +1,54 @@
 --liquibase formatted sql logicalFilePath:db/changelog/database-changelog.sql
 
 --changeset lymar-sa:FIT-STATS-1-1
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSql:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'DB_LOCK'
+CREATE TABLE DB_LOCK
+(
+    LOCK_ID      VARCHAR(200)                        NOT NULL,
+    PROCESS_ID   VARCHAR(36)                         NOT NULL,
+    CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE UNIQUE INDEX DB_LOCK_ID_INDX ON DB_LOCK (LOCK_ID);
+--rollback not required
+
+--changeset lymar-sa:FIT-STATS-1-2
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSql:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'DB_LOCK_KEEPALIVE'
+CREATE TABLE DB_LOCK_KEEPALIVE
+(
+    PROCESS_ID   VARCHAR(36)                         NOT NULL,
+    EXPIRY_DATE  TIMESTAMP                           NOT NULL,
+    CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE UNIQUE INDEX DB_LOCK_KEEP_INDX ON DB_LOCK_KEEPALIVE (PROCESS_ID);
+--rollback not required
+
+--changeset lymar-sa:FIT-STATS-1-3
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSql:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'ASYNC_DB_LOCKS'
+CREATE TABLE ASYNC_DB_LOCKS
+(
+    LOCK_ID    VARCHAR(200) NOT NULL,
+    EXPIRE     DECIMAL(22)  NOT NULL,
+    CREATOR_ID VARCHAR(36)  NOT NULL,
+    LOCK_STATE VARCHAR(50)  NOT NULL
+);
+CREATE UNIQUE INDEX ASYNC_DB_LOCKS_INDX ON ASYNC_DB_LOCKS (LOCK_ID);
+--rollback not required
+
+--changeset lymar-sa:FIT-STATS-1-4
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSql:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'XDUAL'
+CREATE TABLE XDUAL
+(
+    DUMMY VARCHAR(1)
+);
+INSERT INTO XDUAL (DUMMY)
+VALUES ('X');
+--rollback not required
+
+--changeset lymar-sa:FIT-STATS-1-5
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'CLIENT_ENTITY' and table_schema = 'public';
 CREATE TABLE CLIENT_ENTITY
@@ -20,7 +68,7 @@ CREATE TABLE CLIENT_ENTITY
 );
 CREATE SEQUENCE SEQ_CLIENT_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-2
+--changeset lymar-sa:FIT-STATS-1-6
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'BIOMETRIC_ENTITY' and table_schema = 'public';
 CREATE TABLE BIOMETRIC_ENTITY
@@ -41,7 +89,7 @@ CREATE TABLE BIOMETRIC_ENTITY
 );
 CREATE SEQUENCE SEQ_BIOMETRIC_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-3
+--changeset lymar-sa:FIT-STATS-1-7
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PRODUCT_ENTITY' and table_schema = 'public';
 CREATE TABLE PRODUCT_ENTITY
@@ -54,6 +102,8 @@ CREATE TABLE PRODUCT_ENTITY
     CALORIES      DOUBLE PRECISION NOT NULL,
     CARBOHYDRATES DOUBLE PRECISION NOT NULL,
     FATS          DOUBLE PRECISION NOT NULL,
+    ALCOHOL       DOUBLE PRECISION NOT NULL,
+    VOL           DOUBLE PRECISION NOT NULL,
     MEASUREMENT   VARCHAR(64),
     PRODUCER      VARCHAR(255)     NOT NULL,
     PROTEINS      DOUBLE PRECISION NOT NULL,
@@ -64,7 +114,7 @@ CREATE TABLE PRODUCT_ENTITY
 );
 CREATE SEQUENCE SEQ_PRODUCT_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-4
+--changeset lymar-sa:FIT-STATS-1-8
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'DIET_RECORD_ENTITY' and table_schema = 'public';
 CREATE TABLE DIET_RECORD_ENTITY
@@ -77,6 +127,8 @@ CREATE TABLE DIET_RECORD_ENTITY
     DATE          DATE             NOT NULL,
     FATS          DOUBLE PRECISION NOT NULL,
     PROTEINS      DOUBLE PRECISION NOT NULL,
+    ALCOHOL       DOUBLE PRECISION NOT NULL,
+    VOL           DOUBLE PRECISION NOT NULL,
     TIME          TIME,
     UUID          VARCHAR(255)     NOT NULL,
     VOLUME        DOUBLE PRECISION NOT NULL,
@@ -88,7 +140,7 @@ CREATE TABLE DIET_RECORD_ENTITY
 );
 CREATE SEQUENCE SEQ_DIET_RECORD_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-5
+--changeset lymar-sa:FIT-STATS-1-9
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'DIET_SETTING_ENTITY' and table_schema = 'public';
 CREATE TABLE DIET_SETTING_ENTITY
@@ -109,7 +161,7 @@ CREATE TABLE DIET_SETTING_ENTITY
 );
 CREATE SEQUENCE SEQ_DIET_SETTING_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-6
+--changeset lymar-sa:FIT-STATS-1-10
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'SPRING_SESSION' and table_schema = 'public';
 CREATE TABLE SPRING_SESSION
@@ -124,7 +176,7 @@ CREATE TABLE SPRING_SESSION
     CONSTRAINT SPRING_SESSION_PK PRIMARY KEY (PRIMARY_ID)
 );
 
---changeset lymar-sa:FIT-STATS-1-7
+--changeset lymar-sa:FIT-STATS-1-11
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'SPRING_SESSION_ATTRIBUTES' and table_schema = 'public';
 CREATE TABLE SPRING_SESSION_ATTRIBUTES
@@ -136,7 +188,7 @@ CREATE TABLE SPRING_SESSION_ATTRIBUTES
     CONSTRAINT SPRING_SESSION_ATTRIBUTES_FK FOREIGN KEY (SESSION_PRIMARY_ID) REFERENCES SPRING_SESSION (PRIMARY_ID) ON DELETE CASCADE
 );
 
---changeset lymar-sa:FIT-STATS-1-8
+--changeset lymar-sa:FIT-STATS-1-12
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'AUTH_ACTION_ENTITY' and table_schema = 'public';
 CREATE TABLE AUTH_ACTION_ENTITY
@@ -157,7 +209,7 @@ CREATE TABLE AUTH_ACTION_ENTITY
 );
 CREATE SEQUENCE SEQ_AUTH_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-9
+--changeset lymar-sa:FIT-STATS-1-13
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'REGISTRATION_ACTION_ENTITY' and table_schema = 'public';
 CREATE TABLE REGISTRATION_ACTION_ENTITY
@@ -178,23 +230,7 @@ CREATE TABLE REGISTRATION_ACTION_ENTITY
 );
 CREATE SEQUENCE SEQ_REGISTRATION_ACTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-10
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TAG_ENTITY' and table_schema = 'public';
-CREATE TABLE TAG_ENTITY
-(
-    ID           BIGINT       NOT NULL,
-    CREATED_DATE TIMESTAMP    NOT NULL,
-    UPDATED_DATE TIMESTAMP,
-    IS_DELETED   BOOLEAN      NOT NULL,
-    DELETED_DATE TIMESTAMP,
-    TITLE        VARCHAR(128) NOT NULL,
-    TYPE         VARCHAR(128) NOT NULL,
-    CONSTRAINT TAG_ENTITY_PKEY PRIMARY KEY (ID)
-);
-CREATE SEQUENCE SEQ_TAG_ENTITY START WITH 100 INCREMENT BY 1000;
-
---changeset lymar-sa:FIT-STATS-1-11
+--changeset lymar-sa:FIT-STATS-1-14
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'BLOCKED_CREDENTIALS_ENTITY' and table_schema = 'public';
 CREATE TABLE BLOCKED_CREDENTIALS_ENTITY
@@ -207,7 +243,7 @@ CREATE TABLE BLOCKED_CREDENTIALS_ENTITY
 );
 CREATE SEQUENCE SEQ_BLOCKED_CREDENTIALS_ENTITY START WITH 1 INCREMENT BY 1000;
 
---changeset lymar-sa:FIT-STATS-1-12
+--changeset lymar-sa:FIT-STATS-1-15
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'OTP_COUNTER_ENTITY' and table_schema = 'public';
 CREATE TABLE OTP_COUNTER_ENTITY
@@ -219,28 +255,6 @@ CREATE TABLE OTP_COUNTER_ENTITY
     CONSTRAINT OTP_COUNTER_PK PRIMARY KEY (ID)
 );
 CREATE SEQUENCE SEQ_OTP_COUNTER_ENTITY START WITH 1 INCREMENT BY 1000;
-
---changeset lymar-sa:FIT-STATS-1-13
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'PRODUCT_TAG' and table_schema = 'public';
-CREATE TABLE PRODUCT_TAG
-(
-    PRODUCT_ID  BIGINT NOT NULL,
-    TAG_ID BIGINT NOT NULL,
-    PRIMARY KEY (PRODUCT_ID, TAG_ID),
-    CONSTRAINT FK_PRODUCT_TAG_PRODUCT FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT_ENTITY (ID),
-    CONSTRAINT FK_PRODUCT_TAG_TAG FOREIGN KEY (TAG_ID) REFERENCES TAG_ENTITY (ID)
-);
-
---changeset lymar-sa:FIT-STATS-1-14
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'PRODUCT_ENTITY' and upper(column_name) = 'VOL' AND table_schema = 'public'
-ALTER TABLE PRODUCT_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;
-
---changeset lymar-sa:FIT-STATS-1-15
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'DIET_RECORD_ENTITY' and upper(column_name) = 'VOL' AND table_schema = 'public'
-ALTER TABLE DIET_RECORD_ENTITY ADD VOL DOUBLE PRECISION NOT NULL DEFAULT 0;
 
 --changeset lymar-sa:FIT-STATS-1-16
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
@@ -331,13 +345,14 @@ CREATE SEQUENCE SEQ_PROFILE_CHANGE_PASSWORD_ACTION_ENTITY START WITH 1 INCREMENT
 --changeset lymar-sa:FIT-STATS-1-20
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'WEIGHT_RECORD_ENTITY' and table_schema = 'public';
-CREATE TABLE WEIGHT_RECORD_ENTITY (
-    ID            BIGINT           NOT NULL,
-    CREATED_DATE  TIMESTAMP        NOT NULL,
-    UPDATED_DATE  TIMESTAMP,
-    DATE          DATE             NOT NULL,
-    WEIGHT_VALUE  VARCHAR(255)     NOT NULL,
-    CLIENT_ID     BIGINT           NOT NULL,
+CREATE TABLE WEIGHT_RECORD_ENTITY
+(
+    ID           BIGINT       NOT NULL,
+    CREATED_DATE TIMESTAMP    NOT NULL,
+    UPDATED_DATE TIMESTAMP,
+    DATE         DATE         NOT NULL,
+    WEIGHT_VALUE VARCHAR(255) NOT NULL,
+    CLIENT_ID    BIGINT       NOT NULL,
     CONSTRAINT WEIGHT_RECORD_PKEY PRIMARY KEY (ID),
     CONSTRAINT WEIGHT_RECORD_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
 );
@@ -346,54 +361,66 @@ CREATE SEQUENCE SEQ_WEIGHT_RECORD_ENTITY START WITH 1 INCREMENT BY 1000;
 --changeset lymar-sa:FIT-STATS-1-21
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
 --precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_AUTH_CODE_ENTITY' and table_schema = 'public';
-CREATE TABLE TELEGRAM_AUTH_CODE_ENTITY (
-  ID            BIGINT           NOT NULL,
-  CODE          VARCHAR(255)     NOT NULL,
-  CREATED_DATE  TIMESTAMP        NOT NULL,
-  EXPIRED_AT    TIMESTAMP        NOT NULL,
-  CLIENT_ID     BIGINT           NOT NULL,
-  CONSTRAINT TELEGRAM_AUTH_CODE_PKEY PRIMARY KEY (ID),
-  CONSTRAINT TELEGRAM_AUTH_CODE_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
+CREATE TABLE TELEGRAM_AUTH_CODE_ENTITY
+(
+    ID           BIGINT       NOT NULL,
+    CODE         VARCHAR(255) NOT NULL,
+    CREATED_DATE TIMESTAMP    NOT NULL,
+    EXPIRED_AT   TIMESTAMP    NOT NULL,
+    CLIENT_ID    BIGINT       NOT NULL,
+    CONSTRAINT TELEGRAM_AUTH_CODE_PKEY PRIMARY KEY (ID),
+    CONSTRAINT TELEGRAM_AUTH_CODE_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
 );
 CREATE SEQUENCE SEQ_TELEGRAM_AUTH_CODE_ENTITY START WITH 1 INCREMENT BY 1000;
 
 --changeset lymar-sa:FIT-STATS-1-22
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_SUBSCRIPTION_ENTITY' and table_schema = 'public';
-CREATE TABLE TELEGRAM_SUBSCRIPTION_ENTITY (
-   ID             BIGINT           NOT NULL,
-   TELEGRAM_ID    BIGINT           NOT NULL,
-   CREATED_DATE   TIMESTAMP        NOT NULL,
-   UPDATED_DATE   TIMESTAMP,
-   CHAT_ID        VARCHAR(255)     NOT NULL,
-   IS_DELETED     BOOLEAN          NOT NULL,
-   DELETED_DATE   TIMESTAMP,
-   CLIENT_ID      BIGINT            NOT NULL,
-   CONSTRAINT TELEGRAM_SUBSCRIPTION_PKEY PRIMARY KEY (ID),
-   CONSTRAINT TELEGRAM_SUBSCRIPTION_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSql:FAIL
+--precondition-sql-check expectedResult:0 SELECT count(*) FROM information_schema.tables where upper(table_name) = 'TELEGRAM_SUBSCRIPTION_TYPE_ENTITY'
+CREATE TABLE TELEGRAM_SUBSCRIPTION_TYPE_ENTITY
+(
+    ID           BIGINT                              NOT NULL,
+    CODE         VARCHAR(50)                         NOT NULL,
+    CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    UPDATED_DATE TIMESTAMP,
+    CONSTRAINT TELEGRAM_SUBSCRIPTION_TYPE PRIMARY KEY (ID)
 );
-CREATE SEQUENCE SEQ_TELEGRAM_SUBSCRIPTION_ENTITY START WITH 1 INCREMENT BY 1000;
+CREATE SEQUENCE SEQ_TELEGRAM_SUBSCRIPTION_TYPE_ENTITY START WITH 100 INCREMENT BY 1000;
+
+INSERT INTO TELEGRAM_SUBSCRIPTION_TYPE_ENTITY(ID, CODE)
+VALUES (1, 'telegram.statistic');
+--rollback not required
 
 --changeset lymar-sa:FIT-STATS-1-23
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY' and table_schema = 'public';
-CREATE TABLE TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY (
-  ID                                        BIGINT           NOT NULL,
-  TELEGRAM_ID                               BIGINT           NOT NULL,
-  DIET_NOTIFICATION_SUBSCRIPTION_TYPE       VARCHAR(255)     NOT NULL,
-  IS_PROCESSED                              BOOLEAN          NOT NULL,
-  CLIENT_ID                                 BIGINT           NOT NULL,
-  CONSTRAINT TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_PKEY PRIMARY KEY (ID),
-  CONSTRAINT TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_SUBSCRIPTION_ENTITY' and table_schema = 'public';
+CREATE TABLE TELEGRAM_SUBSCRIPTION_ENTITY
+(
+    ID           BIGINT       NOT NULL,
+    TELEGRAM_ID  BIGINT       NOT NULL,
+    CREATED_DATE TIMESTAMP    NOT NULL,
+    UPDATED_DATE TIMESTAMP,
+    CHAT_ID      VARCHAR(255) NOT NULL,
+    TYPE_ID      BIGINT       NOT NULL,
+    IS_DELETED   BOOLEAN      NOT NULL,
+    DELETED_DATE TIMESTAMP,
+    CLIENT_ID    BIGINT       NOT NULL,
+    CONSTRAINT TELEGRAM_SUBSCRIPTION_PKEY PRIMARY KEY (ID),
+    CONSTRAINT TELEGRAM_SUBSCRIPTION_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID),
+    CONSTRAINT TELEGRAM_SUBSCRIPTION_TYPE_ID_FK FOREIGN KEY (TYPE_ID) REFERENCES TELEGRAM_SUBSCRIPTION_TYPE_ENTITY (ID)
 );
-CREATE SEQUENCE SEQ_TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY START WITH 1 INCREMENT BY 1000;
+CREATE SEQUENCE SEQ_TELEGRAM_SUBSCRIPTION_ENTITY START WITH 1 INCREMENT BY 1000;
 
 --changeset lymar-sa:FIT-STATS-1-24
 --preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'PRODUCT_ENTITY' and upper(column_name) = 'ALCOHOL' AND table_schema = 'public'
-ALTER TABLE PRODUCT_ENTITY ADD ALCOHOL DOUBLE PRECISION NOT NULL DEFAULT 0;
-
---changeset lymar-sa:FIT-STATS-1-25
---preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
---precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'DIET_RECORD_ENTITY' and upper(column_name) = 'ALCOHOL' AND table_schema = 'public'
-ALTER TABLE DIET_RECORD_ENTITY ADD ALCOHOL DOUBLE PRECISION NOT NULL DEFAULT 0;
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.tables where upper(table_name) = 'TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY' and table_schema = 'public';
+CREATE TABLE TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY
+(
+    ID                                  BIGINT       NOT NULL,
+    TELEGRAM_ID                         BIGINT       NOT NULL,
+    DIET_NOTIFICATION_SUBSCRIPTION_TYPE VARCHAR(255) NOT NULL,
+    IS_PROCESSED                        BOOLEAN      NOT NULL,
+    CLIENT_ID                           BIGINT       NOT NULL,
+    CONSTRAINT TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_PKEY PRIMARY KEY (ID),
+    CONSTRAINT TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_CLIENT_FKEY FOREIGN KEY (CLIENT_ID) REFERENCES CLIENT_ENTITY (ID)
+);
+CREATE SEQUENCE SEQ_TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY START WITH 1 INCREMENT BY 1000;

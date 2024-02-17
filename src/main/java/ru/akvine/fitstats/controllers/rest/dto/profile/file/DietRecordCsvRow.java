@@ -23,10 +23,10 @@ public class DietRecordCsvRow {
     private String calories;
 
     @CsvBindByPosition(position = 5)
-    private String alcohol;
+    private String vol;
 
     @CsvBindByPosition(position = 6)
-    private String vol;
+    private String alcohol;
 
     @CsvBindByPosition(position = 7)
     private String volume;

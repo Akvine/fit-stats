@@ -25,6 +25,10 @@ public class TelegramSubscriptionEntity extends SoftBaseEntity {
     private String chatId;
 
     @OneToOne
+    @JoinColumn(name = "TYPE_ID", nullable = false)
+    private TelegramSubscriptionTypeEntity type;
+
+    @OneToOne
     @JoinColumn(name = "CLIENT_ID", nullable = false)
     private ClientEntity client;
 }

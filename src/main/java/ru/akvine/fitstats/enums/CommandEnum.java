@@ -26,7 +26,11 @@ public enum CommandEnum {
     COMMAND_PROFILE_UPDATE("/profile/update"),
 
     COMMAND_STATISTIC_HISTORY("/statistic/history"),
-    COMMAND_STATISTIC_INDICATORS("/statistic/indicators");
+    COMMAND_STATISTIC_INDICATORS("/statistic/indicators"),
+
+    // TODO: возможно нужно удалить
+    COMMAND_STOP_ACCEPT("/stop_accept"),
+    COMMAND_STOP_CANCEL("/stop_cancel");
 
     private final String commandName;
 }

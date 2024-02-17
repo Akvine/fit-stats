@@ -13,6 +13,14 @@ public interface TelegramSubscriptionRepository extends JpaRepository<TelegramSu
             "and tse.client.deleted = false")
     Optional<TelegramSubscriptionEntity> findByTelegramId(@Param("telegramId") Long telegramId);
 
+    @Query("from TelegramSubscriptionEntity t where t.telegramId = :telegramId " +
+            "and t.type.id = :typeId " +
+            "and t.deleted = false " +
+            "and t.client.deleted = false")
+    Optional<TelegramSubscriptionEntity> findByTelegramIdAndTypeId(
+            @Param("telegramId") Long telegramId,
+            @Param("typeId") Long typeId);
+
     @Query("from TelegramSubscriptionEntity tse where tse.client.id = :clientId " +
             "and tse.deleted = false " +
             "and tse.client.deleted = false")

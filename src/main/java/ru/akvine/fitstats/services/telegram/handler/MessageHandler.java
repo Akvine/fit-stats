@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.services.telegram;
+package ru.akvine.fitstats.services.telegram.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,6 +22,9 @@ import ru.akvine.fitstats.controllers.telegram.parser.TelegramStatisticParser;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
+import ru.akvine.fitstats.services.telegram.CommandResolver;
+import ru.akvine.fitstats.services.telegram.TelegramAuthService;
+import ru.akvine.fitstats.services.telegram.TelegramExceptionHandler;
 import ru.akvine.fitstats.services.telegram.factory.BaseMessagesFactory;
 
 import java.util.Map;
@@ -29,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class MessageHandler {
+public class MessageHandler extends AbstractMessageHandler {
     private final TelegramExceptionHandler telegramExceptionHandler;
     private final BaseMessagesFactory baseMessagesFactory;
     private final CommandResolver commandResolver;
@@ -47,6 +50,7 @@ public class MessageHandler {
 
     private final Map<String, String> waitingStates = new ConcurrentHashMap<>();
 
+    @Override
     public BotApiMethod<?> processUpdate(Update update) {
         Message message = update.getMessage();
 
@@ -56,6 +60,11 @@ public class MessageHandler {
         } catch (TelegramSubscriptionNotFoundException exception) {
             return processNotAuthenticatedUserUpdate(message);
         }
+    }
+
+    @Override
+    protected Long getTelegramId(Update update) {
+        return update.getMessage().getFrom().getId();
     }
 
     private BotApiMethod<?> processAuthenticatedUserUpdate(Message message, ClientBean client) {

@@ -48,6 +48,7 @@ public class CommandResolver {
     }
 
 
+
     public boolean isStartCommand(String command) {
         return CommandEnum.COMMAND_START.getCommandName().equals(command);
     }
@@ -134,5 +135,13 @@ public class CommandResolver {
 
     public boolean isStatisticIndicatorsCommand(String command) {
         return CommandEnum.COMMAND_STATISTIC_INDICATORS.getCommandName().equals(command) || command.equals(STATISTIC_INDICATORS_ACTION);
+    }
+
+    public boolean isStopAcceptCommand(String command) {
+        return CommandEnum.COMMAND_STOP_ACCEPT.getCommandName().equals(command);
+    }
+
+    public boolean isStopCancelCommand(String command) {
+        return CommandEnum.COMMAND_STOP_CANCEL.getCommandName().equals(command);
     }
 }
