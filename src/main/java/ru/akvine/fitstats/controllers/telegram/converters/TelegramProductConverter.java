@@ -18,6 +18,8 @@ public class TelegramProductConverter {
     private final static int MAX_TELEGRAM_TEXT_LENGTH = 4096;
     private static final int DEFAULT_PRODUCT_VOLUME = 100;
 
+    private static final double ALCOHOL_COEFFICIENT = 0.789;
+
     public SendMessage convertToProductListResponse(String chatId, List<ProductBean> productBeans) {
         Preconditions.checkNotNull(productBeans, "products is null");
         if (productBeans.isEmpty()) {
@@ -43,7 +45,7 @@ public class TelegramProductConverter {
                 .setProteins(request.getProteins())
                 .setVolume(DEFAULT_PRODUCT_VOLUME)
                 .setCarbohydrates(request.getCarbohydrates())
-                .setAlcohol(request.getVol() * 0.8)
+                .setAlcohol(request.getVol() * ALCOHOL_COEFFICIENT)
                 .setVol(request.getVol())
                 .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()));
     }

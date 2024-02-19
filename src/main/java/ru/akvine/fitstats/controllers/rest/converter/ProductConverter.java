@@ -22,7 +22,7 @@ public class ProductConverter {
     private static final int PRODUCT_ROUND_VALUE_ACCURACY = 1;
     private static final int DEFAULT_PRODUCT_VOLUME = 100;
 
-    private static final double ALCOHOL_COEFFICIENT = 0.8;
+    private static final double ALCOHOL_COEFFICIENT = 0.789;
     private final MacronutrientParser macronutrientParser;
     private final PropertyParseService propertyParseService;
 
