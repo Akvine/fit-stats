@@ -1,14 +1,13 @@
 package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
 import ru.akvine.fitstats.controllers.rest.dto.admin.*;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
@@ -16,6 +15,7 @@ import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
+import ru.akvine.fitstats.managers.ParsersManager;
 import ru.akvine.fitstats.services.dto.admin.BlockClientEntry;
 import ru.akvine.fitstats.services.dto.admin.BlockClientFinish;
 import ru.akvine.fitstats.services.dto.admin.BlockClientStart;
@@ -29,30 +29,19 @@ import ru.akvine.fitstats.utils.SecurityUtils;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-
 @Component
+@RequiredArgsConstructor
 public class AdminConverter {
     private static final int PRODUCT_ROUND_VALUE_ACCURACY = 1;
     private static final String HEADER_PREFIX = "attachment; filename=";
     private static final String DEFAULT_FILE_NAME = "file";
     private static final String POINT = ".";
 
-    private static final int ONE_HUNDRED_YEARS_BLOCK_TIME = 100;
+    private static final int BLOCK_TIME_YEARS = 100;
 
-    private final Map<ConverterType, Parser> availableParsers;
-
-    @Autowired
-    public AdminConverter(List<Parser> parsers) {
-        this.availableParsers =
-                parsers
-                        .stream()
-                        .collect(toMap(Parser::getType, identity()));
-    }
+    private final ParsersManager parsersManager;
 
     public ConverterType convertToConverterType(ExportProductsRequest request) {
         String converterType = request.getConverterType();
@@ -77,7 +66,8 @@ public class AdminConverter {
         ConverterType type = ConverterType.valueOf(converterType);
         return new ImportProducts()
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
-                .setRecords(availableParsers
+                .setRecords(parsersManager
+                        .getParsers()
                         .get(type)
                         .parse(file, resolveClass(type)));
     }
@@ -119,7 +109,7 @@ public class AdminConverter {
         }
 
         if (request.getDate() == null) {
-            start.setMinutes(DateUtils.getMinutes(ONE_HUNDRED_YEARS_BLOCK_TIME));
+            start.setMinutes(DateUtils.getMinutes(BLOCK_TIME_YEARS));
         } else {
             start.setMinutes(LocalDateTime.now().until(request.getDate(), ChronoUnit.MINUTES));
         }

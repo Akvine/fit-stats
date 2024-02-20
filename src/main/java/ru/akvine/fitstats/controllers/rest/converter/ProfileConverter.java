@@ -1,15 +1,14 @@
 package ru.akvine.fitstats.controllers.rest.converter;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
 import ru.akvine.fitstats.controllers.rest.dto.profile.DisplayBiometricResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
@@ -26,15 +25,16 @@ import ru.akvine.fitstats.controllers.rest.dto.security.OtpActionResponse;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.PhysicalActivity;
+import ru.akvine.fitstats.managers.ParsersManager;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionRequest;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionResult;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailResponse;
+import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionRequest;
 import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionResult;
 import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordResponse;
-import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionRequest;
 import ru.akvine.fitstats.services.dto.profile.delete.ProfileDeleteActionResult;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
@@ -42,33 +42,19 @@ import ru.akvine.fitstats.utils.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 @Component
+@RequiredArgsConstructor
 public class ProfileConverter {
     private static final String HEADER_PREFIX = "attachment; filename=";
     private static final String DEFAULT_FILE_NAME = "file";
     private static final String POINT = ".";
 
-    private final Map<ConverterType, Parser> availableParsers;
+    private final ParsersManager parsersManager;
     private final PropertyParseService propertyParseService;
 
     @Value("security.otp.new.delay.seconds")
     private String otpNewDelaySeconds;
-
-    @Autowired
-    public ProfileConverter(List<Parser> parsers,
-                            PropertyParseService propertyParseService) {
-        this.propertyParseService = propertyParseService;
-        this.availableParsers =
-                parsers
-                        .stream()
-                        .collect(toMap(Parser::getType, identity()));
-    }
 
     public ProfileDownload convertToProfileDownload(
             LocalDate startDate,
@@ -99,7 +85,8 @@ public class ProfileConverter {
         ConverterType type = ConverterType.valueOf(converterType);
         return new ImportRecords()
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
-                .setRecords(availableParsers
+                .setRecords(parsersManager
+                        .getParsers()
                         .get(type)
                         .parse(file, resolveClass(type)));
     }

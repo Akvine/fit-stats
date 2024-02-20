@@ -1,8 +1,8 @@
 package ru.akvine.fitstats.services;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,14 +10,14 @@ import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.Macronutrient;
 import ru.akvine.fitstats.enums.StatisticType;
+import ru.akvine.fitstats.managers.MacronutrientProcessorsManager;
+import ru.akvine.fitstats.managers.StatisticProcessorsManager;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.statistic.*;
-import ru.akvine.fitstats.services.processors.macronutrient.MacronutrientProcessor;
 import ru.akvine.fitstats.services.processors.statistic.additional.ModeStatisticProcessor;
 import ru.akvine.fitstats.services.processors.statistic.additional.PercentStatisticProcessor;
-import ru.akvine.fitstats.services.processors.statistic.main.StatisticProcessor;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.MathUtils;
 
@@ -26,12 +26,11 @@ import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static ru.akvine.fitstats.utils.DateUtils.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class StatisticService {
     private static final String FATS_MACRONUTRIENT_NAME = "fats";
     private static final String PROTEINS_MACRONUTRIENT_NAME = "proteins";
@@ -49,35 +48,12 @@ public class StatisticService {
     private final ClientService clientService;
     private final ModeStatisticProcessor modeStatisticProcessor;
     private final PercentStatisticProcessor percentStatisticProcessor;
-    private final Map<StatisticType, StatisticProcessor> availableStatisticProcessors;
-    private final Map<Macronutrient, MacronutrientProcessor> availableMacronutrientProcessors;
+    private final StatisticProcessorsManager statisticProcessorsManager;
+    private final MacronutrientProcessorsManager macronutrientProcessorsManager;
     private final PropertyParseService propertyParseService;
 
     @Value("round.accuracy")
     private String roundAccuracy;
-
-    @Autowired
-    public StatisticService(List<StatisticProcessor> statisticProcessors,
-                            List<MacronutrientProcessor> macronutrientProcessors,
-                            ClientService clientService,
-                            DietRecordRepository dietRecordRepository,
-                            ModeStatisticProcessor modeStatisticProcessor,
-                            PercentStatisticProcessor percentStatisticProcessor,
-                            PropertyParseService propertyParseService) {
-        this.dietRecordRepository = dietRecordRepository;
-        this.clientService = clientService;
-        this.propertyParseService = propertyParseService;
-        this.modeStatisticProcessor = modeStatisticProcessor;
-        this.percentStatisticProcessor = percentStatisticProcessor;
-        this.availableStatisticProcessors =
-                statisticProcessors
-                        .stream()
-                        .collect(toMap(StatisticProcessor::getType, identity()));
-        this.availableMacronutrientProcessors =
-                macronutrientProcessors
-                        .stream()
-                        .collect(toMap(MacronutrientProcessor::getType, identity()));
-    }
 
     public DescriptiveStatisticInfo calculateDescriptiveStatisticInfo(DescriptiveStatistic descriptiveStatistic) {
         Preconditions.checkNotNull(descriptiveStatistic, "descriptiveStatistic is null");
@@ -98,10 +74,10 @@ public class StatisticService {
                     Map<String, Double> statsInfo = new LinkedHashMap<>();
                     macronutrients
                             .forEach(macronutrient -> {
-                                List<Double> macronutrientsValues = availableMacronutrientProcessors
+                                List<Double> macronutrientsValues = macronutrientProcessorsManager.getMacronutrientProcessors()
                                         .get(macronutrient)
                                         .extract(records);
-                                double statisticValue = availableStatisticProcessors
+                                double statisticValue = statisticProcessorsManager.getStatisticProcessors()
                                         .get(indicator)
                                         .calculate(macronutrientsValues);
                                 statsInfo.put(macronutrient.name().toLowerCase(), MathUtils.round(statisticValue, roundAccuracy));
@@ -133,31 +109,31 @@ public class StatisticService {
                 .map(record -> new ProductBean(record.getProduct()))
                 .collect(Collectors.toList());
 
-        List<Double> proteinsValues = availableMacronutrientProcessors
+        List<Double> proteinsValues = macronutrientProcessorsManager.getMacronutrientProcessors()
                 .get(Macronutrient.PROTEINS)
                 .extract(records)
                 .stream()
                 .map(value -> value * PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT)
                 .collect(Collectors.toList());
-        List<Double> fatsValues = availableMacronutrientProcessors
+        List<Double> fatsValues = macronutrientProcessorsManager.getMacronutrientProcessors()
                 .get(Macronutrient.FATS)
                 .extract(records)
                 .stream()
                 .map(value -> value * FATS_MACRONUTRIENT_CALORIES_COEFFICIENT)
                 .collect(Collectors.toList());
-        List<Double> carbohydrates = availableMacronutrientProcessors
+        List<Double> carbohydrates = macronutrientProcessorsManager.getMacronutrientProcessors()
                 .get(Macronutrient.CARBOHYDRATES)
                 .extract(records)
                 .stream()
                 .map(value -> value * CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT)
                 .collect(Collectors.toList());
-        List<Double> alcohol = availableMacronutrientProcessors
+        List<Double> alcohol = macronutrientProcessorsManager.getMacronutrientProcessors()
                 .get(Macronutrient.ALCOHOL)
                 .extract(records)
                 .stream()
                 .map(value -> value * ALCOHOL_MACRONUTRIENT_CALORIES_COEFFICIENT)
                 .collect(Collectors.toList());
-        double totalCalories = availableMacronutrientProcessors
+        double totalCalories = macronutrientProcessorsManager.getMacronutrientProcessors()
                 .get(Macronutrient.CALORIES)
                 .extract(records)
                 .stream()
@@ -284,7 +260,7 @@ public class StatisticService {
                 .average()
                 .orElse(0), accuracy);
         median = MathUtils.round(
-                availableStatisticProcessors.get(StatisticType.MEDIAN).calculate(new ArrayList<>(macronutrientHistory
+                statisticProcessorsManager.getStatisticProcessors().get(StatisticType.MEDIAN).calculate(new ArrayList<>(macronutrientHistory
                         .values())), accuracy);
 
         return new StatisticHistoryResult()

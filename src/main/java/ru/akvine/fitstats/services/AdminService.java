@@ -1,9 +1,9 @@
 package ru.akvine.fitstats.services;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
@@ -11,42 +11,25 @@ import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
 import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
+import ru.akvine.fitstats.managers.ConvertersManager;
 import ru.akvine.fitstats.services.dto.admin.*;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
-import ru.akvine.fitstats.services.processors.format.Converter;
 import ru.akvine.fitstats.services.security.BlockingService;
 import ru.akvine.fitstats.utils.DateUtils;
-import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AdminService {
     private final ProductService productService;
     private final BlockingService blockingService;
     private final ClientService clientService;
-    private final Map<ConverterType, Converter> availableConverters;
-
-    @Autowired
-    public AdminService(ProductService productService,
-                        BlockingService blockingService,
-                        ClientService clientService,
-                        List<Converter> converters) {
-        this.productService = productService;
-        this.blockingService = blockingService;
-        this.clientService = clientService;
-        this.availableConverters = converters
-                .stream()
-                .collect(toMap(Converter::getType, identity()));
-    }
+    private final ConvertersManager convertersManager;
 
     public byte[] exportProducts(ConverterType converterType) {
         Preconditions.checkNotNull(converterType, "converterType is null");
@@ -55,7 +38,8 @@ public class AdminService {
                 .stream()
                 .map(ProductExport::new)
                 .collect(Collectors.toList());
-        return availableConverters
+        return convertersManager
+                .getConverters()
                 .get(converterType)
                 .convert(productsExport, ProductExport.class);
     }
