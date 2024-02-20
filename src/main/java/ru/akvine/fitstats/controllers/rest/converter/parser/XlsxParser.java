@@ -15,6 +15,19 @@ import java.util.List;
 
 @Component
 public class XlsxParser implements Parser {
+    private static final int ROW_NUMBER_INDEX = 0;
+    private static final int UUID_INDEX = 1;
+    private static final int TITLE_INDEX = 2;
+    private static final int PRODUCER_INDEX = 3;
+    private static final int PROTEINS_INDEX = 4;
+    private static final int FATS_INDEX = 5;
+    private static final int CARBOHYDRATES_INDEX = 6;
+    private static final int CALORIES_INDEX = 7;
+    private static final int ALCOHOL_INDEX = 8;
+    private static final int VOL_INDEX = 9;
+    private static final int VOLUME_INDEX = 10;
+    private static final int VOLUME_MEASUREMENT_INDEX = 11;
+
     @Override
     public List<?> parse(MultipartFile file, Class clazz) {
         try (Workbook workbook = new HSSFWorkbook(file.getInputStream())) {
@@ -25,18 +38,18 @@ public class XlsxParser implements Parser {
                 ProductXlsxRow productXlsxRow = new ProductXlsxRow();
 
                 while(row.iterator().hasNext()) {
-                    productXlsxRow.setRowNumber(row.getCell(0).getStringCellValue());
-                    productXlsxRow.setUuid(row.getCell(1).getStringCellValue());
-                    productXlsxRow.setTitle(row.getCell(2).getStringCellValue());
-                    productXlsxRow.setProducer(row.getCell(3).getStringCellValue());
-                    productXlsxRow.setProteins(row.getCell(4).getStringCellValue());
-                    productXlsxRow.setFats(row.getCell(5).getStringCellValue());
-                    productXlsxRow.setCarbohydrates(row.getCell(6).getStringCellValue());
-                    productXlsxRow.setCalories(row.getCell(7).getStringCellValue());
-                    productXlsxRow.setAlcohol(row.getCell(8).getStringCellValue());
-                    productXlsxRow.setVol(row.getCell(9).getStringCellValue());
-                    productXlsxRow.setVolume(row.getCell(10).getStringCellValue());
-                    productXlsxRow.setMeasurement(row.getCell(11).getStringCellValue());
+                    productXlsxRow.setRowNumber(row.getCell(ROW_NUMBER_INDEX).getStringCellValue());
+                    productXlsxRow.setUuid(row.getCell(UUID_INDEX).getStringCellValue());
+                    productXlsxRow.setTitle(row.getCell(TITLE_INDEX).getStringCellValue());
+                    productXlsxRow.setProducer(row.getCell(PRODUCER_INDEX).getStringCellValue());
+                    productXlsxRow.setProteins(row.getCell(PROTEINS_INDEX).getStringCellValue());
+                    productXlsxRow.setFats(row.getCell(FATS_INDEX).getStringCellValue());
+                    productXlsxRow.setCarbohydrates(row.getCell(CARBOHYDRATES_INDEX).getStringCellValue());
+                    productXlsxRow.setCalories(row.getCell(CALORIES_INDEX).getStringCellValue());
+                    productXlsxRow.setAlcohol(row.getCell(ALCOHOL_INDEX).getStringCellValue());
+                    productXlsxRow.setVol(row.getCell(VOL_INDEX).getStringCellValue());
+                    productXlsxRow.setVolume(row.getCell(VOLUME_INDEX).getStringCellValue());
+                    productXlsxRow.setMeasurement(row.getCell(VOLUME_MEASUREMENT_INDEX).getStringCellValue());
                 }
 
                 records.add(productXlsxRow);
