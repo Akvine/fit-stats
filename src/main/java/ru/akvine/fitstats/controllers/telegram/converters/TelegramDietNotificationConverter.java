@@ -1,11 +1,16 @@
 package ru.akvine.fitstats.controllers.telegram.converters;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
+import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.AddDietNotificationRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.DeleteDietNotificationRequest;
+import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.enums.telegram.DietNotificationSubscriptionType;
+import ru.akvine.fitstats.services.MessageResolveService;
 import ru.akvine.fitstats.services.dto.telegram.AddDietNotificationSubscription;
 import ru.akvine.fitstats.services.dto.telegram.DeleteDietNotificationSubscription;
 import ru.akvine.fitstats.services.dto.telegram.TelegramDietNotificationSubscription;
@@ -13,8 +18,11 @@ import ru.akvine.fitstats.services.dto.telegram.TelegramDietNotificationSubscrip
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class TelegramDietNotificationConverter {
     private final static String NEXT_LINE = "\n";
+
+    private final MessageResolveService messageResolveService;
 
     public AddDietNotificationSubscription convertToAddDietNotification(AddDietNotificationRequest request) {
         Preconditions.checkNotNull(request, "addDietNotificationRequest is null");
@@ -31,7 +39,8 @@ public class TelegramDietNotificationConverter {
                 .setType(DietNotificationSubscriptionType.valueOf(deleteDietNotificationRequest.getType().toUpperCase()));
     }
 
-    public SendMessage convertToTelegramListDietNotificationRequest(String chatId, List<TelegramDietNotificationSubscription> notificationSubscriptions) {
+    public SendMessage convertToTelegramListDietNotificationRequest(String chatId,
+                                                                    List<TelegramDietNotificationSubscription> notificationSubscriptions) {
         Preconditions.checkNotNull(notificationSubscriptions, "notificationSubscriptions is null");
         return new SendMessage(
                 chatId,
@@ -40,20 +49,29 @@ public class TelegramDietNotificationConverter {
     }
 
     private String buildTelegramListDietNotificationRequest(List<TelegramDietNotificationSubscription> notificationSubscriptions) {
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
         StringBuilder sb = new StringBuilder();
-        sb.append("Список активных подписок: ").append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.DIET_NOTIFICATION_SUBSCRIPTION_ACTIVE_LIST_CODE, language))
+                .append(": ")
+                .append(NEXT_LINE);
 
         notificationSubscriptions.forEach(subscription -> {
                     if (subscription.getDietNotificationSubscriptionType() == DietNotificationSubscriptionType.PROTEINS) {
-                        sb.append("Превышение лимита по белкам").append(NEXT_LINE);
+                        sb.append(messageResolveService.message(MessageResolverCodes.DIET_NOTIFICATION_SUBSCRIPTION_PROTEINS_LIMIT_EXCEED_CODE, language))
+                                .append(NEXT_LINE);
                     } else if (subscription.getDietNotificationSubscriptionType() == DietNotificationSubscriptionType.FATS) {
-                        sb.append("Превышение лимита по жирам").append(NEXT_LINE);
+                        sb.append(messageResolveService.message(MessageResolverCodes.DIET_NOTIFICATION_SUBSCRIPTION_FATS_LIMIT_EXCEED_CODE, language))
+                                .append(NEXT_LINE);
                     } else if (subscription.getDietNotificationSubscriptionType() == DietNotificationSubscriptionType.CARBOHYDRATES) {
-                        sb.append("Превышение лимита по углеводам").append(NEXT_LINE);
-                    } else if (subscription.getDietNotificationSubscriptionType() == DietNotificationSubscriptionType.ENERGY) {
-                        sb.append("Превышение лимита по энергии").append(NEXT_LINE);
+                        sb.append(messageResolveService.message(MessageResolverCodes.DIET_NOTIFICATION_SUBSCRIPTION_CARBOHYDRATES_LIMIT_EXCEED_CODE, language))
+                                .append(NEXT_LINE);
+                    } else if (subscription.getDietNotificationSubscriptionType() == DietNotificationSubscriptionType.CALORIES) {
+                        sb.append(messageResolveService.message(MessageResolverCodes.DIET_NOTIFICATION_SUBSCRIPTION_CALORIES_LIMIT_EXCEED_CODE, language))
+                                .append(NEXT_LINE);
                     } else {
-                        sb.append("Превышение всех показателей: энергии, белков, жиров, углеводов").append(NEXT_LINE);
+                        sb.append(messageResolveService.message(MessageResolverCodes.DIET_NOTIFICATION_SUBSCRIPTION_ALL_LIMIT_EXCEED_CODE, language))
+                                .append(NEXT_LINE);
                     }
                 }
         );

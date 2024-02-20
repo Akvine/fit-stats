@@ -15,6 +15,7 @@ public class ProductBean extends SoftBean {
     private String uuid;
     private String title;
     private String producer;
+    private String clientUuid;
     private double proteins;
     private double fats;
     private double carbohydrates;

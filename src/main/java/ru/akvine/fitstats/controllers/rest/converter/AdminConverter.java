@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.controllers.rest.dto.admin.*;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
@@ -31,10 +32,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.akvine.fitstats.utils.MathUtils.round;
+
 @Component
 @RequiredArgsConstructor
 public class AdminConverter {
-    private static final int PRODUCT_ROUND_VALUE_ACCURACY = 1;
     private static final String HEADER_PREFIX = "attachment; filename=";
     private static final String DEFAULT_FILE_NAME = "file";
     private static final String POINT = ".";
@@ -149,14 +151,15 @@ public class AdminConverter {
     }
 
     private ProductDto buildProductDto(ProductBean productBean) {
+        int roundAccuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
         return new ProductDto()
                 .setTitle(productBean.getTitle())
                 .setProducer(productBean.getProducer())
                 .setUuid(productBean.getUuid())
-                .setProteins(MathUtils.round(productBean.getProteins(), PRODUCT_ROUND_VALUE_ACCURACY))
-                .setFats(MathUtils.round(productBean.getFats(), PRODUCT_ROUND_VALUE_ACCURACY))
-                .setCalories(MathUtils.round(productBean.getCalories(), PRODUCT_ROUND_VALUE_ACCURACY))
-                .setCarbohydrates(MathUtils.round(productBean.getCarbohydrates(), PRODUCT_ROUND_VALUE_ACCURACY))
+                .setProteins(round(productBean.getProteins(), roundAccuracy))
+                .setFats(round(productBean.getFats(), roundAccuracy))
+                .setCalories(round(productBean.getCalories(), roundAccuracy))
+                .setCarbohydrates(round(productBean.getCarbohydrates(), roundAccuracy))
                 .setMeasurement(productBean.getMeasurement().toString())
                 .setVol(productBean.getVol())
                 .setVolume(productBean.getVolume());

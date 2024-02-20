@@ -3,9 +3,9 @@ package ru.akvine.fitstats.services;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.entities.DietRecordEntity;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.Macronutrient;
@@ -13,6 +13,7 @@ import ru.akvine.fitstats.enums.StatisticType;
 import ru.akvine.fitstats.managers.MacronutrientProcessorsManager;
 import ru.akvine.fitstats.managers.StatisticProcessorsManager;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.statistic.*;
@@ -26,7 +27,9 @@ import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.akvine.fitstats.constants.MacronutrientsConstants.*;
 import static ru.akvine.fitstats.utils.DateUtils.*;
+import static ru.akvine.fitstats.utils.MathUtils.round;
 
 @Service
 @Slf4j
@@ -37,11 +40,6 @@ public class StatisticService {
     private static final String CARBOHYDRATES_MACRONUTRIENT_NAME = "carbohydrates";
     private static final String ALCOHOL_NAME = "alcohol";
 
-    private static final double FATS_MACRONUTRIENT_CALORIES_COEFFICIENT = 9.3;
-    private static final double PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT = 4.1;
-    private static final double CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT = 4.1;
-    private static final double ALCOHOL_MACRONUTRIENT_CALORIES_COEFFICIENT = 7.1;
-
     private static final int MONTH_AVERAGE_COUNT = 30;
 
     private final DietRecordRepository dietRecordRepository;
@@ -51,9 +49,6 @@ public class StatisticService {
     private final StatisticProcessorsManager statisticProcessorsManager;
     private final MacronutrientProcessorsManager macronutrientProcessorsManager;
     private final PropertyParseService propertyParseService;
-
-    @Value("round.accuracy")
-    private String roundAccuracy;
 
     public DescriptiveStatisticInfo calculateDescriptiveStatisticInfo(DescriptiveStatistic descriptiveStatistic) {
         Preconditions.checkNotNull(descriptiveStatistic, "descriptiveStatistic is null");
@@ -80,7 +75,7 @@ public class StatisticService {
                                 double statisticValue = statisticProcessorsManager.getStatisticProcessors()
                                         .get(indicator)
                                         .calculate(macronutrientsValues);
-                                statsInfo.put(macronutrient.name().toLowerCase(), MathUtils.round(statisticValue, roundAccuracy));
+                                statsInfo.put(macronutrient.name().toLowerCase(), round(statisticValue, roundAccuracy));
                             });
                     indicatorStatistics.put(indicator.toString().toLowerCase(), statsInfo);
                 });
@@ -140,13 +135,13 @@ public class StatisticService {
                 .mapToDouble(value -> value)
                 .sum();
 
-        double proteinsPercent = MathUtils.round(
+        double proteinsPercent = round(
                 percentStatisticProcessor.calculate(proteinsValues, totalCalories), roundAccuracy);
-        double fatsPercent = MathUtils.round(
+        double fatsPercent = round(
                 percentStatisticProcessor.calculate(fatsValues, totalCalories), roundAccuracy);
-        double carbohydratesPercent = MathUtils.round(
+        double carbohydratesPercent = round(
                 percentStatisticProcessor.calculate(carbohydrates, totalCalories), roundAccuracy);
-        double alcoholPercent = MathUtils.round(percentStatisticProcessor.calculate(alcohol, totalCalories), roundAccuracy);
+        double alcoholPercent = round(percentStatisticProcessor.calculate(alcohol, totalCalories), roundAccuracy);
 
         macronutrientsPercents.put(PROTEINS_MACRONUTRIENT_NAME, proteinsPercent);
         macronutrientsPercents.put(FATS_MACRONUTRIENT_NAME, fatsPercent);
@@ -252,14 +247,14 @@ public class StatisticService {
                 throw new IllegalArgumentException("Macronutrient with type = [" + macronutrient + "] is not supported");
         }
 
-        int accuracy = propertyParseService.parseInteger(roundAccuracy);
-        average = MathUtils.round(macronutrientHistory
+        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
+        average = round(macronutrientHistory
                 .values()
                 .stream()
                 .mapToDouble(Double::doubleValue)
                 .average()
                 .orElse(0), accuracy);
-        median = MathUtils.round(
+        median = round(
                 statisticProcessorsManager.getStatisticProcessors().get(StatisticType.MEDIAN).calculate(new ArrayList<>(macronutrientHistory
                         .values())), accuracy);
 
@@ -272,7 +267,7 @@ public class StatisticService {
     }
 
     private Map<String, DietStatisticHistory> calculatePerPastDays(List<DietRecordEntity> entities) {
-        int accuracy = propertyParseService.parseInteger(roundAccuracy);
+        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
         return entities.stream()
                 .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusDays(MONTH_AVERAGE_COUNT)))
                 .collect(Collectors.groupingBy(
@@ -290,18 +285,18 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
-                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
+                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
+                                        round(agg1.getFats() + agg2.getFats(), accuracy),
+                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
+                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
                 ));
     }
 
     private Map<String, DietStatisticHistory> calculateWeeksPerHalfYear(List<DietRecordEntity> entities) {
-        int accuracy = propertyParseService.parseInteger(roundAccuracy);
+        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
         return entities.stream()
                 .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusMonths(6)))
                 .collect(Collectors.groupingBy(
@@ -318,18 +313,18 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
-                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
+                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
+                                        round(agg1.getFats() + agg2.getFats(), accuracy),
+                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
+                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
                 ));
     }
 
     private Map<String, DietStatisticHistory> calculatePastMonths(List<DietRecordEntity> entities) {
-        int accuracy = propertyParseService.parseInteger(roundAccuracy);
+        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
         return entities.stream()
                 .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusYears(1)))
                 .collect(Collectors.groupingBy(
@@ -346,18 +341,18 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
-                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
+                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
+                                        round(agg1.getFats() + agg2.getFats(), accuracy),
+                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
+                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
                 ));
     }
 
     private Map<String, DietStatisticHistory> calculatePastFiveYears(List<DietRecordEntity> entities) {
-        int accuracy = propertyParseService.parseInteger(roundAccuracy);
+        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
         return entities.stream()
                 .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusYears(5)))
                 .collect(Collectors.groupingBy(
@@ -374,11 +369,11 @@ public class StatisticService {
                                 ),
                                 (agg1, agg2) -> new DietStatisticHistory(
                                         agg1.getDate(),
-                                        MathUtils.round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        MathUtils.round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        MathUtils.round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        MathUtils.round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
-                                        MathUtils.round(agg1.getCalories() + agg2.getCalories(), accuracy)
+                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
+                                        round(agg1.getFats() + agg2.getFats(), accuracy),
+                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
+                                        round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
+                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
                                 )
                         )
                 ));

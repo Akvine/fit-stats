@@ -3,13 +3,10 @@ package ru.akvine.fitstats.services;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 
+import static ru.akvine.fitstats.constants.MacronutrientsConstants.*;
+
 @Service
 public class MacronutrientsCalculationService {
-    private static final double PROTEINS_ENERGY_COEFFICIENT = 4.1;
-    private static final double FATS_ENERGY_COEFFICIENT = 9.3;
-    private static final double CARBOHYDRATES_ENERGY_COEFFICIENT = 4.1;
-    private static final double ALCOHOL_ENERGY_COEFFICIENT = 7.1;
-
     private static final int DEFAULT_VOLUME = 100;
 
     private static final double ZERO = 0;
@@ -33,10 +30,10 @@ public class MacronutrientsCalculationService {
                                     double fats,
                                     double carbohydrates,
                                     double alcohol) {
-        return proteins * PROTEINS_ENERGY_COEFFICIENT +
-                fats * FATS_ENERGY_COEFFICIENT +
-                carbohydrates * CARBOHYDRATES_ENERGY_COEFFICIENT +
-                alcohol * ALCOHOL_ENERGY_COEFFICIENT;
+        return proteins * PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT +
+                fats * FATS_MACRONUTRIENT_CALORIES_COEFFICIENT +
+                carbohydrates * CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT +
+                alcohol * ALCOHOL_MACRONUTRIENT_CALORIES_COEFFICIENT;
     }
 
     public Macronutrients calculatePer100(double proteins,

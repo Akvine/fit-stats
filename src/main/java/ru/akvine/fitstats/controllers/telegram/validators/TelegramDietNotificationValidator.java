@@ -8,7 +8,7 @@ import ru.akvine.fitstats.controllers.telegram.dto.notification.diet.DeleteDietN
 import ru.akvine.fitstats.enums.telegram.DietNotificationSubscriptionType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.telegram.TelegramDietNotificationSubscriptionService;
 import ru.akvine.fitstats.validators.telegram.DietNotificationTypeValidator;
 

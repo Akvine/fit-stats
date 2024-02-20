@@ -2,29 +2,31 @@ package ru.akvine.fitstats.controllers.telegram.converters;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
+import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.statistic.TelegramStatisticHistoryRequest;
 import ru.akvine.fitstats.enums.Duration;
+import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.enums.Macronutrient;
+import ru.akvine.fitstats.services.MessageResolveService;
+import ru.akvine.fitstats.services.dto.client.ClientSettingsBean;
 import ru.akvine.fitstats.services.dto.statistic.AdditionalStatistic;
 import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistory;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
-import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.DateUtils;
 import ru.akvine.fitstats.utils.MathUtils;
+
+import static ru.akvine.fitstats.utils.MathUtils.round;
 
 @Component
 @RequiredArgsConstructor
 public class TelegramStatisticConverter {
     private static final String NEXT_LINE = "\n";
-    private final PropertyParseService propertyParseService;
-
-    @Value("round.accuracy")
-    private String defaultRoundAccuracy;
+    private final MessageResolveService messageResolveService;
 
     public StatisticHistory convertToStatisticHistory(TelegramStatisticHistoryRequest telegramStatisticHistoryRequest) {
         Preconditions.checkNotNull(telegramStatisticHistoryRequest, "telegramStatisticHistoryRequest is null");
@@ -44,11 +46,12 @@ public class TelegramStatisticConverter {
 
     public AdditionalStatistic convertToAdditionalStatistic(TelegramBaseRequest request) {
         Preconditions.checkNotNull(request, "telegramBaseRequest is null");
+        int roundAccuracy = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getRoundAccuracy();
         int withoutMode = 0;
         return AdditionalStatistic.builder()
                 .modeCount(withoutMode)
                 .clientUuid(request.getClientUuid())
-                .roundAccuracy(propertyParseService.parseInteger(defaultRoundAccuracy))
+                .roundAccuracy(roundAccuracy)
                 .dateRange(DateUtils.getYearRange())
                 .build();
     }
@@ -62,12 +65,26 @@ public class TelegramStatisticConverter {
     }
 
     private String buildStatisticHistoryResponse(StatisticHistoryResult statisticHistoryResult) {
-        int accuracy = propertyParseService.parseInteger(defaultRoundAccuracy);
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        int roundAccuracy = clientSettingsBean.getRoundAccuracy();
+        Language language = clientSettingsBean.getLanguage();
         StringBuilder sb = new StringBuilder();
-        sb.append("Период: ").append(statisticHistoryResult.getDuration()).append(NEXT_LINE);
-        sb.append("Макронутриент: ").append(statisticHistoryResult.getMacronutrient()).append(NEXT_LINE);
-        sb.append("Среднее: ").append(MathUtils.round(statisticHistoryResult.getAverage(), accuracy)).append(NEXT_LINE);
-        sb.append("Медиана: ").append(MathUtils.round(statisticHistoryResult.getMedian(), accuracy)).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.DURATION_CODE, language))
+                .append(": ")
+                .append(statisticHistoryResult.getDuration()).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.MACRONUTRIENT_CODE, language))
+                .append(": ")
+                .append(statisticHistoryResult.getMacronutrient()).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.AVERAGE_CODE, language))
+                .append(": ")
+                .append(round(statisticHistoryResult.getAverage(), roundAccuracy)).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.MEDIAN_CODE, language))
+                .append(": ")
+                .append(round(statisticHistoryResult.getMedian(), roundAccuracy)).append(NEXT_LINE);
 
         statisticHistoryResult
                 .getHistory()
@@ -79,11 +96,24 @@ public class TelegramStatisticConverter {
     }
 
     private String buildAdditionalStatisticResponse(AdditionalStatisticInfo additionalStatisticInfo) {
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
         StringBuilder sb = new StringBuilder();
-        sb.append("Процент калорий жиров в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("fats")).append(NEXT_LINE);
-        sb.append("Процент калорий от белка в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("proteins")).append(NEXT_LINE);
-        sb.append("Процент калорий углеводов в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("carbohydrates")).append(NEXT_LINE);
-        sb.append("Процент калорий от алкоголя в рационе: ").append(additionalStatisticInfo.getMacronutrientsPercent().get("alcohol")).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.PROTEINS_PERCENT_DIET_CODE, language))
+                .append(": ")
+                .append(additionalStatisticInfo.getMacronutrientsPercent().get("fats")).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.FATS_PERCENT_DIET_CODE, language))
+                .append(": ")
+                .append(additionalStatisticInfo.getMacronutrientsPercent().get("proteins")).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.CARBOHYDRATES_PERCENT_DIET_CODE, language))
+                .append(": ")
+                .append(additionalStatisticInfo.getMacronutrientsPercent().get("carbohydrates")).append(NEXT_LINE);
+        sb
+                .append(messageResolveService.message(MessageResolverCodes.ALCOHOL_PERCENT_DIET_CODE, language))
+                .append(": ")
+                .append(additionalStatisticInfo.getMacronutrientsPercent().get("alcohol")).append(NEXT_LINE);
         return sb.toString();
     }
 }

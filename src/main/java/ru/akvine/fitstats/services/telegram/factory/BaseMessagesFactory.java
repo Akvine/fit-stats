@@ -3,146 +3,138 @@ package ru.akvine.fitstats.services.telegram.factory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-
-import java.util.List;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
+import ru.akvine.fitstats.enums.Language;
+import ru.akvine.fitstats.services.MessageResolveService;
 
 @Component
 @RequiredArgsConstructor
 public class BaseMessagesFactory {
     private final KeyboardFactory keyboardFactory;
+    private final MessageResolveService messageResolveService;
 
-    public SendMessage getInvalidMessage(String chatId) {
-        return new SendMessage(chatId, "Незнаю такой команды! Справка: /help");
+    public SendMessage getInvalidMessage(String chatId, Language language) {
+        return new SendMessage(chatId,
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_UNKNOWN_COMMAND_MESSAGE_CODE, language));
     }
 
-    public SendMessage getHelpMessage(String chatId) {
+    public SendMessage getHelpMessage(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Список доступных команд:\n" +
-                        "1. /start - начать работу с ботом\n" +
-                        "2. /help - помощь\n" +
-                        "3. /products/list - найти продукты по фильтру\n" +
-                        "4. /diet/display - показать БЖУ на сегодня\n" +
-                        "5. /diet/record/add - добавить запись\n"
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_LIST_AVAILABLE_COMMANDS_CODE, language)
         );
     }
 
-    public SendMessage getProductAddInputWaiting(String chatId) {
+    public SendMessage getProductAddInputWaiting(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите название продукта, производителя, жиры (на 100 грамм)," +
-                        " белки (на 100 грамм), углеводы (на 100 грамм), процент крепости алкоголя, измерение " +
-                        "(Пример: Творог, ООО Савушкин, 2.5, 16, 1.2, 0, g): "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_INPUT_ADD_CODE, language)
         );
     }
 
-    public SendMessage getProductListFilter(String chatId) {
+    public SendMessage getProductListFilter(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите фильтр, по которому мы найдем продукты: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_INPUT_FILTER_CODE, language)
         );
     }
 
-    public SendMessage getDietKeyboard(String chatId) {
+    public SendMessage getDietKeyboard(String chatId, Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
-                "Выберите действие: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(keyboardFactory.getDietKeyboard());
         return sendMessage;
     }
 
-    public SendMessage getDietRecordAddInputWaiting(String chatId) {
+    public SendMessage getDietRecordAddInputWaiting(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите uuid продукта и объем, который вы потребили: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_RECORD_ADD_CODE, language)
         );
     }
 
-    public SendMessage getDietRecordDeleteInputWaiting(String chatId) {
+    public SendMessage getDietRecordDeleteInputWaiting(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите uuid записи, которую собираетесь удалить: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_RECORD_DELETE_CODE, language)
         );
     }
 
-    public SendMessage getProfileKeyboard(String chatId) {
+    public SendMessage getProfileKeyboard(String chatId, Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
-                "Выберите действие: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(keyboardFactory.getProfileKeyboard());
         return sendMessage;
     }
 
-    public SendMessage getProfileUpdateBiometricInputWaiting(String chatId) {
+    public SendMessage getProfileUpdateBiometricInputWaiting(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите новые биометрические данные (возраст, рост, вес, физическую активность, тип диеты): "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_BIOMETRIC_INPUT_NEW_DATA_CODE, language)
         );
     }
 
-    public SendMessage getNotificationSubscriptionDietAdd(String chatId) {
+    public SendMessage getNotificationSubscriptionDietAdd(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите тип уведомления для отслеживания (proteins, fats, carbohydrates, energy):"
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_INPUT_SUBSCRIPTION_TYPE_FOR_ADD_CODE, language)
         );
     }
 
-    public SendMessage getNotificationSubscriptionDietDelete(String chatId) {
+    public SendMessage getNotificationSubscriptionDietDelete(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите тип уведомления для удаления (proteins, fats, carbohydrates, energy):"
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_INPUT_SUBSCRIPTION_TYPE_FOR_DELETE_CODE, language)
         );
     }
 
-    public SendMessage getNotificationSubscriptionTypesKeyboard(String chatId) {
+    public SendMessage getNotificationSubscriptionTypesKeyboard(String chatId, Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
-                "Выберите тип подписки: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_SUBSCRIPTION_TYPE_CODE, language)
         );
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(keyboardFactory.getNotificationSubscriptionTypesKeyboard());
         return sendMessage;
     }
 
-    public SendMessage getProductKeyboard(String chatId) {
+    public SendMessage getProductKeyboard(String chatId, Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
-                "Выберите действие: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(keyboardFactory.getProductsKeyboard());
         return sendMessage;
     }
 
-    public SendMessage getDietNotificationSubscriptionKeyboard(String chatId) {
+    public SendMessage getDietNotificationSubscriptionKeyboard(String chatId, Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
-                "Выберите действие: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(keyboardFactory.getDietNotificationSubscriptionKeyboard());
         return sendMessage;
     }
 
-    public SendMessage getStatisticHistoryInputWaiting(String chatId) {
+    public SendMessage getStatisticHistoryInputWaiting(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Введите продолжительность (DAY, MONTH, WEEK, YEAR) и макронутриент (FATS, PROTEINS, CARBOHYDRATES, CALORIES): "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_STATISTIC_HISTORY_INPUT_WAITING_CODE, language)
         );
     }
 
-    public SendMessage getStatisticKeyboard(String chatId) {
+    public SendMessage getStatisticKeyboard(String chatId, Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
-                "Выберите действие: "
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
         sendMessage.setReplyMarkup(keyboardFactory.getStatisticKeyboard());
@@ -159,53 +151,16 @@ public class BaseMessagesFactory {
         return sendMessage;
     }
 
-    public SendMessage getInvalidAuthCode(String chatId) {
+    public SendMessage getInvalidAuthCode(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-                "Неверный код!"
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_INVALID_AUTH_CODE, language)
         );
     }
 
-    public SendMessage getStartMessage(String chatId) {
+    public SendMessage getStartMessage(String chatId, Language language) {
         return new SendMessage(
                 chatId,
-               "Добро пожаловать");
-    }
-
-    public SendMessage getStopAcceptMessage(String chatId) {
-        SendMessage sendMessage = getStartMessage(chatId);
-        sendMessage.enableMarkdown(true);
-        ReplyKeyboardRemove replyKeyboardRemove = new ReplyKeyboardRemove();
-        replyKeyboardRemove.setRemoveKeyboard(true);
-        sendMessage.setReplyMarkup(replyKeyboardRemove);
-        return sendMessage;
-    }
-
-    public SendMessage getStopCancelMessage(String chatId) {
-        SendMessage sendMessage = getHelpMessage(chatId);
-        sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(getMainMenuKeyboard());
-        return sendMessage;
-    }
-
-    public ReplyKeyboardMarkup getMainMenuKeyboard() {
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("1"));
-        row.add(new KeyboardButton("2"));
-        row.add(new KeyboardButton("3"));
-
-        return getKeyboard(row);
-    }
-
-    private ReplyKeyboardMarkup getKeyboard(KeyboardRow row) {
-        List<KeyboardRow> keyboard = List.of(row);
-
-        final ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setKeyboard(keyboard);
-        replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(false);
-
-        return replyKeyboardMarkup;
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_WELCOME_MESSAGE_CODE, language));
     }
 }

@@ -18,5 +18,4 @@ public class DietDisplay {
     private double remainingFats;
     private double remainingCarbohydrates;
     private double remainingCalories;
-
 }

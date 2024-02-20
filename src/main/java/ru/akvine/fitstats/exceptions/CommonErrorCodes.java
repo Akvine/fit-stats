@@ -88,6 +88,11 @@ public class CommonErrorCodes {
 
         interface Profile {
             String PROFILE_RECORDS_DOWNLOAD_ERROR = "profile.records.download.error";
+            String PROFILE_SETTINGS_LANGUAGE_BLANK_ERROR = "profile.settings.language.blank.error";
+            String PROFILE_SETTINGS_LANGUAGE_INVALID_ERROR = "profile.settings.language.invalid.error";
+            String PROFILE_SETTINGS_PRINT_MODE_BLANK_ERROR = "profile.settings.print.mode.blank.error";
+            String PROFILE_SETTINGS_PRINT_MODE_INVALID_ERROR = "profile.settings.print.mode.invalid.error";
+            String PROFILE_SETTINGS_ROUND_ACCURACY_INVALID_ERROR = "profile.settings.round.accuracy.invalid.error";
         }
 
         interface Statistic {

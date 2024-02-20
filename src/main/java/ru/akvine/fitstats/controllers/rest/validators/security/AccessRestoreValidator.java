@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.rest.dto.security.LoginRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.access_restore.AccessRestoreFinishRequest;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.validators.EmailValidator;
 import ru.akvine.fitstats.validators.PasswordValidator;
 

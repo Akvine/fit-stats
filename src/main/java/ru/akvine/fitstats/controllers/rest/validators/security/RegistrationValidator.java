@@ -8,7 +8,7 @@ import ru.akvine.fitstats.controllers.rest.dto.security.registration.Registratio
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.validators.*;
 
 @Component

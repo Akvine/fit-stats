@@ -9,10 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import ru.akvine.fitstats.controllers.rest.dto.profile.DisplayBiometricResponse;
-import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
-import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
-import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricResponse;
+import ru.akvine.fitstats.controllers.rest.dto.profile.*;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_password.ProfileChangePasswordFinishRequest;
@@ -24,11 +21,15 @@ import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordXlsxRow;
 import ru.akvine.fitstats.controllers.rest.dto.security.OtpActionResponse;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
+import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.enums.PhysicalActivity;
+import ru.akvine.fitstats.enums.telegram.PrintMacronutrientsMode;
 import ru.akvine.fitstats.managers.ParsersManager;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
+import ru.akvine.fitstats.services.dto.client.ClientSettingsBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
+import ru.akvine.fitstats.services.dto.profile.UpdateSettings;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionRequest;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionResult;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailResponse;
@@ -234,6 +235,23 @@ public class ProfileConverter {
         return new ProfileChangePasswordResponse()
                 .setOtp(otpActionResponse)
                 .setPwdInvalidAttemptsLeft(result.getPwdInvalidAttemptsLeft());
+    }
+
+    public UpdateSettings convertToUpdateSettings(UpdateSettingsRequest request) {
+        Preconditions.checkNotNull(request, "updateSettingsRequest is null");
+        return new UpdateSettings()
+                .setEmail(SecurityUtils.getCurrentUser().getName())
+                .setLanguage(request.getLanguage() != null ? Language.valueOf(request.getLanguage().toUpperCase()) : null)
+                .setPrintMacronutrientsMode(request.getTelegramPrintMacronutrientsMode() != null ? PrintMacronutrientsMode.valueOf(request.getTelegramPrintMacronutrientsMode().toUpperCase()) : null)
+                .setRoundAccuracy(request.getRoundAccuracy());
+    }
+
+    public SettingsResponse convertToSettingsResponse(ClientSettingsBean clientSettingsBean) {
+        Preconditions.checkNotNull(clientSettingsBean, "clientSettingsBean is null");
+        return new SettingsResponse()
+                .setLanguage(clientSettingsBean.getLanguage().name())
+                .setTelegramPrintMacronutrientsMode(clientSettingsBean.getPrintMacronutrientsMode().name())
+                .setRoundAccuracy(clientSettingsBean.getRoundAccuracy());
     }
 
     private String resolveHeaderType(String filename, ConverterType converterType) {

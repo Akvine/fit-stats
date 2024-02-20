@@ -14,7 +14,6 @@ import ru.akvine.fitstats.repositories.specifications.ProductSpecification;
 import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
-import ru.akvine.fitstats.utils.DietUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;

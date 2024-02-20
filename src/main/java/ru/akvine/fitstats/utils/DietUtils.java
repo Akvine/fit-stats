@@ -7,8 +7,6 @@ import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 
-import javax.validation.constraints.NotNull;
-
 public class DietUtils {
     private static final double HEIGHT_COEFFICIENT = 6.25;
     private static final double WEIGHT_COEFFICIENT = 10;
@@ -25,7 +23,7 @@ public class DietUtils {
     private final static int CARBOHYDRATES_CALORIES_COEFFICIENT = 4;;
     private final static int FATS_CALORIES_COEFFICIENT = 9;
 
-    private final static int VOL_ZERO = 0;
+    private final static int ALCOHOL_ZERO = 0;
 
     public static double calculateBasicExchange(Gender gender,
                                                 int age,
@@ -83,6 +81,6 @@ public class DietUtils {
                 throw new IllegalStateException("Diet type = [" + diet + "] is not supported!");
         }
         maxCarbohydrates = (maxCalories - (maxProteins * PROTEINS_CALORIES_COEFFICIENT + maxFats * FATS_CALORIES_COEFFICIENT)) / CARBOHYDRATES_CALORIES_COEFFICIENT;
-        return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, VOL_ZERO, maxCalories);
+        return new Macronutrients(maxProteins, maxFats, maxCarbohydrates, ALCOHOL_ZERO, maxCalories);
     }
 }

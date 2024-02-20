@@ -9,7 +9,7 @@ import ru.akvine.fitstats.entities.telegram.TelegramSubscriptionEntity;
 import ru.akvine.fitstats.entities.telegram.TelegramSubscriptionTypeEntity;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
 import ru.akvine.fitstats.repositories.telegram.TelegramSubscriptionRepository;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.telegram.TelegramAuthCode;
 import ru.akvine.fitstats.services.dto.telegram.TelegramSubscriptionBean;
 

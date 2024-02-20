@@ -12,6 +12,7 @@ import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.managers.ConvertersManager;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.admin.*;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;

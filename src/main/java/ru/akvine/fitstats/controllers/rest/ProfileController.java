@@ -11,6 +11,7 @@ import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateSettingsRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_password.ProfileChangePasswordFinishRequest;
@@ -22,8 +23,10 @@ import ru.akvine.fitstats.controllers.rest.meta.profile.ProfileControllerMeta;
 import ru.akvine.fitstats.controllers.rest.meta.profile.ProfileDeleteControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.ProfileValidator;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
+import ru.akvine.fitstats.services.dto.client.ClientSettingsBean;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
+import ru.akvine.fitstats.services.dto.profile.UpdateSettings;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionRequest;
 import ru.akvine.fitstats.services.dto.profile.change_email.ProfileChangeEmailActionResult;
 import ru.akvine.fitstats.services.dto.profile.change_password.ProfileChangePasswordActionRequest;
@@ -91,6 +94,20 @@ public class ProfileController implements ProfileControllerMeta,
         String clientUuid = SecurityUtils.getCurrentUser().getUuid();
         BiometricBean biometricBean = profileService.display(clientUuid);
         return profileConverter.convertToDisplayBiometricResponse(biometricBean);
+    }
+
+    @Override
+    public Response listSettings() {
+        ClientSettingsBean clientSettingsBean = profileService.listSettings(SecurityUtils.getCurrentUser().getName());
+        return profileConverter.convertToSettingsResponse(clientSettingsBean);
+    }
+
+    @Override
+    public Response updateSettings(@Valid UpdateSettingsRequest request) {
+        profileValidator.verifyUpdateSettingsRequest(request);
+        UpdateSettings updateSettings = profileConverter.convertToUpdateSettings(request);
+        ClientSettingsBean clientSettingsBean = profileService.updateSettings(updateSettings);
+        return profileConverter.convertToSettingsResponse(clientSettingsBean);
     }
 
     @Override

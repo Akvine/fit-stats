@@ -12,7 +12,7 @@ import ru.akvine.fitstats.enums.ActionState;
 import ru.akvine.fitstats.exceptions.security.*;
 import ru.akvine.fitstats.repositories.security.AccessRestoreActionRepository;
 import ru.akvine.fitstats.repositories.security.ActionRepository;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionRequest;
 import ru.akvine.fitstats.services.dto.security.access_restore.AccessRestoreActionResult;

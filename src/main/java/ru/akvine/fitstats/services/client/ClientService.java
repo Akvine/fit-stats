@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.services;
+package ru.akvine.fitstats.services.client;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +11,16 @@ import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.telegram.TelegramAuthRepository;
+import ru.akvine.fitstats.services.BiometricService;
+import ru.akvine.fitstats.services.DietRecordService;
+import ru.akvine.fitstats.services.DietSettingService;
+import ru.akvine.fitstats.services.PasswordService;
+import ru.akvine.fitstats.services.client.settings.ClientSettingsService;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
-import ru.akvine.fitstats.services.telegram.TelegramAuthService;
 import ru.akvine.fitstats.services.telegram.TelegramDietNotificationSubscriptionService;
 import ru.akvine.fitstats.utils.DietUtils;
 import ru.akvine.fitstats.utils.UUIDGenerator;
@@ -35,6 +39,7 @@ public class ClientService {
     private final DietSettingService dietSettingService;
     private final DietRecordService dietRecordService;
     private final PasswordService passwordService;
+    private final ClientSettingsService clientSettingsService;
     private final TelegramAuthRepository telegramAuthRepository;
     private final TelegramDietNotificationSubscriptionService telegramDietNotificationSubscriptionService;
     private final PropertyParseService propertyParseService;
@@ -57,6 +62,7 @@ public class ClientService {
                 .setSecondName(clientRegister.getSecondName())
                 .setThirdName(clientRegister.getThirdName());
         ClientEntity savedClientEntity = clientRepository.save(clientEntity);
+        clientSettingsService.create(savedClientEntity);
         BiometricBean biometricBean = new BiometricBean()
                 .setAge(clientRegister.getAge())
                 .setGender(clientRegister.getGender())

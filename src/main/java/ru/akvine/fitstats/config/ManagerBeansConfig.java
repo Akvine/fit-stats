@@ -4,15 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
 import ru.akvine.fitstats.enums.ConverterType;
+import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.enums.Macronutrient;
 import ru.akvine.fitstats.enums.StatisticType;
-import ru.akvine.fitstats.managers.ConvertersManager;
-import ru.akvine.fitstats.managers.MacronutrientProcessorsManager;
-import ru.akvine.fitstats.managers.ParsersManager;
-import ru.akvine.fitstats.managers.StatisticProcessorsManager;
+import ru.akvine.fitstats.managers.*;
 import ru.akvine.fitstats.services.processors.format.Converter;
 import ru.akvine.fitstats.services.processors.macronutrient.MacronutrientProcessor;
 import ru.akvine.fitstats.services.processors.statistic.main.StatisticProcessor;
+import ru.akvine.fitstats.validators.file.FileValidator;
 
 import java.util.List;
 import java.util.Map;
@@ -53,5 +52,13 @@ public class ManagerBeansConfig {
                 .stream()
                 .collect(toMap(Converter::getType, identity()));
         return new ConvertersManager(availableConverters);
+    }
+
+    @Bean
+    public FileValidatorsManager fileValidatorsManager(List<FileValidator> fileValidators) {
+        Map<FileType, FileValidator> availableFileValidators = fileValidators
+                .stream()
+                .collect(toMap(FileValidator::getType, identity()));
+        return new FileValidatorsManager(availableFileValidators);
     }
 }

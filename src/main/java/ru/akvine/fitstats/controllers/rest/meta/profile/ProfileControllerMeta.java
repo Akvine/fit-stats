@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateSettingsRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,4 +29,10 @@ public interface ProfileControllerMeta {
 
     @GetMapping(value = "/biometric/display")
     Response displayBiometric();
+
+    @GetMapping(value = "/settings/list")
+    Response listSettings();
+
+    @PostMapping(value = "/settings/update")
+    Response updateSettings(@Valid @RequestBody UpdateSettingsRequest request);
 }

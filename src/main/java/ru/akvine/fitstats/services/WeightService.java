@@ -8,6 +8,7 @@ import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.WeightRecordEntity;
 import ru.akvine.fitstats.exceptions.weight.WeightRecordNotFoundException;
 import ru.akvine.fitstats.repositories.WeightRecordRepository;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
 import ru.akvine.fitstats.services.dto.weight.ChangeWeight;
 import ru.akvine.fitstats.services.dto.weight.ListWeightResult;

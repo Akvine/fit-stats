@@ -13,7 +13,7 @@ import ru.akvine.fitstats.exceptions.security.registration.RegistrationNotStarte
 import ru.akvine.fitstats.exceptions.security.registration.RegistrationWrongStateException;
 import ru.akvine.fitstats.repositories.security.ActionRepository;
 import ru.akvine.fitstats.repositories.security.RegistrationActionRepository;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.client.ClientRegister;
 import ru.akvine.fitstats.services.dto.security.registration.RegistrationActionRequest;

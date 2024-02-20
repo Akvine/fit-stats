@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
+import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.controllers.telegram.*;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
@@ -19,8 +21,10 @@ import ru.akvine.fitstats.controllers.telegram.dto.statistic.TelegramStatisticHi
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramProductParser;
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramProfileParser;
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramStatisticParser;
+import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
+import ru.akvine.fitstats.services.MessageResolveService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.telegram.CommandResolver;
 import ru.akvine.fitstats.services.telegram.TelegramAuthService;
@@ -37,6 +41,7 @@ public class MessageHandler extends AbstractMessageHandler {
     private final BaseMessagesFactory baseMessagesFactory;
     private final CommandResolver commandResolver;
     private final TelegramAuthService telegramAuthService;
+    private final MessageResolveService messageResolveService;
 
     private final TelegramDietResolver telegramDietResolver;
     private final TelegramProductResolver telegramProductResolver;
@@ -71,112 +76,124 @@ public class MessageHandler extends AbstractMessageHandler {
         String chatId = getChatId(message);
         String text = message.getText();
         String clientUuid = client.getUuid();
+        String email = client.getEmail();
         Long telegramId = message.getFrom().getId();
+
+
+        setEmailInThreadLocal(email);
+        Language language = ClientSettingsContext.getClientSettingsContextHolder()
+                .getByEmail(email)
+                .getLanguage();
 
         try {
             if (waitingStates.containsKey(clientUuid)) {
-                return processWaitingState(text, chatId, clientUuid, telegramId);
+                return processWaitingState(text, chatId, clientUuid, telegramId, language);
             }
 
-            if (commandResolver.isStartCommand(text)) {
-                String welcomeMessage = "Добро пожаловать! Вам доступен полный функционал бота Fit-Stats";
+            if (commandResolver.isStartCommand(text, language)) {
+                String welcomeMessage = messageResolveService.message(MessageResolverCodes.TELEGRAM_WELCOME_MESSAGE_CODE, language);
                 return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage);
-            } else if (commandResolver.isHelpCommand(text)) {
-                return baseMessagesFactory.getHelpMessage(chatId);
-            } else if (commandResolver.isBackCommand(text)) {
-                return baseMessagesFactory.getMainMenuKeyboard(chatId, "Выберите действие: ");
-            } else if (commandResolver.isProductButton(text)) {
-                return baseMessagesFactory.getProductKeyboard(chatId);
-            } else if (commandResolver.isProductAddCommand(text)) {
+            } else if (commandResolver.isHelpCommand(text, language)) {
+                return baseMessagesFactory.getHelpMessage(chatId, language);
+            } else if (commandResolver.isBackCommand(text, language)) {
+                String chooseActionMessage = messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language);
+                return baseMessagesFactory.getMainMenuKeyboard(chatId, chooseActionMessage + ": ");
+            } else if (commandResolver.isProductButton(text, language)) {
+                return baseMessagesFactory.getProductKeyboard(chatId, language);
+            } else if (commandResolver.isProductAddCommand(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getProductAddInputWaiting(chatId);
-            } else if (commandResolver.isProductListCommand(text)) {
+                return baseMessagesFactory.getProductAddInputWaiting(chatId, language);
+            } else if (commandResolver.isProductListCommand(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getProductListFilter(chatId);
-            } else if (commandResolver.isDietButton(text)) {
-                return baseMessagesFactory.getDietKeyboard(chatId);
-            } else if (commandResolver.isDietStatisticDisplayCommand(text)) {
+                return baseMessagesFactory.getProductListFilter(chatId, language);
+            } else if (commandResolver.isDietButton(text, language)) {
+                return baseMessagesFactory.getDietKeyboard(chatId, language);
+            } else if (commandResolver.isDietStatisticDisplayCommand(text, language)) {
                 TelegramDietDisplayRequest telegramDietDisplayRequest = new TelegramDietDisplayRequest(clientUuid, chatId);
                 return telegramDietResolver.display(telegramDietDisplayRequest);
-            } else if (commandResolver.isDietAddRecordCommand(text)) {
+            } else if (commandResolver.isDietAddRecordCommand(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getDietRecordAddInputWaiting(chatId);
-            } else if (commandResolver.isDietListRecordCommand(text)) {
+                return baseMessagesFactory.getDietRecordAddInputWaiting(chatId, language);
+            } else if (commandResolver.isDietListRecordCommand(text, language)) {
                 TelegramBaseRequest request = new TelegramBaseRequest(clientUuid, chatId, telegramId);
                 return telegramDietResolver.listRecord(request);
-            } else if (commandResolver.isDietDeleteRecordCommand(text)) {
+            } else if (commandResolver.isDietDeleteRecordCommand(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getDietRecordDeleteInputWaiting(chatId);
-            } else if (commandResolver.isProfileButton(text)) {
-                return baseMessagesFactory.getProfileKeyboard(chatId);
-            } else if (commandResolver.isProfileBiometricDisplayCommand(text)) {
+                return baseMessagesFactory.getDietRecordDeleteInputWaiting(chatId, language);
+            } else if (commandResolver.isProfileButton(text, language)) {
+                return baseMessagesFactory.getProfileKeyboard(chatId, language);
+            } else if (commandResolver.isProfileBiometricDisplayCommand(text, language)) {
                 TelegramBaseRequest request = new TelegramBaseRequest(clientUuid, chatId, telegramId);
                 return telegramProfileResolver.biometricDisplay(request);
-            } else if (commandResolver.isProfileBiometricUpdateCommand(text)) {
+            } else if (commandResolver.isProfileBiometricUpdateCommand(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getProfileUpdateBiometricInputWaiting(chatId);
-            } else if (commandResolver.isNotificationSubscriptionButton(text)) {
-                return baseMessagesFactory.getNotificationSubscriptionTypesKeyboard(chatId);
-            } else if (commandResolver.isNotificationSubscriptionDietButton(text)) {
-                return baseMessagesFactory.getDietNotificationSubscriptionKeyboard(chatId);
-            } else if (commandResolver.isNotificationSubscriptionDietAdd(text)) {
+                return baseMessagesFactory.getProfileUpdateBiometricInputWaiting(chatId, language);
+            } else if (commandResolver.isNotificationSubscriptionButton(text, language)) {
+                return baseMessagesFactory.getNotificationSubscriptionTypesKeyboard(chatId, language);
+            } else if (commandResolver.isNotificationSubscriptionDietButton(text, language)) {
+                return baseMessagesFactory.getDietNotificationSubscriptionKeyboard(chatId, language);
+            } else if (commandResolver.isNotificationSubscriptionDietAdd(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getNotificationSubscriptionDietAdd(chatId);
-            } else if (commandResolver.isNotificationSubscriptionDietList(text)) {
+                return baseMessagesFactory.getNotificationSubscriptionDietAdd(chatId, language);
+            } else if (commandResolver.isNotificationSubscriptionDietList(text, language)) {
                 TelegramBaseRequest telegramBaseRequest = new TelegramBaseRequest(clientUuid, chatId, telegramId);
                 return telegramDietNotificationSubscriptionResolver.list(telegramBaseRequest);
-            } else if (commandResolver.isStatisticButton(text)) {
-                return baseMessagesFactory.getStatisticKeyboard(chatId);
-            } else if (commandResolver.isStatisticHistoryCommand(text)) {
+            } else if (commandResolver.isStatisticButton(text, language)) {
+                return baseMessagesFactory.getStatisticKeyboard(chatId, language);
+            } else if (commandResolver.isStatisticHistoryCommand(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getStatisticHistoryInputWaiting(chatId);
-            } else if (commandResolver.isStatisticIndicatorsCommand(text)) {
+                return baseMessagesFactory.getStatisticHistoryInputWaiting(chatId, language);
+            } else if (commandResolver.isStatisticIndicatorsCommand(text, language)) {
                 TelegramBaseRequest request = new TelegramBaseRequest(clientUuid, chatId, telegramId);
                 return telegramStatisticResolver.indicators(request);
-            } else if (commandResolver.isNotificationSubscriptionDietDelete(text)) {
+            } else if (commandResolver.isNotificationSubscriptionDietDelete(text, language)) {
                 waitingStates.put(clientUuid, text);
-                return baseMessagesFactory.getNotificationSubscriptionDietDelete(chatId);
+                return baseMessagesFactory.getNotificationSubscriptionDietDelete(chatId, language);
             } else {
-                return baseMessagesFactory.getInvalidMessage(chatId);
+                return baseMessagesFactory.getInvalidMessage(chatId, language);
             }
         } catch (Exception exception) {
             return telegramExceptionHandler.handle(chatId, exception);
         }
     }
 
-    private BotApiMethod<?> processWaitingState(String text, String chatId, String clientUuid, Long telegramId) {
-        if (commandResolver.isProductListCommand(waitingStates.get(clientUuid))) {
+    private BotApiMethod<?> processWaitingState(String text,
+                                                String chatId,
+                                                String clientUuid,
+                                                Long telegramId,
+                                                Language language) {
+        if (commandResolver.isProductListCommand(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             TelegramProductListRequest telegramProductListRequest = new TelegramProductListRequest(clientUuid, chatId, text);
             return telegramProductResolver.list(telegramProductListRequest);
-        } else if (commandResolver.isProductAddCommand(waitingStates.get(clientUuid))) {
+        } else if (commandResolver.isProductAddCommand(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             TelegramProductAddRequest request = (TelegramProductAddRequest) telegramProductParser.parseTelegramProductAddRequest(text)
                     .setChatId(chatId)
                     .setClientUuid(clientUuid)
                     .setTelegramId(telegramId);
             return telegramProductResolver.add(request);
-        } else if (commandResolver.isDietAddRecordCommand(waitingStates.get(clientUuid))) {
+        } else if (commandResolver.isDietAddRecordCommand(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             TelegramDietAddRecordRequest request = new TelegramDietAddRecordRequest(clientUuid, chatId, text);
             return telegramDietResolver.addRecord(request);
-        } else if (commandResolver.isDietDeleteRecordCommand(waitingStates.get(clientUuid))) {
+        } else if (commandResolver.isDietDeleteRecordCommand(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             TelegramDietDeleteRecordRequest request = new TelegramDietDeleteRecordRequest(text, clientUuid, chatId);
             return telegramDietResolver.deleteRecord(request);
-        } else if (commandResolver.isProfileBiometricUpdateCommand(waitingStates.get(clientUuid))) {
+        } else if (commandResolver.isProfileBiometricUpdateCommand(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             TelegramProfileUpdateBiometricRequest request = telegramProfileParser.parseToTelegramProfileUpdateBiometricRequest(chatId, clientUuid, text);
             return telegramProfileResolver.biometricUpdate(request);
-        } else if (commandResolver.isNotificationSubscriptionDietAdd(waitingStates.get(clientUuid))) {
+        } else if (commandResolver.isNotificationSubscriptionDietAdd(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             AddDietNotificationRequest request = new AddDietNotificationRequest(clientUuid, chatId, telegramId, text);
             return telegramDietNotificationSubscriptionResolver.add(request);
-        } else if (commandResolver.isNotificationSubscriptionDietDelete(waitingStates.get(clientUuid))) {
+        } else if (commandResolver.isNotificationSubscriptionDietDelete(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             DeleteDietNotificationRequest request = new DeleteDietNotificationRequest(clientUuid, chatId, telegramId, text);
             return telegramDietNotificationSubscriptionResolver.delete(request);
-        } else if (commandResolver.isStatisticHistoryCommand(waitingStates.get(clientUuid))) {
+        } else if (commandResolver.isStatisticHistoryCommand(waitingStates.get(clientUuid), language)) {
             waitingStates.remove(clientUuid);
             TelegramStatisticHistoryRequest request = telegramStatisticParser.parseToTelegramStatisticHistoryRequest(clientUuid, chatId, text);
             return telegramStatisticResolver.history(request);
@@ -192,17 +209,24 @@ public class MessageHandler extends AbstractMessageHandler {
         try {
             return authenticateTelegramClient(text, chatId, telegramId);
         } catch (TelegramAuthCodeNotFoundException exception) {
-            return baseMessagesFactory.getInvalidAuthCode(chatId);
+            return baseMessagesFactory.getInvalidAuthCode(chatId, Language.EN);
         }
     }
 
-    private BotApiMethod<?> authenticateTelegramClient(String text, String chatId, Long telegramId) {
+    private BotApiMethod<?> authenticateTelegramClient(String text,
+                                                       String chatId,
+                                                       Long telegramId) {
         telegramAuthService.authenticateTelegramClient(text, telegramId, chatId);
-        String welcomeMessage = "Добро пожаловать! Вам доступен полный функционал бота Fit-Stats";
+        // TODO : подумать, как передавать сюда language
+        String welcomeMessage = messageResolveService.message(MessageResolverCodes.TELEGRAM_WELCOME_MESSAGE_CODE, Language.EN);
         return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage);
     }
 
     private String getChatId(Message message) {
         return String.valueOf(message.getChatId());
+    }
+
+    private void setEmailInThreadLocal(String email) {
+        new ThreadLocal<>().set(email);
     }
 }

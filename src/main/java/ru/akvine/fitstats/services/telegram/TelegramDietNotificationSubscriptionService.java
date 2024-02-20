@@ -17,10 +17,7 @@ import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundExcept
 import ru.akvine.fitstats.repositories.ClientRepository;
 import ru.akvine.fitstats.repositories.telegram.TelegramDietNotificationSubscriptionRepository;
 import ru.akvine.fitstats.repositories.telegram.TelegramSubscriptionRepository;
-import ru.akvine.fitstats.services.dto.telegram.AddDietNotificationSubscription;
-import ru.akvine.fitstats.services.dto.telegram.DeleteDietNotificationSubscription;
-import ru.akvine.fitstats.services.dto.telegram.TelegramDietNotificationSubscription;
-import ru.akvine.fitstats.services.dto.telegram.TelegramSubscriptionBean;
+import ru.akvine.fitstats.services.dto.telegram.*;
 import ru.akvine.fitstats.services.listeners.SendMessageEvent;
 import ru.akvine.fitstats.utils.MathUtils;
 
@@ -36,23 +33,17 @@ public class TelegramDietNotificationSubscriptionService {
     private final ClientRepository clientRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public List<TelegramDietNotificationSubscription> list(TelegramBaseRequest request) {
+    public ListDietNotificationSubscriptions list(TelegramBaseRequest request) {
         Preconditions.checkNotNull(request, "telegramBaseRequest is null");
-        Long clientId = verifyExistsByUuidAndGet(request.getClientUuid()).getId();
-        return telegramDietNotificationSubscriptionRepository
+        ClientEntity clientEntity = verifyExistsByUuidAndGet(request.getClientUuid());
+        Long clientId = clientEntity.getId();
+        List<TelegramDietNotificationSubscription> subscriptions =  telegramDietNotificationSubscriptionRepository
                 .findByClientId(clientId)
                 .stream()
                 .map(TelegramDietNotificationSubscription::new)
                 .collect(Collectors.toList());
-    }
-
-    public List<TelegramDietNotificationSubscription> list(Long clientId) {
-        Preconditions.checkNotNull(clientId, "clientId is null");
-        return telegramDietNotificationSubscriptionRepository
-                .findByClientId(clientId)
-                .stream()
-                .map(TelegramDietNotificationSubscription::new)
-                .collect(Collectors.toList());
+        return new ListDietNotificationSubscriptions()
+                .setSubscriptions(subscriptions);
     }
 
     public void add(AddDietNotificationSubscription addDietNotificationSubscription) {
@@ -135,7 +126,7 @@ public class TelegramDietNotificationSubscriptionService {
 
         TelegramDietNotificationSubscriptionEntity energySubscription = subscriptions
                 .stream()
-                .filter(subscription -> subscription.getDietNotificationSubscriptionType().equals(DietNotificationSubscriptionType.ENERGY))
+                .filter(subscription -> subscription.getDietNotificationSubscriptionType().equals(DietNotificationSubscriptionType.CALORIES))
                 .findFirst()
                 .orElse(null);
         if (energySubscription != null && currentCalories > maxCalories && !energySubscription.isProcessed()) {

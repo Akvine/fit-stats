@@ -1,65 +1,44 @@
 package ru.akvine.fitstats.controllers.rest.validators;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.rest.dto.profile.UpdateSettingsRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_email.ProfileChangeEmailStartRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.change_password.ProfileChangePasswordStartRequest;
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.managers.FileValidatorsManager;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
-import ru.akvine.fitstats.validators.ConverterTypeValidator;
-import ru.akvine.fitstats.validators.DurationValidator;
-import ru.akvine.fitstats.validators.PasswordValidator;
-import ru.akvine.fitstats.validators.PhysicalActivitiesValidator;
-import ru.akvine.fitstats.validators.file.FileValidator;
+import ru.akvine.fitstats.validators.*;
+import ru.akvine.fitstats.validators.telegram.PrintMacronutrientsModeValidator;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 @Component
+@RequiredArgsConstructor
 public class ProfileValidator {
     private final DurationValidator durationValidator;
     private final ConverterTypeValidator converterTypeValidator;
     private final PhysicalActivitiesValidator physicalActivitiesValidator;
-    private final Map<FileType, FileValidator> availableFileValidators;
+    private final FileValidatorsManager fileValidatorsManager;
     private final ClientService clientService;
     private final PasswordValidator passwordValidator;
     private final PropertyParseService propertyParseService;
+    private final PrintMacronutrientsModeValidator printMacronutrientsModeValidator;
+    private final LanguageValidator languageValidator;
 
     @Value("file.converter.max-rows.limit")
     private String maxRowsLimit;
 
-    @Autowired
-    public ProfileValidator(DurationValidator durationValidator,
-                            ConverterTypeValidator converterTypeValidator,
-                            PhysicalActivitiesValidator physicalActivitiesValidator,
-                            List<FileValidator> fileValidators,
-                            ClientService clientService,
-                            PasswordValidator passwordValidator,
-                            PropertyParseService propertyParseService) {
-        this.clientService = clientService;
-        this.propertyParseService = propertyParseService;
-        this.passwordValidator = passwordValidator;
-        this.durationValidator = durationValidator;
-        this.converterTypeValidator = converterTypeValidator;
-        this.physicalActivitiesValidator = physicalActivitiesValidator;
-        this.availableFileValidators = fileValidators
-                .stream()
-                .collect(toMap(FileValidator::getType, identity()));
-    }
 
     public void verifyRecordsExport(LocalDate startDate,
                                     LocalDate endDate,
@@ -94,7 +73,8 @@ public class ProfileValidator {
     public void verifyRecordsImport(String converterType, MultipartFile file) {
         converterTypeValidator.validate(converterType);
         FileType type = FileType.valueOf(converterType);
-        availableFileValidators
+        fileValidatorsManager
+                .getAvailableFileValidators()
                 .get(type)
                 .validate(file);
     }
@@ -157,6 +137,22 @@ public class ProfileValidator {
             );
         }
         passwordValidator.validate(request.getNewPassword());
+    }
+
+    public void verifyUpdateSettingsRequest(UpdateSettingsRequest request) {
+        if (request.getLanguage() != null) {
+            languageValidator.validate(request.getLanguage());
+        }
+        if (request.getTelegramPrintMacronutrientsMode() != null) {
+            printMacronutrientsModeValidator.validate(request.getTelegramPrintMacronutrientsMode());
+        }
+        if (request.getRoundAccuracy() != null) {
+            if (request.getRoundAccuracy() < 0 || request.getRoundAccuracy() > 10) {
+                throw new ValidationException(
+                        CommonErrorCodes.Validation.Profile.PROFILE_SETTINGS_ROUND_ACCURACY_INVALID_ERROR,
+                        "Round accuracy can't be less than 0 or more than 10. Field name: roundAccuracy");
+            }
+        }
     }
 
     private void verifyNotExistsByLogin(String login) {

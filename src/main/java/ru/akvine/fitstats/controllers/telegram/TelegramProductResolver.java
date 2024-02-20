@@ -22,9 +22,11 @@ public class TelegramProductResolver {
 
     public SendMessage add(TelegramProductAddRequest telegramProductAddRequest) {
         telegramProductValidator.verifyTelegramProductAddRequest(telegramProductAddRequest);
-        ProductBean productBean = telegramProductConverter.convertToProductBean(telegramProductAddRequest);
-        ProductBean savedProductBean = productService.add(productBean);
-        return telegramProductConverter.convertToProductAddResponse(telegramProductAddRequest.getChatId(), savedProductBean);
+        ProductBean addProductStart = telegramProductConverter.convertToAddProductStart(telegramProductAddRequest);
+        ProductBean addProductFinish = productService.add(addProductStart);
+        return telegramProductConverter.convertToProductAddResponse(
+                telegramProductAddRequest.getChatId(),
+                addProductFinish);
     }
 
     public SendMessage list(TelegramProductListRequest telegramProductListRequest) {

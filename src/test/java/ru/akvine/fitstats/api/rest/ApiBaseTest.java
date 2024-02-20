@@ -20,7 +20,7 @@ import ru.akvine.fitstats.api.config.TestConfiguration;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthCredentialsRequest;
 import ru.akvine.fitstats.controllers.rest.dto.security.auth.AuthFinishRequest;
 import ru.akvine.fitstats.entities.security.OtpInfo;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.security.AuthActionService;
 import ru.akvine.fitstats.services.security.OtpService;
 

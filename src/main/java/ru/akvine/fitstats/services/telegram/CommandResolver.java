@@ -2,146 +2,125 @@ package ru.akvine.fitstats.services.telegram;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
 import ru.akvine.fitstats.enums.CommandEnum;
-
-import static ru.akvine.fitstats.services.telegram.CommandResolver.Actions.*;
-import static ru.akvine.fitstats.services.telegram.CommandResolver.Buttons.*;
+import ru.akvine.fitstats.enums.Language;
+import ru.akvine.fitstats.services.MessageResolveService;
 
 @Component
 @RequiredArgsConstructor
 public class CommandResolver {
-    public interface Buttons {
-        String BASE_HELP_BUTTON = "Помощь";
-        String BACK_BUTTON = "Назад";
+    private final MessageResolveService messageResolveService;
 
-        String NOTIFICATION_SUBSCRIPTION_BUTTON = "Уведомления";
-        String NOTIFICATION_SUBSCRIPTION_DIET_BUTTON = "Диета";
-        String NOTIFICATION_SUBSCRIPTION_STATISTIC_BUTTON = "Статистика";
-
-        String PRODUCTS_BUTTON = "Продукты";
-
-        String DIET_BUTTON = "Диетический дневник";
-
-        String PROFILE_BUTTON = "Профиль";
-
-        String STATISTIC_BUTTON = "Статистика";
+    public boolean isStartCommand(String command, Language language) {
+        return CommandEnum.COMMAND_START.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_START_CODE, language));
     }
 
-    public interface Actions {
-        String NOTIFICATION_SUBSCRIPTION_DIET_ADD_ACTION = "Добавить подписку на уведомления";
-        String NOTIFICATION_SUBSCRIPTION_DIET_LIST_ACTION = "Список подписок на уведомления";
-        String NOTIFICATION_SUBSCRIPTION_DIET_DELETE_ACTION = "Удалить подписку на уведомление";
-
-        String PRODUCTS_ADD_ACTION = "Добавить продукт";
-        String PRODUCTS_LIST_ACTION = "Список продуктов";
-
-        String DIET_ADD_ACTION = "Добавить запись";
-        String DIET_LIST_ACTION = "Список записей";
-        String DIET_DELETE_ACTION = "Удалить запись";
-        String DIET_STATISTIC_DISPLAY_ACTION = "КБЖУ за сегодня";
-
-        String PROFILE_DISPLAY_ACTION = "Биометрические показатели";
-        String PROFILE_UPDATE_ACTION = "Обновить показатели";
-
-        String STATISTIC_HISTORY_ACTION = "История";
-        String STATISTIC_INDICATORS_ACTION = "Основные показатели";
+    public boolean isBackCommand(String command, Language language) {
+        return CommandEnum.COMMAND_BACK.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language));
     }
 
-
-
-    public boolean isStartCommand(String command) {
-        return CommandEnum.COMMAND_START.getCommandName().equals(command);
+    public boolean isHelpCommand(String command, Language language) {
+        return CommandEnum.COMMAND_HELP.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_HELP_CODE, language));
     }
 
-    public boolean isBackCommand(String command) {
-        return command.equals(BACK_BUTTON);
+    public boolean isNotificationSubscriptionButton(String command, Language language) {
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_CODE, language));
     }
 
-    public boolean isHelpCommand(String command) {
-        return CommandEnum.COMMAND_HELP.getCommandName().equals(command) || command.equals(BASE_HELP_BUTTON);
+    public boolean isNotificationSubscriptionDietButton(String command, Language language) {
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_CODE, language));
     }
 
-    public boolean isNotificationSubscriptionButton(String command) {
-        return command.equals(NOTIFICATION_SUBSCRIPTION_BUTTON);
+    public boolean isNotificationSubscriptionDietAdd(String command, Language language) {
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_ADD.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_ADD_CODE, language));
     }
 
-    public boolean isNotificationSubscriptionDietButton(String command) {
-        return command.equals(NOTIFICATION_SUBSCRIPTION_DIET_BUTTON);
+    public boolean isNotificationSubscriptionDietList(String command, Language language) {
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_LIST.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_LIST_CODE, language));
     }
 
-    public boolean isNotificationSubscriptionDietAdd(String command) {
-        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_ADD.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_ADD_ACTION);
+    public boolean isNotificationSubscriptionDietDelete(String command, Language language) {
+        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_DELETE.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_DELETE_CODE, language));
     }
 
-    public boolean isNotificationSubscriptionDietList(String command) {
-        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_LIST.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_LIST_ACTION);
+    public boolean isProductButton(String command, Language language) {
+        return CommandEnum.COMMAND_PRODUCTS.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_CODE, language));
+
     }
 
-    public boolean isNotificationSubscriptionDietDelete(String command) {
-        return CommandEnum.COMMAND_NOTIFICATION_SUBSCRIPTION_DIET_DELETE.getCommandName().equals(command) || command.equals(NOTIFICATION_SUBSCRIPTION_DIET_DELETE_ACTION);
+    public boolean isProductAddCommand(String command, Language language) {
+        return CommandEnum.COMMAND_PRODUCTS_ADD.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_ADD_CODE, language));
     }
 
-    public boolean isProductButton(String command) {
-        return command.equals(PRODUCTS_BUTTON);
+    public boolean isProductListCommand(String command, Language language) {
+        return CommandEnum.COMMAND_PRODUCTS_LIST.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_LIST_CODE, language));
     }
 
-    public boolean isProductAddCommand(String command) {
-        return CommandEnum.COMMAND_PRODUCTS_ADD.getCommandName().equals(command) || command.equals(PRODUCTS_ADD_ACTION);
+    public boolean isDietButton(String command, Language language) {
+        return CommandEnum.COMMAND_DIET.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_CODE, language));
     }
 
-    public boolean isProductListCommand(String command) {
-        return CommandEnum.COMMAND_PRODUCTS_LIST.getCommandName().equals(command) || command.equals(PRODUCTS_LIST_ACTION);
+    public boolean isDietAddRecordCommand(String command, Language language) {
+        return CommandEnum.COMMAND_DIET_RECORD_ADD.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_ADD_CODE, language));
     }
 
-    public boolean isDietButton(String command) {
-        return command.equals(DIET_BUTTON);
+    public boolean isDietListRecordCommand(String command, Language language) {
+        return CommandEnum.COMMAND_DIET_RECORD_LIST.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_LIST_CODE, language));
     }
 
-    public boolean isDietAddRecordCommand(String command) {
-        return CommandEnum.COMMAND_DIET_RECORD_ADD.getCommandName().equals(command) || command.equals(DIET_ADD_ACTION);
+    public boolean isDietDeleteRecordCommand(String command, Language language) {
+        return CommandEnum.COMMAND_DIET_RECORD_DELETE.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_DELETE_CODE, language));
     }
 
-    public boolean isDietListRecordCommand(String command) {
-        return CommandEnum.COMMAND_DIET_RECORD_LIST.getCommandName().equals(command) || command.equals(DIET_LIST_ACTION);
+    public boolean isDietStatisticDisplayCommand(String command, Language language) {
+        return CommandEnum.COMMAND_DIET_STATISTIC_DISPLAY.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_STATISTIC_DISPLAY_CODE, language));
     }
 
-    public boolean isDietDeleteRecordCommand(String command) {
-        return CommandEnum.COMMAND_DIET_RECORD_DELETE.getCommandName().equals(command) || command.equals(DIET_DELETE_ACTION);
+    public boolean isProfileButton(String command, Language language) {
+        return CommandEnum.COMMAND_PROFILE.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_CODE, language));
+
     }
 
-    public boolean isDietStatisticDisplayCommand(String command) {
-        return CommandEnum.COMMAND_DIET_STATISTIC_DISPLAY.getCommandName().equals(command) || command.equals(Actions.DIET_STATISTIC_DISPLAY_ACTION);
+    public boolean isProfileBiometricDisplayCommand(String command, Language language) {
+        return CommandEnum.COMMAND_PROFILE_DISPLAY.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_BIOMETRIC_DISPLAY_CODE, language));
     }
 
-    public boolean isProfileButton(String command) {
-        return command.equals(PROFILE_BUTTON);
+    public boolean isProfileBiometricUpdateCommand(String command, Language language) {
+        return CommandEnum.COMMAND_PROFILE_UPDATE.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_UPDATE_CODE, language));
     }
 
-    public boolean isProfileBiometricDisplayCommand(String command) {
-        return CommandEnum.COMMAND_PROFILE_DISPLAY.getCommandName().equals(command) || command.equals(PROFILE_DISPLAY_ACTION);
+    public boolean isStatisticButton(String command, Language language) {
+        return CommandEnum.COMMAND_STATISTIC.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_STATISTIC_CODE, language));
     }
 
-    public boolean isProfileBiometricUpdateCommand(String command) {
-        return CommandEnum.COMMAND_PROFILE_UPDATE.getCommandName().equals(command) || command.equals(PROFILE_UPDATE_ACTION);
+    public boolean isStatisticHistoryCommand(String command, Language language) {
+        return CommandEnum.COMMAND_STATISTIC_HISTORY.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_STATISTIC_HISTORY_CODE, language));
     }
 
-    public boolean isStatisticButton(String command) {
-        return command.equals(STATISTIC_BUTTON);
-    }
-
-    public boolean isStatisticHistoryCommand(String command) {
-        return CommandEnum.COMMAND_STATISTIC_HISTORY.getCommandName().equals(command) || command.equals(STATISTIC_HISTORY_ACTION);
-    }
-
-    public boolean isStatisticIndicatorsCommand(String command) {
-        return CommandEnum.COMMAND_STATISTIC_INDICATORS.getCommandName().equals(command) || command.equals(STATISTIC_INDICATORS_ACTION);
-    }
-
-    public boolean isStopAcceptCommand(String command) {
-        return CommandEnum.COMMAND_STOP_ACCEPT.getCommandName().equals(command);
-    }
-
-    public boolean isStopCancelCommand(String command) {
-        return CommandEnum.COMMAND_STOP_CANCEL.getCommandName().equals(command);
+    public boolean isStatisticIndicatorsCommand(String command, Language language) {
+        return CommandEnum.COMMAND_STATISTIC_INDICATORS.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_STATISTIC_INDICATORS_CODE, language));
     }
 }

@@ -1,7 +1,7 @@
 package ru.akvine.fitstats.enums.telegram;
 
 public enum DietNotificationSubscriptionType {
-    ENERGY,
+    CALORIES,
     PROTEINS,
     FATS,
     CARBOHYDRATES

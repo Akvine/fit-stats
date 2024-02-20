@@ -16,6 +16,7 @@ import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.repositories.DietRecordRepository;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
@@ -141,25 +142,27 @@ public class DietService {
     }
 
     @Transactional
-    public List<DietRecordBean> list(ListRecord listRecord) {
-        Preconditions.checkNotNull(listRecord, "listRecord is null");
-        logger.info("Try to get list diet records = [{}]", listRecord);
+    public ListRecordsFinish list(ListRecordsStart listRecordsStart) {
+        Preconditions.checkNotNull(listRecordsStart, "listRecord is null");
+        logger.info("Try to get list diet records = [{}]", listRecordsStart);
 
-        String clientUuid = listRecord.getClientUuid();
+        String clientUuid = listRecordsStart.getClientUuid();
         clientService.verifyExistsByUuidAndGet(clientUuid);
 
         LocalDate date;
-        if (listRecord.getDate() == null) {
+        if (listRecordsStart.getDate() == null) {
             date = LocalDate.now();
         } else {
-            date = listRecord.getDate();
+            date = listRecordsStart.getDate();
         }
 
-        return dietRecordRepository
+        List<DietRecordBean> records = dietRecordRepository
                 .findByDate(clientUuid, date)
                 .stream()
                 .map(DietRecordBean::new)
                 .collect(Collectors.toList());
+        return new ListRecordsFinish()
+                .setRecords(records);
     }
 
     public void deleteRecord(DeleteRecord deleteRecord) {

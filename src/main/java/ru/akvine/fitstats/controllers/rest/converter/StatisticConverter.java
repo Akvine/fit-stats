@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.*;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.enums.Macronutrient;
 import ru.akvine.fitstats.enums.StatisticType;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.statistic.*;
-import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 public class StatisticConverter {
     private final PropertyParseService propertyParseService;
 
-    @Value("round.accuracy")
-    private String defaultRoundAccuracy;
     @Value("product.statistic.mode.count.limit")
     private String limit;
 
@@ -52,7 +50,8 @@ public class StatisticConverter {
                         .setStartDate(request.getDateRangeInfo().getStartDate())
                         .setEndDate(request.getDateRangeInfo().getEndDate()))
                 .indicatorsWithMacronutrients(indicatorsWithMacronutrients)
-                .roundAccuracy(request.getRoundAccuracy() == null ? propertyParseService.parseInteger(defaultRoundAccuracy) : request.getRoundAccuracy())
+                .roundAccuracy(request.getRoundAccuracy() == null ?
+                        ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy() : request.getRoundAccuracy())
                 .build();
     }
 
@@ -77,7 +76,8 @@ public class StatisticConverter {
                         .setDuration(StringUtils.isBlank(duration) ? null : Duration.valueOf(duration))
                         .setStartDate(request.getDateRangeInfo().getStartDate())
                         .setEndDate(request.getDateRangeInfo().getEndDate()))
-                .roundAccuracy(request.getRoundAccuracy() == null ? propertyParseService.parseInteger(defaultRoundAccuracy) : request.getRoundAccuracy())
+                .roundAccuracy(request.getRoundAccuracy() == null ?
+                        ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy() : request.getRoundAccuracy())
                 .build();
     }
 

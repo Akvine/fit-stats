@@ -1,62 +1,48 @@
 package ru.akvine.fitstats.services.profile;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
 import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordXlsxRow;
-import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
+import ru.akvine.fitstats.managers.ConvertersManager;
 import ru.akvine.fitstats.services.BiometricService;
-import ru.akvine.fitstats.services.ClientService;
 import ru.akvine.fitstats.services.DietService;
 import ru.akvine.fitstats.services.ProductService;
+import ru.akvine.fitstats.services.client.ClientService;
+import ru.akvine.fitstats.services.client.settings.ClientSettingsService;
 import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
+import ru.akvine.fitstats.services.dto.client.ClientSettingsBean;
 import ru.akvine.fitstats.services.dto.diet.DietRecordBean;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.services.dto.profile.ProfileDownload;
 import ru.akvine.fitstats.services.dto.profile.UpdateBiometric;
-import ru.akvine.fitstats.services.processors.format.Converter;
+import ru.akvine.fitstats.services.dto.profile.UpdateSettings;
 import ru.akvine.fitstats.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static ru.akvine.fitstats.utils.DateUtils.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProfileService {
-    private final Map<ConverterType, Converter> availableConverters;
+    private final ConvertersManager convertersManager;
     private final DietService dietService;
     private final BiometricService biometricService;
     private final ClientService clientService;
     private final ProductService productService;
-
-    @Autowired
-    public ProfileService(List<Converter> converters,
-                          DietService dietService,
-                          BiometricService biometricService,
-                          ClientService clientService,
-                          ProductService productService) {
-        this.dietService = dietService;
-        this.biometricService = biometricService;
-        this.clientService = clientService;
-        this.productService = productService;
-        this.availableConverters = converters
-                .stream()
-                .collect(toMap(Converter::getType, identity()));
-    }
+    private final ClientSettingsService clientSettingsService;
 
     public byte[] exportRecords(ProfileDownload profileDownload) {
         Preconditions.checkNotNull(profileDownload, "profileDownload is null");
@@ -67,7 +53,8 @@ public class ProfileService {
                 profileDownload.getClientUuid(),
                 getDateRange.getStartDate(),
                 getDateRange.getEndDate());
-        byte[] records = availableConverters
+        byte[] records = convertersManager
+                .getConverters()
                 .get(profileDownload.getConverterType())
                 .convert(dietRecordsExport, DietRecordExport.class);
         logger.info("Successful export records for client with uuid = {}", profileDownload.getClientUuid());
@@ -130,6 +117,21 @@ public class ProfileService {
     public BiometricBean display(String clientUuid) {
         Preconditions.checkNotNull(clientUuid, "clientUuid is null");
         return new BiometricBean(biometricService.verifyExistsAndGet(clientUuid));
+    }
+
+    public ClientSettingsBean listSettings(String email) {
+        return clientSettingsService.findBeanByClientEmail(email);
+    }
+
+    public ClientSettingsBean updateSettings(UpdateSettings updateSettings) {
+        Preconditions.checkNotNull(updateSettings, "updateSettings is null");
+        ClientSettingsBean clientSettingsBean = new ClientSettingsBean()
+                .setClientEmail(updateSettings.getEmail())
+                .setRoundAccuracy(updateSettings.getRoundAccuracy())
+                .setLanguage(updateSettings.getLanguage())
+                .setPrintMacronutrientsMode(updateSettings.getPrintMacronutrientsMode());
+
+        return clientSettingsService.update(clientSettingsBean);
     }
 
     private DateRange getDateRange(ProfileDownload profileDownload) {

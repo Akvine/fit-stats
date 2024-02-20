@@ -24,7 +24,7 @@ public class TelegramMessageProcessor {
     public BotApiMethod<? extends Serializable> processIncomingMessage(Update update) {
         boolean isEnabled = propertyParseService.parseBoolean(enabledPropertyName);
         if (!isEnabled) {
-            logger.debug("Telegram statistic bot disabled");
+            logger.debug("Telegram bot disabled");
             return null;
         }
         return telegramWebhookBot.onWebhookUpdateReceived(update);

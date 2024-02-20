@@ -12,15 +12,13 @@ import ru.akvine.fitstats.exceptions.telegram.TelegramConfigurationException;
 @RequiredArgsConstructor
 public class MessageHandlerFacade {
 
-    private final CallbackQueryMessageHandler callbackQueryMessageHandler;
     private final MessageHandler messageHandler;
 
     public BotApiMethod<?> processUpdate(Update update) {
         logger.debug("Incoming update=[{}]", update);
 
         if (update.hasCallbackQuery()) {
-            // TODO: уточнить, действительно ли нужны callback'и?
-            return callbackQueryMessageHandler.processUpdate(update);
+            throw new RuntimeException("Not supporting callback!");
         } else if (update.hasMessage()) {
             return messageHandler.processUpdate(update);
         }

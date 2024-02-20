@@ -27,9 +27,9 @@ public class ProductController implements ProductControllerMeta {
     @Override
     public Response add(@Valid AddProductRequest request) {
         productValidator.verifyAddProductRequest(request);
-        ProductBean productBean = productConverter.convertToProductBean(request);
-        ProductBean savedProductBean = productService.add(productBean);
-        return productConverter.convertToProductResponse(savedProductBean);
+        ProductBean addProductStart = productConverter.convertToProductBean(request);
+        ProductBean addProductFinish = productService.add(addProductStart);
+        return productConverter.convertToProductResponse(addProductFinish);
     }
 
     @Override

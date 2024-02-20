@@ -3,6 +3,7 @@ package ru.akvine.fitstats.controllers.telegram;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
 import ru.akvine.fitstats.controllers.telegram.converters.TelegramDietConverter;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
@@ -10,6 +11,8 @@ import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDeleteRecord
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplayRequest;
 import ru.akvine.fitstats.controllers.telegram.validators.TelegramDietValidator;
 import ru.akvine.fitstats.services.DietService;
+import ru.akvine.fitstats.services.MessageResolveService;
+import ru.akvine.fitstats.services.dto.client.ClientSettingsBean;
 import ru.akvine.fitstats.services.dto.diet.*;
 
 import java.util.List;
@@ -20,11 +23,15 @@ public class TelegramDietResolver {
     private final DietService dietService;
     private final TelegramDietConverter telegramDietConverter;
     private final TelegramDietValidator telegramDietValidator;
+    private final MessageResolveService messageResolveService;
 
     public SendMessage display(TelegramDietDisplayRequest telegramDietDisplayRequest) {
         Display display = telegramDietConverter.convertToDisplay(telegramDietDisplayRequest);
         DietDisplay dietDisplay = dietService.display(display);
-        return telegramDietConverter.convertToDietDisplayResponse(telegramDietDisplayRequest.getChatId(), dietDisplay);
+        return telegramDietConverter.convertToDietDisplayResponse(
+                telegramDietDisplayRequest.getChatId(),
+                dietDisplay
+        );
     }
 
     public SendMessage addRecord(TelegramDietAddRecordRequest telegramDietAddRecordRequest) {
@@ -35,9 +42,9 @@ public class TelegramDietResolver {
     }
 
     public SendMessage listRecord(TelegramBaseRequest request) {
-        ListRecord listRecord = telegramDietConverter.convertToListRecord(request);
-        List<DietRecordBean> recordBeans = dietService.list(listRecord);
-        return telegramDietConverter.convertToListRecordResponse(request.getChatId(), recordBeans);
+        ListRecordsStart listRecordsStart = telegramDietConverter.convertToListRecord(request);
+        ListRecordsFinish listRecordsFinish = dietService.list(listRecordsStart);
+        return telegramDietConverter.convertToListRecordResponse(request.getChatId(), listRecordsFinish);
     }
 
     public SendMessage deleteRecord(TelegramDietDeleteRecordRequest request) {
@@ -45,7 +52,7 @@ public class TelegramDietResolver {
         dietService.deleteRecord(deleteRecord);
         return new SendMessage(
                 request.getChatId(),
-                "Запись успешно удалена!"
+                messageResolveService.message(MessageResolverCodes.DIET_RECORD_DELETE_SUCCESSFUL_CODE)
         );
     }
 }

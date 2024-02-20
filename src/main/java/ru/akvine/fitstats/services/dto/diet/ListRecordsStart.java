@@ -9,7 +9,7 @@ import java.time.LocalTime;
 
 @Data
 @Accessors(chain = true)
-public class ListRecord {
+public class ListRecordsStart {
     private String clientUuid;
     private LocalDate date;
     @Nullable

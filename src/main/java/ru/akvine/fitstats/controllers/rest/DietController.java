@@ -38,9 +38,9 @@ public class DietController implements DietControllerMeta {
 
     @Override
     public Response list(@Valid ListRecordRequest request) {
-        ListRecord listRecord = dietConverter.convertToListRecord(request);
-        List<DietRecordBean> records = dietService.list(listRecord);
-        return dietConverter.convertToDietRecordListResponse(records);
+        ListRecordsStart listRecordsStart = dietConverter.convertToListRecord(request);
+        ListRecordsFinish listRecordsFinish = dietService.list(listRecordsStart);
+        return dietConverter.convertToDietRecordListResponse(listRecordsFinish);
     }
 
     @Override

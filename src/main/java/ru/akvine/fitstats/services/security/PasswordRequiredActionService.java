@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.security.AccountPasswordable;
 import ru.akvine.fitstats.entities.security.OneTimePasswordable;
 import ru.akvine.fitstats.entities.security.OtpInfo;
-import ru.akvine.fitstats.services.ClientService;
+import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.PasswordService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.dto.security.OtpCreateNewAction;

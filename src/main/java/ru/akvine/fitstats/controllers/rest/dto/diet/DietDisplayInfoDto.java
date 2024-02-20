@@ -6,27 +6,27 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class DietDisplayInfoDto {
-    private int maxProteins;
+    private double maxProteins;
 
-    private int maxFats;
+    private double maxFats;
 
-    private int maxCarbohydrates;
+    private double maxCarbohydrates;
 
-    private int maxCalories;
+    private double maxCalories;
 
-    private int currentProteins;
+    private double currentProteins;
 
-    private int currentFats;
+    private double currentFats;
 
-    private int currentCarbohydrates;
+    private double currentCarbohydrates;
 
-    private int currentCalories;
+    private double currentCalories;
 
-    private int remainingProteins;
+    private double remainingProteins;
 
-    private int remainingFats;
+    private double remainingFats;
 
-    private int remainingCarbohydrates;
+    private double remainingCarbohydrates;
 
-    private int remainingCalories;
+    private double remainingCalories;
 }

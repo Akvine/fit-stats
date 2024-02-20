@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.controllers.rest.dto.diet.*;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DateRangeInfo;
 import ru.akvine.fitstats.controllers.rest.dto.statistic.DietRecordDto;
@@ -16,7 +17,6 @@ import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.akvine.fitstats.utils.MathUtils.round;
@@ -46,9 +46,9 @@ public class DietConverter {
 
     }
 
-    public ListRecord convertToListRecord(ListRecordRequest request) {
+    public ListRecordsStart convertToListRecord(ListRecordRequest request) {
         Preconditions.checkNotNull(request, "listRecordRequest is null");
-        return new ListRecord()
+        return new ListRecordsStart()
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .setDate(request.getDate())
                 .setTime(request.getTime());
@@ -71,10 +71,11 @@ public class DietConverter {
                 .setRecordUuid(request.getUuid());
     }
 
-    public DietRecordListResponse convertToDietRecordListResponse(List<DietRecordBean> records) {
-        Preconditions.checkNotNull(records, "records is null");
+    public DietRecordListResponse convertToDietRecordListResponse(ListRecordsFinish listRecordsFinish) {
+        Preconditions.checkNotNull(listRecordsFinish, "listRecordsFinish is null");
         return new DietRecordListResponse()
-                .setRecords(records
+                .setRecords(listRecordsFinish
+                        .getRecords()
                         .stream()
                         .map(this::buildDietRecordDto)
                         .collect(Collectors.toList()));
@@ -133,18 +134,19 @@ public class DietConverter {
     }
 
     private DietDisplayInfoDto buildDietDisplayInfoDto(DietDisplay dietDisplay) {
+        int roundAccuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
         return new DietDisplayInfoDto()
-                .setCurrentCalories(round(dietDisplay.getCurrentCalories()))
-                .setCurrentCarbohydrates(round(dietDisplay.getCurrentCarbohydrates()))
-                .setCurrentFats(round(dietDisplay.getCurrentFats()))
-                .setCurrentProteins(round(dietDisplay.getCurrentProteins()))
-                .setMaxCalories(round(dietDisplay.getMaxCalories()))
-                .setMaxCarbohydrates(round(dietDisplay.getMaxCarbohydrates()))
-                .setMaxFats(round(dietDisplay.getMaxFats()))
-                .setMaxProteins(round(dietDisplay.getMaxProteins()))
-                .setRemainingProteins(round(dietDisplay.getRemainingProteins()))
-                .setRemainingFats(round(dietDisplay.getRemainingFats()))
-                .setRemainingCarbohydrates(round(dietDisplay.getRemainingCarbohydrates()))
-                .setRemainingCalories(round(dietDisplay.getRemainingCalories()));
+                .setCurrentCalories(round(dietDisplay.getCurrentCalories(), roundAccuracy))
+                .setCurrentCarbohydrates(round(dietDisplay.getCurrentCarbohydrates(), roundAccuracy))
+                .setCurrentFats(round(dietDisplay.getCurrentFats(), roundAccuracy))
+                .setCurrentProteins(round(dietDisplay.getCurrentProteins(), roundAccuracy))
+                .setMaxCalories(round(dietDisplay.getMaxCalories(), roundAccuracy))
+                .setMaxCarbohydrates(round(dietDisplay.getMaxCarbohydrates(), roundAccuracy))
+                .setMaxFats(round(dietDisplay.getMaxFats(), roundAccuracy))
+                .setMaxProteins(round(dietDisplay.getMaxProteins(), roundAccuracy))
+                .setRemainingProteins(round(dietDisplay.getRemainingProteins(), roundAccuracy))
+                .setRemainingFats(round(dietDisplay.getRemainingFats(), roundAccuracy))
+                .setRemainingCarbohydrates(round(dietDisplay.getRemainingCarbohydrates(), roundAccuracy))
+                .setRemainingCalories(round(dietDisplay.getRemainingCalories(), roundAccuracy));
     }
 }
