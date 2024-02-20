@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.converter.parser.Parser;
 import ru.akvine.fitstats.controllers.rest.dto.admin.*;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
 import ru.akvine.fitstats.enums.ConverterType;
@@ -58,7 +59,7 @@ public class AdminConverter {
         if (StringUtils.isBlank(converterType)) {
             return ConverterType.CSV;
         }
-        return ConverterType.valueOf(converterType);
+        return ConverterType.valueOf(converterType.toUpperCase());
     }
 
     public ResponseEntity convertToExportResponse(String filename, byte[] file, ConverterType converterType) {
@@ -199,6 +200,8 @@ public class AdminConverter {
         switch (converterType) {
             case CSV:
                 return "application/csv";
+            case XLSX:
+                return "application/xlsx";
             default:
                 throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
         }
@@ -208,6 +211,8 @@ public class AdminConverter {
         switch (converterType) {
             case CSV:
                 return ProductCsvRow.class;
+            case XLSX:
+                return ProductXlsxRow.class;
             default:
                 throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
         }

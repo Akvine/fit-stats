@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
 import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
@@ -78,6 +79,20 @@ public class AdminService {
                         .setTitle(csvRow.getTitle())
                         .setProducer(csvRow.getProducer())
                         .setMeasurement(VolumeMeasurement.safeValueOf(csvRow.getMeasurement()));
+                productService.add(productBean);
+            } else {
+                ProductXlsxRow xlsxRow = (ProductXlsxRow) record;
+                ProductBean productBean = new ProductBean()
+                        .setUuid(xlsxRow.getUuid())
+                        .setProteins(Double.parseDouble(xlsxRow.getProteins()))
+                        .setFats(Double.parseDouble(xlsxRow.getFats()))
+                        .setCarbohydrates(Double.parseDouble(xlsxRow.getCarbohydrates()))
+                        .setAlcohol(Double.parseDouble(xlsxRow.getAlcohol()))
+                        .setVol(Double.parseDouble(xlsxRow.getVol()))
+                        .setVolume(Double.parseDouble(xlsxRow.getVolume()))
+                        .setTitle(xlsxRow.getTitle())
+                        .setProducer(xlsxRow.getProducer())
+                        .setMeasurement(VolumeMeasurement.safeValueOf(xlsxRow.getMeasurement()));
                 productService.add(productBean);
             }
         });

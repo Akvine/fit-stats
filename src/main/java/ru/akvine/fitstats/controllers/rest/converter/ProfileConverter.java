@@ -21,6 +21,7 @@ import ru.akvine.fitstats.controllers.rest.dto.profile.change_password.ProfileCh
 import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteFinishRequest;
 import ru.akvine.fitstats.controllers.rest.dto.profile.delete.ProfileDeleteResponse;
 import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordXlsxRow;
 import ru.akvine.fitstats.controllers.rest.dto.security.OtpActionResponse;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
@@ -75,7 +76,7 @@ public class ProfileConverter {
             String duration,
             String converterType) {
         return new ProfileDownload()
-                .setConverterType(converterType == null ? ConverterType.CSV : ConverterType.valueOf(converterType))
+                .setConverterType(converterType == null ? ConverterType.CSV : ConverterType.valueOf(converterType.toUpperCase()))
                 .setDuration(StringUtils.isBlank(duration) ? null : Duration.valueOf(duration))
                 .setStartDate(startDate)
                 .setEndDate(endDate)
@@ -268,6 +269,8 @@ public class ProfileConverter {
         switch (converterType) {
             case CSV:
                 return "application/csv";
+            case XLSX:
+                return "application/xlsx";
             default:
                 throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
         }
@@ -277,6 +280,8 @@ public class ProfileConverter {
         switch (converterType) {
             case CSV:
                 return DietRecordCsvRow.class;
+            case XLSX:
+                return DietRecordXlsxRow.class;
             default:
                 throw new IllegalArgumentException("Converter with type = [" + converterType + "] is not supported!");
         }

@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.admin.*;
 import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
 import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorCsvWrapper;
+import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorXlsxWrapper;
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
@@ -35,15 +37,18 @@ public class AdminValidator {
     private final ConverterTypeValidator converterTypeValidator;
     private final Map<FileType, FileValidator> availableFileValidators;
     private final AdminValidatorCsvWrapper adminValidatorCsvWrapper;
+    private final AdminValidatorXlsxWrapper adminValidatorXlsxWrapper;
     private final PropertyParseService propertyParseService;
 
     public AdminValidator(VolumeMeasurementValidator volumeMeasurementValidator,
                           ConverterTypeValidator converterTypeValidator,
                           List<FileValidator> fileValidators,
                           AdminValidatorCsvWrapper adminValidatorCsvWrapper,
+                          AdminValidatorXlsxWrapper adminValidatorXlsxWrapper,
                           PropertyParseService propertyParseService) {
         this.volumeMeasurementValidator = volumeMeasurementValidator;
         this.adminValidatorCsvWrapper = adminValidatorCsvWrapper;
+        this.adminValidatorXlsxWrapper = adminValidatorXlsxWrapper;
         this.converterTypeValidator = converterTypeValidator;
         this.propertyParseService = propertyParseService;
         this.availableFileValidators = fileValidators
@@ -84,6 +89,11 @@ public class AdminValidator {
         records.forEach(record -> {
             if (record instanceof ProductCsvRow) {
                 InvalidProductRow invalidProductRow = adminValidatorCsvWrapper.wrap((ProductCsvRow) record);
+                if (invalidProductRow != null) {
+                    invalidProductRows.add(invalidProductRow);
+                }
+            } else if (record instanceof ProductXlsxRow) {
+                InvalidProductRow invalidProductRow = adminValidatorXlsxWrapper.wrap((ProductXlsxRow) record);
                 if (invalidProductRow != null) {
                     invalidProductRows.add(invalidProductRow);
                 }

@@ -51,7 +51,7 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             errors.put(productCsvRow.getProducer(), CommonErrorCodes.Validation.Admin.PRODUCER_BLANK_ERROR);
         }
 
-        double proteins, fats, carbohydrates, calories, vol, volume;
+        double proteins, fats, carbohydrates, calories, vol, alcohol, volume;
         try {
             proteins = Double.parseDouble(productCsvRow.getProteins());
             if (proteins < 0) {
@@ -95,6 +95,15 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             }
         } catch (NumberFormatException exception) {
             errors.put(productCsvRow.getVol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        }
+
+        try {
+            alcohol = Double.parseDouble(productCsvRow.getAlcohol());
+            if (alcohol < 0) {
+                errors.put(productCsvRow.getAlcohol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+            }
+        } catch (NumberFormatException exception) {
+            errors.put(productCsvRow.getAlcohol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {

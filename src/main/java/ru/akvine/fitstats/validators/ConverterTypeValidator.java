@@ -17,7 +17,7 @@ public class ConverterTypeValidator implements Validator<String> {
                     "Converter type is blank. Field name: converterType");
         }
         try {
-            ConverterType.valueOf(converterType);
+            ConverterType.valueOf(converterType.toUpperCase());
         } catch (IllegalArgumentException exception) {
             throw new ValidationException(CommonErrorCodes.Validation.Profile.PROFILE_RECORDS_DOWNLOAD_ERROR,
                     "Converter type is invalid. Field name: converterType");

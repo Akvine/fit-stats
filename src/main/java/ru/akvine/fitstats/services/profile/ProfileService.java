@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.controllers.rest.dto.profile.ImportRecords;
 import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.profile.file.DietRecordXlsxRow;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.Duration;
 import ru.akvine.fitstats.services.BiometricService;
@@ -99,6 +100,23 @@ public class ProfileService {
                         .setVolume(Double.parseDouble(csvRow.getVolume()))
                         .setDate(DateUtils.convertToLocalDate(csvRow.getDate()))
                         .setTime(StringUtils.isBlank(csvRow.getTime()) ? null : DateUtils.convertToLocalTime(csvRow.getTime()));
+                dietService.add(dietRecordBean);
+            }
+            if (record instanceof DietRecordXlsxRow) {
+                DietRecordXlsxRow xlsxRow = (DietRecordXlsxRow) record;
+                ProductBean productBean = new ProductBean(productService.findByUuid(xlsxRow.getUuid()));
+                DietRecordBean dietRecordBean = new DietRecordBean()
+                        .setClientBean(clientBean)
+                        .setProductBean(productBean)
+                        .setProteins(Double.parseDouble(xlsxRow.getProteins()))
+                        .setFats(Double.parseDouble(xlsxRow.getFats()))
+                        .setCarbohydrates(Double.parseDouble(xlsxRow.getCarbohydrates()))
+                        .setAlcohol(Double.parseDouble(xlsxRow.getAlcohol()))
+                        .setVol(Double.parseDouble(xlsxRow.getVol()))
+                        .setCalories(Double.parseDouble(xlsxRow.getCalories()))
+                        .setVolume(Double.parseDouble(xlsxRow.getVolume()))
+                        .setDate(DateUtils.convertToLocalDate(xlsxRow.getDate()))
+                        .setTime(StringUtils.isBlank(xlsxRow.getTime()) ? null : DateUtils.convertToLocalTime(xlsxRow.getTime()));
                 dietService.add(dietRecordBean);
             }
         });

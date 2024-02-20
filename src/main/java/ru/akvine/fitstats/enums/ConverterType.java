@@ -1,7 +1,8 @@
 package ru.akvine.fitstats.enums;
 
 public enum ConverterType {
-    CSV("csv");
+    CSV("csv"),
+    XLSX("xlsx");
 
     private final String value;
 
