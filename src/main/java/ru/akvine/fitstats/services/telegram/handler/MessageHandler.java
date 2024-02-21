@@ -92,12 +92,12 @@ public class MessageHandler extends AbstractMessageHandler {
 
             if (commandResolver.isStartCommand(text, language)) {
                 String welcomeMessage = messageResolveService.message(MessageResolverCodes.TELEGRAM_WELCOME_MESSAGE_CODE, language);
-                return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage);
+                return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage, language);
             } else if (commandResolver.isHelpCommand(text, language)) {
                 return baseMessagesFactory.getHelpMessage(chatId, language);
             } else if (commandResolver.isBackCommand(text, language)) {
                 String chooseActionMessage = messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language);
-                return baseMessagesFactory.getMainMenuKeyboard(chatId, chooseActionMessage + ": ");
+                return baseMessagesFactory.getMainMenuKeyboard(chatId, chooseActionMessage + ": ", language);
             } else if (commandResolver.isProductButton(text, language)) {
                 return baseMessagesFactory.getProductKeyboard(chatId, language);
             } else if (commandResolver.isProductAddCommand(text, language)) {
@@ -217,9 +217,8 @@ public class MessageHandler extends AbstractMessageHandler {
                                                        String chatId,
                                                        Long telegramId) {
         telegramAuthService.authenticateTelegramClient(text, telegramId, chatId);
-        // TODO : подумать, как передавать сюда language
         String welcomeMessage = messageResolveService.message(MessageResolverCodes.TELEGRAM_WELCOME_MESSAGE_CODE, Language.EN);
-        return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage);
+        return baseMessagesFactory.getMainMenuKeyboard(chatId, welcomeMessage, Language.EN);
     }
 
     private String getChatId(Message message) {

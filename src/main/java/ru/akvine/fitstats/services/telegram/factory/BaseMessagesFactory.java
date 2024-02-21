@@ -45,7 +45,7 @@ public class BaseMessagesFactory {
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(keyboardFactory.getDietKeyboard());
+        sendMessage.setReplyMarkup(keyboardFactory.getDietKeyboard(language));
         return sendMessage;
     }
 
@@ -69,7 +69,7 @@ public class BaseMessagesFactory {
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(keyboardFactory.getProfileKeyboard());
+        sendMessage.setReplyMarkup(keyboardFactory.getProfileKeyboard(language));
         return sendMessage;
     }
 
@@ -100,7 +100,7 @@ public class BaseMessagesFactory {
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_SUBSCRIPTION_TYPE_CODE, language)
         );
         sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(keyboardFactory.getNotificationSubscriptionTypesKeyboard());
+        sendMessage.setReplyMarkup(keyboardFactory.getNotificationSubscriptionTypesKeyboard(language));
         return sendMessage;
     }
 
@@ -110,7 +110,7 @@ public class BaseMessagesFactory {
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(keyboardFactory.getProductsKeyboard());
+        sendMessage.setReplyMarkup(keyboardFactory.getProductsKeyboard(language));
         return sendMessage;
     }
 
@@ -120,7 +120,7 @@ public class BaseMessagesFactory {
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(keyboardFactory.getDietNotificationSubscriptionKeyboard());
+        sendMessage.setReplyMarkup(keyboardFactory.getDietNotificationSubscriptionKeyboard(language));
         return sendMessage;
     }
 
@@ -137,17 +137,19 @@ public class BaseMessagesFactory {
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_CHOOSE_ACTION_CODE, language) + ": "
         );
         sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(keyboardFactory.getStatisticKeyboard());
+        sendMessage.setReplyMarkup(keyboardFactory.getStatisticKeyboard(language));
         return sendMessage;
     }
 
-    public SendMessage getMainMenuKeyboard(String chatId, String message) {
+    public SendMessage getMainMenuKeyboard(String chatId,
+                                           String message,
+                                           Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
                 message
         );
         sendMessage.enableMarkdown(true);
-        sendMessage.setReplyMarkup(keyboardFactory.getMainMenuKeyboard());
+        sendMessage.setReplyMarkup(keyboardFactory.getMainMenuKeyboard(language));
         return sendMessage;
     }
 
