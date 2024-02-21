@@ -45,10 +45,15 @@ public class TelegramSubscriptionService {
         );
     }
 
-    public TelegramSubscriptionBean save(Long telegramId, TelegramAuthCode authCode, String chatId) {
+    public TelegramSubscriptionBean save(Long telegramId,
+                                         TelegramAuthCode authCode,
+                                         String chatId,
+                                         Long subscriptionTypeId) {
         Preconditions.checkNotNull(telegramId, "telegramId is null");
         Preconditions.checkNotNull(authCode, "authCode is null");
         Preconditions.checkNotNull(chatId, "chatId is null");
+        Preconditions.checkNotNull(subscriptionTypeId, "subscriptionTypeId is null");
+        TelegramSubscriptionTypeEntity telegramSubscriptionTypeEntity = telegramSubscriptionTypeService.getById(subscriptionTypeId);
         ClientEntity client = clientService.verifyExistsByUuidAndGet(authCode.getClient().getUuid());
 
         Optional<TelegramSubscriptionEntity> subscriptionOptional = telegramSubscriptionRepository
@@ -61,6 +66,7 @@ public class TelegramSubscriptionService {
         TelegramSubscriptionEntity telegramSubscription = new TelegramSubscriptionEntity()
                 .setTelegramId(telegramId)
                 .setClient(client)
+                .setType(telegramSubscriptionTypeEntity)
                 .setChatId(chatId);
         return new TelegramSubscriptionBean(telegramSubscriptionRepository.save(telegramSubscription));
     }
