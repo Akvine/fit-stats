@@ -5,78 +5,82 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
+import ru.akvine.fitstats.enums.Language;
+import ru.akvine.fitstats.services.MessageResolveService;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class KeyboardFactory {
+    private final MessageResolveService messageResolveService;
 
-    public ReplyKeyboardMarkup getMainMenuKeyboard() {
+    public ReplyKeyboardMarkup getMainMenuKeyboard(Language language) {
         KeyboardRow firstRow = new KeyboardRow();
         KeyboardRow secondRow = new KeyboardRow();
-        firstRow.add(new KeyboardButton("Продукты"));
-        firstRow.add(new KeyboardButton("Диетический дневник"));
-        firstRow.add(new KeyboardButton("Статистика"));
-        secondRow.add(new KeyboardButton("Уведомления"));
-        secondRow.add(new KeyboardButton("Профиль"));
-        secondRow.add(new KeyboardButton("Помощь"));
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_CODE, language)));
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_CODE, language)));
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_STATISTIC_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_HELP_CODE, language)));
 
         return getKeyboard(List.of(firstRow, secondRow));
     }
 
-    public ReplyKeyboardMarkup getNotificationSubscriptionTypesKeyboard() {
+    public ReplyKeyboardMarkup getNotificationSubscriptionTypesKeyboard(Language language) {
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Диета"));;
-        row.add(new KeyboardButton("Назад"));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
         return getKeyboard(List.of(row));
     }
 
-    public ReplyKeyboardMarkup getDietNotificationSubscriptionKeyboard() {
+    public ReplyKeyboardMarkup getDietNotificationSubscriptionKeyboard(Language language) {
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Добавить подписку на уведомления"));
-        row.add(new KeyboardButton("Список подписок на уведомления"));
-        row.add(new KeyboardButton("Удалить подписку на уведомление"));
-        row.add(new KeyboardButton("Назад"));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_ADD_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_LIST_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_NOTIFICATION_SUBSCRIPTION_DIET_DELETE_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
         return getKeyboard(List.of(row));
     }
 
-    public ReplyKeyboardMarkup getProductsKeyboard() {
+    public ReplyKeyboardMarkup getProductsKeyboard(Language language) {
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Добавить продукт"));
-        row.add(new KeyboardButton("Список продуктов"));
-        row.add(new KeyboardButton("Назад"));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_ADD_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_LIST_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
         return getKeyboard(List.of(row));
     }
 
-    public ReplyKeyboardMarkup getDietKeyboard() {
+    public ReplyKeyboardMarkup getDietKeyboard(Language language) {
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Добавить запись"));
-        row.add(new KeyboardButton("Список записей"));
-        row.add(new KeyboardButton("Удалить запись"));
-        row.add(new KeyboardButton("КБЖУ за сегодня"));
-        row.add(new KeyboardButton("Назад"));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_ADD_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_LIST_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_DELETE_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_STATISTIC_DISPLAY_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
         return getKeyboard(List.of(row));
     }
 
-    public ReplyKeyboardMarkup getProfileKeyboard() {
+    public ReplyKeyboardMarkup getProfileKeyboard(Language language) {
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("Биометрические показатели"));
-        row.add(new KeyboardButton("Обновить показатели"));
-        row.add(new KeyboardButton("Назад"));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_BIOMETRIC_DISPLAY_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_UPDATE_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
         return getKeyboard(List.of(row));
     }
 
-    public ReplyKeyboardMarkup getStatisticKeyboard() {
+    public ReplyKeyboardMarkup getStatisticKeyboard(Language language) {
         KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton("История"));
-        row.add(new KeyboardButton("Основные показатели"));
-        row.add(new KeyboardButton("Назад"));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_STATISTIC_HISTORY_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_STATISTIC_INDICATORS_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
         return getKeyboard(List.of(row));
     }
