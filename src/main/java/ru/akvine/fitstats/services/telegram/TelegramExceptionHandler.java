@@ -1,14 +1,22 @@
 package ru.akvine.fitstats.services.telegram;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import ru.akvine.fitstats.constants.MessageResolverCodes;
+import ru.akvine.fitstats.context.ClientSettingsContext;
+import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.parse.*;
+import ru.akvine.fitstats.services.MessageResolveService;
 
 @Component
+@RequiredArgsConstructor
 public class TelegramExceptionHandler {
+    private final MessageResolveService messageResolveService;
+
     public SendMessage handle(String chatId, Exception exception) {
         if (exception instanceof ProductNotFoundException) {
             return handleProductNotFoundException(chatId);
@@ -30,33 +38,41 @@ public class TelegramExceptionHandler {
     }
 
     private SendMessage handleException(String chatId) {
-        return new SendMessage(chatId, "Что-то пошло не так...");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_GENERAL_ERROR_CODE, language));
     }
 
     private SendMessage handleProductNotFoundException(String chatId) {
-        return new SendMessage(chatId, "Продукт с указанным uuid не найден!");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId,  messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_NOT_FOUND_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramFatsParseException(String chatId) {
-        return new SendMessage(chatId, "Некорректно введены жиры!");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_FATS_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramProteinsParseException(String chatId) {
-        return new SendMessage(chatId, "Некорректно введены белки!");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_PROTEINS_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramCarbohydratesParseException(String chatId) {
-        return new SendMessage(chatId, "Некорректно введены углеводы!");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_CARBOHYDRATES_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramVolParseException(String chatId) {
-        return new SendMessage(chatId, "Некорректно введен процент крепости алкоголя!");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_VOL_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleProductsNotUniqueException(String chatId) {
-        return new SendMessage(chatId, "Данному uuid соответствует не один продукт. Введите uuid по длиннее");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_UUID_NOT_UNIQUE_ERROR_CODE, language));
     }
     private SendMessage handleDietRecordsNotUniqueException(String chatId) {
-        return new SendMessage(chatId, "Данному uuid соответствует не одна запись. Введите uuid по длиннее");
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_UUID_NOT_UNIQUE_ERROR_CODE, language));
     }
 }

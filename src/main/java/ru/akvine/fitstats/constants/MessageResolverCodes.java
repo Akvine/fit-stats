@@ -95,4 +95,13 @@ public class MessageResolverCodes {
     public static final String TELEGRAM_DIET_RECORD_DELETE_CODE = "telegram.diet.record.delete.code";
     public static final String TELEGRAM_DIET_RECORD_ADD_CODE = "telegram.diet.record.add.code";
     public static final String TELEGRAM_PRODUCT_INPUT_ADD_CODE = "telegram.product.add.input.code";
+
+    public static final String TELEGRAM_GENERAL_ERROR_CODE = "telegram.general.error.code";
+    public static final String TELEGRAM_PRODUCT_NOT_FOUND_ERROR_CODE = "telegram.product.notFound.error.code";
+    public static final String TELEGRAM_MACRONUTRIENT_PROTEINS_INPUT_ERROR_CODE = "telegram.macronutrient.proteins.input.error.code";
+    public static final String TELEGRAM_MACRONUTRIENT_FATS_INPUT_ERROR_CODE = "telegram.macronutrient.fats.input.error.code";
+    public static final String TELEGRAM_MACRONUTRIENT_CARBOHYDRATES_INPUT_ERROR_CODE = "telegram.macronutrient.carbohydrates.input.error.code";
+    public static final String TELEGRAM_MACRONUTRIENT_VOL_INPUT_ERROR_CODE = "telegram.macronutrient.vol.input.error.code";
+    public static final String TELEGRAM_PRODUCT_UUID_NOT_UNIQUE_ERROR_CODE = "telegram.product.uuid.notUnique.error.code";
+    public static final String TELEGRAM_DIET_UUID_NOT_UNIQUE_ERROR_CODE = "telegram.diet.uuid.notUnique.error.code";
 }
