@@ -44,11 +44,11 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
         }
 
         if (StringUtils.isBlank(productXlsxRow.getTitle())) {
-            errors.put(productXlsxRow.getTitle(), CommonErrorCodes.Validation.Admin.TITLE_BLANK_ERROR);
+            errors.put(String.valueOf(productXlsxRow.getTitle()), CommonErrorCodes.Validation.Admin.TITLE_BLANK_ERROR);
         }
 
         if (StringUtils.isBlank(productXlsxRow.getProducer())) {
-            errors.put(productXlsxRow.getProducer(), CommonErrorCodes.Validation.Admin.PRODUCER_BLANK_ERROR);
+            errors.put(String.valueOf(productXlsxRow.getProducer()), CommonErrorCodes.Validation.Admin.PRODUCER_BLANK_ERROR);
         }
 
         double proteins, fats, carbohydrates, calories, alcohol, vol, volume;
@@ -57,8 +57,8 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
             if (proteins < 0) {
                 errors.put(String.valueOf(proteins), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productXlsxRow.getProteins(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productXlsxRow.getProteins()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -66,8 +66,8 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
             if (fats < 0) {
                 errors.put(String.valueOf(productXlsxRow.getFats()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productXlsxRow.getFats(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productXlsxRow.getFats()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -75,8 +75,8 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
             if (carbohydrates < 0) {
                 errors.put(String.valueOf(productXlsxRow.getCarbohydrates()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productXlsxRow.getCarbohydrates(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productXlsxRow.getCarbohydrates()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -84,8 +84,8 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
             if (calories < 0) {
                 errors.put(productXlsxRow.getCalories(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);;
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productXlsxRow.getCalories(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productXlsxRow.getCalories()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -93,8 +93,8 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
             if (alcohol < 0) {
                 errors.put(productXlsxRow.getAlcohol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productXlsxRow.getAlcohol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productXlsxRow.getAlcohol()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -102,8 +102,8 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
             if (vol < 0 || vol > 100) {
                 errors.put(productXlsxRow.getVol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productXlsxRow.getVol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productXlsxRow.getVol()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -111,8 +111,8 @@ public class AdminValidatorXlsxWrapper implements ValidatorWrapper<ProductXlsxRo
             if (volume < 0) {
                 errors.put(productXlsxRow.getVolume(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productXlsxRow.getVolume(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productXlsxRow.getVolume()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {

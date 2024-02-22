@@ -9,4 +9,6 @@ public class MacronutrientsConstants {
     public static final double PROTEINS_MACRONUTRIENT_CALORIES_COEFFICIENT = 4.1;
     public static final double CARBOHYDRATES_MACRONUTRIENT_CALORIES_COEFFICIENT = 4.1;
     public static final double ALCOHOL_MACRONUTRIENT_CALORIES_COEFFICIENT = 7.1;
+
+    public static final int DEFAULT_VOLUME = 100;
 }

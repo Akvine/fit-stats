@@ -44,11 +44,11 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
         }
 
         if (StringUtils.isBlank(productCsvRow.getTitle())) {
-            errors.put(productCsvRow.getTitle(), CommonErrorCodes.Validation.Admin.TITLE_BLANK_ERROR);
+            errors.put(String.valueOf(productCsvRow.getTitle()), CommonErrorCodes.Validation.Admin.TITLE_BLANK_ERROR);
         }
 
         if (StringUtils.isBlank(productCsvRow.getProducer())) {
-            errors.put(productCsvRow.getProducer(), CommonErrorCodes.Validation.Admin.PRODUCER_BLANK_ERROR);
+            errors.put(String.valueOf(productCsvRow.getProducer()), CommonErrorCodes.Validation.Admin.PRODUCER_BLANK_ERROR);
         }
 
         double proteins, fats, carbohydrates, calories, vol, alcohol, volume;
@@ -57,8 +57,8 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             if (proteins < 0) {
                 errors.put(String.valueOf(proteins), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productCsvRow.getProteins(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productCsvRow.getProteins()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -66,8 +66,8 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             if (fats < 0) {
                 errors.put(String.valueOf(productCsvRow.getFats()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productCsvRow.getFats(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productCsvRow.getFats()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -75,8 +75,8 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             if (carbohydrates < 0) {
                 errors.put(String.valueOf(productCsvRow.getCarbohydrates()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productCsvRow.getCarbohydrates(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productCsvRow.getCarbohydrates()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -84,8 +84,8 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             if (calories < 0) {
                 errors.put(productCsvRow.getCalories(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);;
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productCsvRow.getCalories(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productCsvRow.getCalories()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -93,8 +93,8 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             if (vol < 0 || vol > 100) {
                 errors.put(productCsvRow.getVol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productCsvRow.getVol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productCsvRow.getVol()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -102,8 +102,8 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             if (alcohol < 0) {
                 errors.put(productCsvRow.getAlcohol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productCsvRow.getAlcohol(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productCsvRow.getAlcohol()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
@@ -111,14 +111,14 @@ public class AdminValidatorCsvWrapper implements ValidatorWrapper<ProductCsvRow,
             if (volume < 0) {
                 errors.put(productCsvRow.getVolume(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
             }
-        } catch (NumberFormatException exception) {
-            errors.put(productCsvRow.getVolume(), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
+        } catch (Exception exception) {
+            errors.put(String.valueOf(productCsvRow.getVolume()), CommonErrorCodes.Validation.Admin.MACRONUTRIENT_INVALID_ERROR);
         }
 
         try {
             volumeMeasurementValidator.validate(productCsvRow.getMeasurement());
         } catch (Exception exception) {
-            errors.put(productCsvRow.getMeasurement(), CommonErrorCodes.Validation.Admin.MEASUREMENT_INVALID_ERROR);
+            errors.put(String.valueOf(productCsvRow.getMeasurement()), CommonErrorCodes.Validation.Admin.MEASUREMENT_INVALID_ERROR);
         }
 
         if (errors.isEmpty()) {

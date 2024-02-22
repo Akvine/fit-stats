@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.akvine.fitstats.constants.MacronutrientsConstants.DEFAULT_VOLUME;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -60,7 +62,7 @@ public class AdminService {
                         .setCarbohydrates(Double.parseDouble(csvRow.getCarbohydrates()))
                         .setAlcohol(Double.parseDouble(csvRow.getAlcohol()))
                         .setVol(Double.parseDouble(csvRow.getVol()))
-                        .setVolume(Double.parseDouble(csvRow.getVolume()))
+                        .setVolume(DEFAULT_VOLUME)
                         .setTitle(csvRow.getTitle())
                         .setProducer(csvRow.getProducer())
                         .setMeasurement(VolumeMeasurement.safeValueOf(csvRow.getMeasurement()));
@@ -74,7 +76,7 @@ public class AdminService {
                         .setCarbohydrates(Double.parseDouble(xlsxRow.getCarbohydrates()))
                         .setAlcohol(Double.parseDouble(xlsxRow.getAlcohol()))
                         .setVol(Double.parseDouble(xlsxRow.getVol()))
-                        .setVolume(Double.parseDouble(xlsxRow.getVolume()))
+                        .setVolume(DEFAULT_VOLUME)
                         .setTitle(xlsxRow.getTitle())
                         .setProducer(xlsxRow.getProducer())
                         .setMeasurement(VolumeMeasurement.safeValueOf(xlsxRow.getMeasurement()));

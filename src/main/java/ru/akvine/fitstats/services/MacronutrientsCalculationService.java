@@ -7,8 +7,6 @@ import static ru.akvine.fitstats.constants.MacronutrientsConstants.*;
 
 @Service
 public class MacronutrientsCalculationService {
-    private static final int DEFAULT_VOLUME = 100;
-
     private static final double ZERO = 0;
 
     public double calculateCalories(double proteins) {
