@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 import ru.akvine.fitstats.controllers.rest.converter.AdminConverter;
 import ru.akvine.fitstats.controllers.rest.dto.admin.BlockClientRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.SecretRequest;
 import ru.akvine.fitstats.controllers.rest.dto.admin.UnblockClientRequest;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
@@ -37,7 +38,8 @@ public class AdminClientController implements AdminClientControllerMeta {
     }
 
     @Override
-    public Response list() {
+    public Response list(@Valid SecretRequest request) {
+        adminValidator.verifySecret(request.getSecret());
         List<BlockClientEntry> blocked = adminService.listBlocked(SecurityUtils.getCurrentUser().getName());
         return adminConverter.convertToListBlockClientResponse(blocked);
     }

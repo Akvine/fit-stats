@@ -3,6 +3,7 @@ package ru.akvine.fitstats.controllers.rest.meta;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import ru.akvine.fitstats.controllers.rest.dto.admin.SecretRequest;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.admin.BlockClientRequest;
 import ru.akvine.fitstats.controllers.rest.dto.admin.UnblockClientRequest;
@@ -15,7 +16,7 @@ public interface AdminClientControllerMeta {
     Response block(@Valid @RequestBody BlockClientRequest request);
 
     @PostMapping(value = "/block/list")
-    Response list();
+    Response list(@Valid @RequestBody SecretRequest request);
 
     @PostMapping(value = "/unblock")
     Response unblock(@Valid @RequestBody UnblockClientRequest request);
