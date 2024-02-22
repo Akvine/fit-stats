@@ -2,10 +2,12 @@ package ru.akvine.fitstats.services.telegram;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.akvine.fitstats.context.TelegramAuthContext;
 import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.telegram.TelegramAuthCodeEntity;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
@@ -20,6 +22,7 @@ import ru.akvine.fitstats.utils.RandomCodeGenerator;
 import java.time.LocalDateTime;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TelegramAuthService {
     private final ClientService clientService;
@@ -87,6 +90,11 @@ public class TelegramAuthService {
     public ClientBean getAuthenticateUser(Update update) {
         Long telegramId = update.getMessage().getFrom().getId();
         TelegramSubscriptionBean telegramSubscriptionBean = telegramSubscriptionService.findByTelegramId(telegramId);
+        authenticate(telegramSubscriptionBean.getClient().getEmail());
         return telegramSubscriptionBean.getClient();
+    }
+
+    private void authenticate(String email) {
+        TelegramAuthContext.set(email);
     }
 }

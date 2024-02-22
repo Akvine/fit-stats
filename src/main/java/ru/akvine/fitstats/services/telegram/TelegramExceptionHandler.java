@@ -38,41 +38,41 @@ public class TelegramExceptionHandler {
     }
 
     private SendMessage handleException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_GENERAL_ERROR_CODE, language));
     }
 
     private SendMessage handleProductNotFoundException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId,  messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_NOT_FOUND_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramFatsParseException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_FATS_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramProteinsParseException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_PROTEINS_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramCarbohydratesParseException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_CARBOHYDRATES_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleTelegramVolParseException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_MACRONUTRIENT_VOL_INPUT_ERROR_CODE, language));
     }
 
     private SendMessage handleProductsNotUniqueException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_UUID_NOT_UNIQUE_ERROR_CODE, language));
     }
     private SendMessage handleDietRecordsNotUniqueException(String chatId) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_UUID_NOT_UNIQUE_ERROR_CODE, language));
     }
 }

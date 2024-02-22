@@ -48,7 +48,7 @@ public class TelegramProfileConverter {
     }
 
     private String buildProfileBiometricDisplayResponse(BiometricBean bean) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         StringBuilder sb = new StringBuilder();
         sb
                 .append(messageResolveService.message(MessageResolverCodes.AGE_CODE, language))

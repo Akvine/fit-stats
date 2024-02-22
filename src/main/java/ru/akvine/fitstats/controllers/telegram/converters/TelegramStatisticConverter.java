@@ -18,7 +18,6 @@ import ru.akvine.fitstats.services.dto.statistic.AdditionalStatisticInfo;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistory;
 import ru.akvine.fitstats.services.dto.statistic.StatisticHistoryResult;
 import ru.akvine.fitstats.utils.DateUtils;
-import ru.akvine.fitstats.utils.MathUtils;
 
 import static ru.akvine.fitstats.utils.MathUtils.round;
 
@@ -46,7 +45,7 @@ public class TelegramStatisticConverter {
 
     public AdditionalStatistic convertToAdditionalStatistic(TelegramBaseRequest request) {
         Preconditions.checkNotNull(request, "telegramBaseRequest is null");
-        int roundAccuracy = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getRoundAccuracy();
+        int roundAccuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
         int withoutMode = 0;
         return AdditionalStatistic.builder()
                 .modeCount(withoutMode)
@@ -65,7 +64,7 @@ public class TelegramStatisticConverter {
     }
 
     private String buildStatisticHistoryResponse(StatisticHistoryResult statisticHistoryResult) {
-        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent();
         int roundAccuracy = clientSettingsBean.getRoundAccuracy();
         Language language = clientSettingsBean.getLanguage();
         StringBuilder sb = new StringBuilder();
@@ -96,7 +95,7 @@ public class TelegramStatisticConverter {
     }
 
     private String buildAdditionalStatisticResponse(AdditionalStatisticInfo additionalStatisticInfo) {
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         StringBuilder sb = new StringBuilder();
         sb
                 .append(messageResolveService.message(MessageResolverCodes.PROTEINS_PERCENT_DIET_CODE, language))

@@ -33,7 +33,7 @@ public class TelegramProductConverter {
 
     public SendMessage convertToProductListResponse(String chatId,
                                                     List<ProductBean> productBeans) {
-        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent();
         Preconditions.checkNotNull(productBeans, "products is null");
         if (productBeans.isEmpty()) {
             return new SendMessage(
@@ -86,7 +86,7 @@ public class TelegramProductConverter {
     }
 
     private String buildProductListResponse(List<ProductBean> products) {
-        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent();
         int roundAccuracy = clientSettingsBean.getRoundAccuracy();
         Language language = clientSettingsBean.getLanguage();
 
@@ -140,7 +140,7 @@ public class TelegramProductConverter {
     }
 
     private String buildProductAddResponse(ProductBean productBean) {
-        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent();
         int roundAccuracy = clientSettingsBean.getRoundAccuracy();
         Language language = clientSettingsBean.getLanguage();
 

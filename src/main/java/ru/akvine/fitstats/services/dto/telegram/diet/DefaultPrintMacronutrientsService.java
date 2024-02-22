@@ -96,6 +96,7 @@ public class DefaultPrintMacronutrientsService implements PrintMacronutrientsSer
                 .append(NEXT_LINE);
         sb.append("4. ")
                 .append(messageResolveService.message(MessageResolverCodes.CARBOHYDRATES_CODE, language))
+                .append(": ")
                 .append(round(dietDisplay.getCurrentCarbohydrates(), roundAccuracy))
                 .append(NEXT_LINE);
         return sb;

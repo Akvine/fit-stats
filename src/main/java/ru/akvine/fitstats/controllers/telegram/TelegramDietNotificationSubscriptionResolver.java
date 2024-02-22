@@ -36,7 +36,7 @@ public class TelegramDietNotificationSubscriptionResolver {
         telegramDietNotificationValidator.verifyTelegramAddDietNotificationRequest(addDietNotificationRequest);
         AddDietNotificationSubscription addDietNotificationSubscription = telegramDietNotificationConverter.convertToAddDietNotification(addDietNotificationRequest);
         telegramDietNotificationSubscriptionService.add(addDietNotificationSubscription);
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(
                 addDietNotificationRequest.getChatId(),
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_SUBSCRIPTION_ADDED_CODE, language, addDietNotificationSubscription.getType())
@@ -46,7 +46,7 @@ public class TelegramDietNotificationSubscriptionResolver {
     public SendMessage delete(DeleteDietNotificationRequest deleteDietNotificationRequest) {
         telegramDietNotificationValidator.verifyTelegramDeleteDietNotificationRequest(deleteDietNotificationRequest);
         DeleteDietNotificationSubscription deleteDietNotificationSubscription = telegramDietNotificationConverter.convertToDeleteDietNotificationSubscription(deleteDietNotificationRequest);
-        Language language = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent().getLanguage();
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         telegramDietNotificationSubscriptionService.delete(deleteDietNotificationSubscription);
         return new SendMessage(
                 deleteDietNotificationRequest.getChatId(),

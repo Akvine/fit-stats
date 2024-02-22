@@ -81,7 +81,7 @@ public class TelegramDietConverter {
                                                             AddDietRecordFinish addDietRecordFinish) {
         Preconditions.checkNotNull(addDietRecordFinish, "addDietRecordFinish is null");
 
-        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent();
         int roundAccuracy = clientSettingsBean.getRoundAccuracy();
         Language language = clientSettingsBean.getLanguage();
 
@@ -140,13 +140,13 @@ public class TelegramDietConverter {
     }
 
     private String buildListRecordResponse(List<DietRecordBean> records) {
-        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent();
         int roundAccuracy = clientSettingsBean.getRoundAccuracy();
         Language language = clientSettingsBean.getLanguage();
 
         StringBuilder sb = new StringBuilder();
         sb.append("=======[");
-        sb.append(messageResolveService.message(MessageResolverCodes.DIET_RECORD_ADD_SUCCESSFUL_CODE, language));
+        sb.append(messageResolveService.message(MessageResolverCodes.DIET_RECORD_LIST_CODE, language));
         sb.append("]=======").append(NEXT_LINE);
 
         int size = records.size();
@@ -203,7 +203,7 @@ public class TelegramDietConverter {
     }
 
     private String buildDietDisplayStatistic(DietDisplay dietDisplay) {
-        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getByThreadLocalForCurrent();
+        ClientSettingsBean clientSettingsBean = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent();
         return availablePrintMacronutrientsService
                 .get(clientSettingsBean.getPrintMacronutrientsMode())
                 .print(dietDisplay, clientSettingsBean);

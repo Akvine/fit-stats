@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ClientSettingsService {
     private final ClientSettingsRepository clientSettingsRepository;
-
     private static final int DEFAULT_ROUND_ACCURACY = 1;
 
     public ClientSettingsBean create(ClientEntity clientEntity) {
@@ -73,5 +72,9 @@ public class ClientSettingsService {
         return clientSettingsRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new ClientSettingsNotFoundException("Settings for client with email = [" + email + "] not found!"));
+    }
+
+    public ClientSettingsBean getByClientEmail(String key) {
+        return findBeanByClientEmail(key);
     }
 }
