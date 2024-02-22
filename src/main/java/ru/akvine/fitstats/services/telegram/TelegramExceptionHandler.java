@@ -9,6 +9,7 @@ import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
+import ru.akvine.fitstats.exceptions.security.BlockedCredentialsException;
 import ru.akvine.fitstats.exceptions.telegram.parse.*;
 import ru.akvine.fitstats.services.MessageResolveService;
 
@@ -32,6 +33,8 @@ public class TelegramExceptionHandler {
             return handleProductsNotUniqueException(chatId);
         } else if (exception instanceof DietRecordsNotUniqueResultException) {
           return handleDietRecordsNotUniqueException(chatId);
+        } else if (exception instanceof BlockedCredentialsException) {
+            return handleBlockedCredentialsException(chatId);
         } else {
             return handleException(chatId);
         }
@@ -74,5 +77,9 @@ public class TelegramExceptionHandler {
     private SendMessage handleDietRecordsNotUniqueException(String chatId) {
         Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_UUID_NOT_UNIQUE_ERROR_CODE, language));
+    }
+    private SendMessage handleBlockedCredentialsException(String chatId) {
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_BLOCKED_CREDENTIALS_ERROR_CODE, language));
     }
 }

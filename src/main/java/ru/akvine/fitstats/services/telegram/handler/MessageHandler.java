@@ -22,10 +22,12 @@ import ru.akvine.fitstats.controllers.telegram.parser.TelegramProductParser;
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramProfileParser;
 import ru.akvine.fitstats.controllers.telegram.parser.TelegramStatisticParser;
 import ru.akvine.fitstats.enums.Language;
+import ru.akvine.fitstats.exceptions.security.BlockedCredentialsException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramAuthCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.telegram.TelegramSubscriptionNotFoundException;
 import ru.akvine.fitstats.services.MessageResolveService;
 import ru.akvine.fitstats.services.dto.client.ClientBean;
+import ru.akvine.fitstats.services.security.BlockingService;
 import ru.akvine.fitstats.services.telegram.CommandResolver;
 import ru.akvine.fitstats.services.telegram.TelegramAuthService;
 import ru.akvine.fitstats.services.telegram.TelegramExceptionHandler;
@@ -40,6 +42,7 @@ public class MessageHandler extends AbstractMessageHandler {
     private final TelegramExceptionHandler telegramExceptionHandler;
     private final BaseMessagesFactory baseMessagesFactory;
     private final CommandResolver commandResolver;
+    private final BlockingService blockingService;
     private final TelegramAuthService telegramAuthService;
     private final MessageResolveService messageResolveService;
 
@@ -78,14 +81,13 @@ public class MessageHandler extends AbstractMessageHandler {
         String clientUuid = client.getUuid();
         String email = client.getEmail();
         Long telegramId = message.getFrom().getId();
-
-
-        setEmailInThreadLocal(email);
         Language language = ClientSettingsContext.getClientSettingsContextHolder()
                 .getByEmail(email)
                 .getLanguage();
 
         try {
+            checkIsBlockedAndThrow(email);
+
             if (waitingStates.containsKey(clientUuid)) {
                 return processWaitingState(text, chatId, clientUuid, telegramId, language);
             }
@@ -225,7 +227,10 @@ public class MessageHandler extends AbstractMessageHandler {
         return String.valueOf(message.getChatId());
     }
 
-    private void setEmailInThreadLocal(String email) {
-        new ThreadLocal<>().set(email);
+
+    public void checkIsBlockedAndThrow(String email) {
+        if (blockingService.isBlocked(email)) {
+            throw new BlockedCredentialsException("Client with email is blocked");
+        }
     }
 }

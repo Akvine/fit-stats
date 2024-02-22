@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
 import ru.akvine.fitstats.exceptions.security.BlockedCredentialsException;
 import ru.akvine.fitstats.repositories.security.BlockedCredentialsRepository;
+import ru.akvine.fitstats.services.dto.client.ClientBean;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.utils.DateUtils;
 import ru.akvine.fitstats.utils.DietUtils;
@@ -102,6 +103,10 @@ public class BlockingService {
 
     public List<BlockedCredentialsEntity> list() {
         return blockedCredentialsRepository.findAll();
+    }
+
+    public boolean isBlocked(String email) {
+        return blockedCredentialsRepository.findByLogin(email).isPresent();
     }
 
     @Scheduled(fixedDelayString = "${security.blocked.credentials.expired.cache.fixedDelay.milliseconds}")

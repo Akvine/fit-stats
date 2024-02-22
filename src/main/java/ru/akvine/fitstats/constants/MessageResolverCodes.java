@@ -104,4 +104,5 @@ public class MessageResolverCodes {
     public static final String TELEGRAM_MACRONUTRIENT_VOL_INPUT_ERROR_CODE = "telegram.macronutrient.vol.input.error.code";
     public static final String TELEGRAM_PRODUCT_UUID_NOT_UNIQUE_ERROR_CODE = "telegram.product.uuid.notUnique.error.code";
     public static final String TELEGRAM_DIET_UUID_NOT_UNIQUE_ERROR_CODE = "telegram.diet.uuid.notUnique.error.code";
+    public static final String TELEGRAM_BLOCKED_CREDENTIALS_ERROR_CODE = "telegram.blocked.credentials.error.code";
 }
