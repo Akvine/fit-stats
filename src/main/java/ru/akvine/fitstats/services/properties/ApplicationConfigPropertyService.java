@@ -5,14 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.enums.PropertyLoadStrategyType;
 import ru.akvine.fitstats.exceptions.property.PropertyNotFoundException;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
 public class ApplicationConfigPropertyService implements PropertyService {
@@ -43,5 +42,10 @@ public class ApplicationConfigPropertyService implements PropertyService {
         Map<String, String> properties = new HashMap<>();
         names.forEach(key -> properties.put(key, get(key)));
         return properties;
+    }
+
+    @Override
+    public PropertyLoadStrategyType getType() {
+        return PropertyLoadStrategyType.CONFIG_FILE;
     }
 }
