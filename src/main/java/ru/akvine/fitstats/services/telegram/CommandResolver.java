@@ -3,7 +3,7 @@ package ru.akvine.fitstats.services.telegram;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.constants.MessageResolverCodes;
-import ru.akvine.fitstats.enums.CommandEnum;
+import ru.akvine.fitstats.enums.telegram.CommandEnum;
 import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.services.MessageResolveService;
 

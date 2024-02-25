@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.enums;
+package ru.akvine.fitstats.enums.telegram;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
