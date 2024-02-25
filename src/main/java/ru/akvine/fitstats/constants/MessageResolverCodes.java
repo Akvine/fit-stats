@@ -56,6 +56,10 @@ public class MessageResolverCodes {
     public static final String CARBOHYDRATES_PERCENT_DIET_CODE = "carbohydrates.percent.diet.code";
     public static final String ALCOHOL_PERCENT_DIET_CODE = "alcohol.percent.diet.code";
 
+    public static final String ROUND_ACCURACY_CODE = "round.accuracy.code";
+    public static final String LANGUAGE_CODE = "language.code";
+    public static final String PRINT_STATISTIC_MODE_CODE = "print.statistic.mode.code";
+
     public static final String TELEGRAM_SUBSCRIPTION_ADDED_CODE = "telegram.subscription.added.code";
     public static final String TELEGRAM_SUBSCRIPTION_DELETED_CODE = "telegram.subscription.deleted.code";
 
@@ -83,6 +87,8 @@ public class MessageResolverCodes {
     public static final String TELEGRAM_PROFILE_CODE = "telegram.profile.code";
     public static final String TELEGRAM_PROFILE_BIOMETRIC_DISPLAY_CODE = "telegram.profile.biometric.display.code";
     public static final String TELEGRAM_PROFILE_UPDATE_CODE = "telegram.profile.update.code";
+    public static final String TELEGRAM_PROFILE_SETTINGS_CODE = "telegram.profile.settings.code";
+    public static final String TELEGRAM_PROFILE_SETTINGS_UPDATE_CODE = "telegram.profile.settings.update.code";
     public static final String TELEGRAM_STATISTIC_CODE = "telegram.statistic.code";
     public static final String TELEGRAM_STATISTIC_HISTORY_CODE = "telegram.statistic.history.code";
     public static final String TELEGRAM_STATISTIC_INDICATORS_CODE = "telegram.statistic.indicators.code";
@@ -91,6 +97,7 @@ public class MessageResolverCodes {
     public static final String TELEGRAM_INPUT_SUBSCRIPTION_TYPE_FOR_DELETE_CODE = "telegram.choose.subscription.type.for.delete.code";
     public static final String TELEGRAM_INPUT_SUBSCRIPTION_TYPE_FOR_ADD_CODE = "telegram.choose.subscription.type.for.add.code";
     public static final String TELEGRAM_PROFILE_BIOMETRIC_INPUT_NEW_DATA_CODE = "telegram.profile.biometric.input.new.data.code";
+    public static final String TELEGRAM_PROFILE_SETTINGS_INPUT_NEW_DATA_CODE = "telegram.profile.settings.input.new.data.code";
     public static final String TELEGRAM_PRODUCT_INPUT_FILTER_CODE = "telegram.product.input.filter.code";
     public static final String TELEGRAM_DIET_RECORD_DELETE_CODE = "telegram.diet.record.delete.code";
     public static final String TELEGRAM_DIET_RECORD_ADD_CODE = "telegram.diet.record.add.code";

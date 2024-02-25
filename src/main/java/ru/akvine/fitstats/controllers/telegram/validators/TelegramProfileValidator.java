@@ -5,14 +5,19 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.telegram.dto.profile.TelegramProfileUpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.profile.TelegramProfileUpdateSettingsRequest;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
+import ru.akvine.fitstats.validators.LanguageValidator;
 import ru.akvine.fitstats.validators.PhysicalActivitiesValidator;
+import ru.akvine.fitstats.validators.telegram.PrintMacronutrientsModeValidator;
 
 @Component
 @RequiredArgsConstructor
 public class TelegramProfileValidator {
     private final PhysicalActivitiesValidator physicalActivitiesValidator;
+    private final LanguageValidator languageValidator;
+    private final PrintMacronutrientsModeValidator printMacronutrientsModeValidator;
 
     public void verifyTelegramProfileUpdateBiometricRequest(TelegramProfileUpdateBiometricRequest request) {
         Preconditions.checkNotNull(request, "telegramProfileUpdateBiometricRequest is null");
@@ -44,5 +49,28 @@ public class TelegramProfileValidator {
         if (StringUtils.isNotBlank(request.getPhysicalActivity())) {
             physicalActivitiesValidator.validate(request.getPhysicalActivity());
         }
+    }
+
+    public void verifyTelegramProfileUpdateSettingsRequest(TelegramProfileUpdateSettingsRequest request) {
+        Preconditions.checkNotNull(request, "telegramProfileUpdateSettingsRequest is null");
+
+        int roundAccuracy;
+
+        try {
+            roundAccuracy = Integer.parseInt(request.getRoundAccuracy());
+        } catch (NumberFormatException exception) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Profile.PROFILE_SETTINGS_ROUND_ACCURACY_INVALID_ERROR,
+                    "Round accuracy must be value!");
+        }
+
+        if (roundAccuracy < 0 || roundAccuracy > 10) {
+            throw new ValidationException(
+                    CommonErrorCodes.Validation.Profile.PROFILE_SETTINGS_ROUND_ACCURACY_INVALID_ERROR,
+                    "Round accuracy can't be less than 0 or more than 10!");
+        }
+
+        languageValidator.validate(request.getLanguage());
+        printMacronutrientsModeValidator.validate(request.getPrintMode());
     }
 }

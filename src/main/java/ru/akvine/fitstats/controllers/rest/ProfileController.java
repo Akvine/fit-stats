@@ -98,7 +98,7 @@ public class ProfileController implements ProfileControllerMeta,
 
     @Override
     public Response listSettings() {
-        ClientSettingsBean clientSettingsBean = profileService.listSettings(SecurityUtils.getCurrentUser().getName());
+        ClientSettingsBean clientSettingsBean = profileService.listSettingsByEmail(SecurityUtils.getCurrentUser().getName());
         return profileConverter.convertToSettingsResponse(clientSettingsBean);
     }
 

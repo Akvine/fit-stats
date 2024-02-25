@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class TelegramBaseRequest {
     protected String clientUuid;
+    protected String clientEmail;
     protected String chatId;
     protected Long telegramId;
 }

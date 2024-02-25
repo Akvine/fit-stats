@@ -13,9 +13,10 @@ public class AddDietNotificationRequest extends TelegramBaseRequest {
 
     public AddDietNotificationRequest(String clientUuid,
                                       String chatId,
+                                      String email,
                                       Long telegramId,
                                       String type) {
-        super(clientUuid, chatId, telegramId);
+        super(clientUuid, email, chatId, telegramId);
         this.type = type;
     }
 }

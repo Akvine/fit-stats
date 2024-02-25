@@ -3,6 +3,7 @@ package ru.akvine.fitstats.controllers.telegram.parser;
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.controllers.telegram.dto.profile.TelegramProfileUpdateBiometricRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.profile.TelegramProfileUpdateSettingsRequest;
 import ru.akvine.fitstats.exceptions.telegram.parse.TelegramAgeParseException;
 
 @Component
@@ -35,6 +36,20 @@ public class TelegramProfileParser {
                 .setPhysicalActivity(physicalActivity)
                 .setUpdateDietSetting(updateDietSetting)
                 .setClientUuid(clientUuid)
+                .setChatId(chatId);
+    }
+
+    public TelegramProfileUpdateSettingsRequest parseToTelegramProfileUpdateSettingsRequest(String chatId, String clientEmail, String text) {
+        Preconditions.checkNotNull(text, "text is null");
+        Preconditions.checkNotNull(clientEmail, "clientEmail is null");
+
+        String[] parts = text.split(COMMA);
+
+        return (TelegramProfileUpdateSettingsRequest) new TelegramProfileUpdateSettingsRequest()
+                .setRoundAccuracy(parts[0].trim())
+                .setLanguage(parts[1].trim())
+                .setPrintMode(parts[2].trim())
+                .setClientEmail(clientEmail)
                 .setChatId(chatId);
     }
 }

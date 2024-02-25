@@ -80,6 +80,13 @@ public class BaseMessagesFactory {
         );
     }
 
+    public SendMessage getProfileSettingsUpdateInputWaiting(String chatId, Language language) {
+        return new SendMessage(
+                chatId,
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_SETTINGS_INPUT_NEW_DATA_CODE, language)
+        );
+    }
+
     public SendMessage getNotificationSubscriptionDietAdd(String chatId, Language language) {
         return new SendMessage(
                 chatId,
@@ -158,11 +165,5 @@ public class BaseMessagesFactory {
                 chatId,
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_INVALID_AUTH_CODE, language)
         );
-    }
-
-    public SendMessage getStartMessage(String chatId, Language language) {
-        return new SendMessage(
-                chatId,
-                messageResolveService.message(MessageResolverCodes.TELEGRAM_WELCOME_MESSAGE_CODE, language));
     }
 }

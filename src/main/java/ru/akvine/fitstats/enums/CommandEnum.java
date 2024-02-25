@@ -29,6 +29,8 @@ public enum CommandEnum {
     COMMAND_PROFILE("/profile"),
     COMMAND_PROFILE_DISPLAY("/profile/display"),
     COMMAND_PROFILE_UPDATE("/profile/update"),
+    COMMAND_PROFILE_SETTINGS("/profile/settings"),
+    COMMAND_PROFILE_SETTINGS_UPDATE("/profile/settings/update"),
 
     COMMAND_STATISTIC("/statistic"),
     COMMAND_STATISTIC_HISTORY("/statistic/history"),

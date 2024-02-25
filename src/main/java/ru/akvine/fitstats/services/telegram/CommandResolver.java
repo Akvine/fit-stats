@@ -96,7 +96,6 @@ public class CommandResolver {
     public boolean isProfileButton(String command, Language language) {
         return CommandEnum.COMMAND_PROFILE.getCommandName().equals(command) ||
                 command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_CODE, language));
-
     }
 
     public boolean isProfileBiometricDisplayCommand(String command, Language language) {
@@ -107,6 +106,16 @@ public class CommandResolver {
     public boolean isProfileBiometricUpdateCommand(String command, Language language) {
         return CommandEnum.COMMAND_PROFILE_UPDATE.getCommandName().equals(command) ||
                 command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_UPDATE_CODE, language));
+    }
+
+    public boolean isProfileSettingsCommand(String command, Language language) {
+        return CommandEnum.COMMAND_PROFILE_SETTINGS.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_SETTINGS_CODE, language));
+    }
+
+    public boolean isProfileSettingsUpdateCommand(String command, Language language) {
+        return CommandEnum.COMMAND_PROFILE_SETTINGS_UPDATE.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_SETTINGS_UPDATE_CODE, language));
     }
 
     public boolean isStatisticButton(String command, Language language) {

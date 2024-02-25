@@ -119,7 +119,14 @@ public class ProfileService {
         return new BiometricBean(biometricService.verifyExistsAndGet(clientUuid));
     }
 
-    public ClientSettingsBean listSettings(String email) {
+    public ClientSettingsBean listSettingsByUuid(String uuid) {
+        String email = clientService
+                .verifyExistsByUuidAndGet(uuid)
+                .getEmail();
+        return listSettingsByEmail(email);
+    }
+
+    public ClientSettingsBean listSettingsByEmail(String email) {
         return clientSettingsService.findBeanByClientEmail(email);
     }
 

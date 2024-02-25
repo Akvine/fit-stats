@@ -9,8 +9,8 @@ import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
 public class DeleteDietNotificationRequest extends TelegramBaseRequest {
     private String type;
 
-    public DeleteDietNotificationRequest(String clientUuid, String chatId, Long telegramId, String type) {
-        super(clientUuid, chatId, telegramId);
+    public DeleteDietNotificationRequest(String clientUuid, String email, String chatId, Long telegramId, String type) {
+        super(clientUuid, email, chatId, telegramId);
         this.type = type;
     }
 }

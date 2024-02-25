@@ -71,6 +71,8 @@ public class KeyboardFactory {
         KeyboardRow row = new KeyboardRow();
         row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_BIOMETRIC_DISPLAY_CODE, language)));
         row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_UPDATE_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_SETTINGS_CODE, language)));
+        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PROFILE_SETTINGS_UPDATE_CODE, language)));
         row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
         return getKeyboard(List.of(row));
