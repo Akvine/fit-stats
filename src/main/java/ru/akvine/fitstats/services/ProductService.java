@@ -7,10 +7,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.akvine.fitstats.services.dto.product.GetByBarCode;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.repositories.ProductRepository;
 import ru.akvine.fitstats.repositories.specifications.ProductSpecification;
+import ru.akvine.fitstats.services.dto.barcode.BarCodeBean;
+import ru.akvine.fitstats.services.dto.barcode.GetBarCode;
 import ru.akvine.fitstats.services.dto.product.Filter;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final BarCodeService barCodeService;
     private final MacronutrientsCalculationService macronutrientsCalculationService;
     private final ProductUuidGeneratorService productUuidGeneratorService;
 
@@ -54,6 +58,21 @@ public class ProductService {
         ProductBean savedProductBean = new ProductBean(productRepository.save(productEntity));
         logger.info("Successful save product bean = [{}]", savedProductBean);
         return savedProductBean;
+    }
+
+    public ProductBean getByBarCodeNumber(GetByBarCode getByBarCode) {
+        Preconditions.checkNotNull(getByBarCode, "getByBarCode is null");
+
+        String clientUuid = getByBarCode.getClientUuid();
+        String barCodeNumber = getByBarCode.getNumber();
+        logger.info("Get product with barcode number = {} by client with uuid = {}", barCodeNumber, clientUuid);
+
+        GetBarCode getBarCode = new GetBarCode()
+                .setClientUuid(clientUuid)
+                .setNumber(barCodeNumber);
+        BarCodeBean barCodeBean = barCodeService.get(getBarCode);
+
+        return barCodeBean.getProductBean();
     }
 
     public ProductBean update(UpdateProduct updateProduct) {

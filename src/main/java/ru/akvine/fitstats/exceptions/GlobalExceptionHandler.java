@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.akvine.fitstats.controllers.rest.dto.common.ErrorResponse;
+import ru.akvine.fitstats.exceptions.barcode.BarCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordNotFoundException;
@@ -255,6 +256,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
         logger.info("Illegal argument exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(Validation.FIELD_INVALID_ERROR, "Field is not presented!");
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({BarCodeNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleBarCodeNotFoundException(BarCodeNotFoundException exception) {
+        logger.info("Barcode not found exception=", exception);
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                BarCode.BAR_CODE_NOT_FOUND_ERROR,
+                exception.getMessage()
+        );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 }

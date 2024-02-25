@@ -6,9 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.controllers.rest.converter.parser.macronutrient.MacronutrientParser;
+import ru.akvine.fitstats.controllers.rest.converter.scanner.barcode.BarCodeScanResult;
 import ru.akvine.fitstats.controllers.rest.dto.product.*;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.services.dto.product.Filter;
+import ru.akvine.fitstats.services.dto.product.GetByBarCode;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
@@ -64,6 +66,20 @@ public class ProductConverter {
         Preconditions.checkNotNull(products, "products is null");
         return new ProductListResponse()
                 .setProducts(products.stream().map(this::buildProductDto).collect(Collectors.toList()));
+    }
+
+    public GetByBarCode convertToGetByBarCode(GetByBarcodeNumberRequest request) {
+        Preconditions.checkNotNull(request, "getByBarcodeNumberRequest is null");
+        return new GetByBarCode()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setNumber(request.getNumber());
+    }
+
+    public GetByBarCode convertToGetByBarCode(BarCodeScanResult result) {
+        Preconditions.checkNotNull(result, "barCodeScanResult is null");
+        return new GetByBarCode()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setNumber(result.getNumber());
     }
 
     public Filter convertToFilter(ListProductRequest request) {

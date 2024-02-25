@@ -11,6 +11,10 @@ public class CommonErrorCodes {
         String CLIENT_NOT_FOUND_ERROR = "client.notFound.error";
     }
 
+    public interface BarCode {
+        String BAR_CODE_NOT_FOUND_ERROR = "barcode.not.found.error";
+    }
+
     public interface Telegram {
         String TELEGRAM_AUTH_CODE_NOT_FOUND_ERROR = "telegram.authcode.notFound.error";
     }
@@ -53,6 +57,11 @@ public class CommonErrorCodes {
 
         String FILE_TYPE_BLANK_ERROR ="file.type.blank.error";
         String FILE_TYPE_INVALID_ERROR = "file.type.isNot.supported.error";
+
+        interface BarCode {
+            String BAR_CODE_TYPE_BLANK_ERROR = "barcode.type.blank.error";
+            String BAR_CODE_TYPE_INVALID_ERROR = "barcode.type.invalid.error";
+        }
 
         interface Telegram {
             String TEXT_MESSAGE_LENGTH_ERROR = "text.message.length.error";
