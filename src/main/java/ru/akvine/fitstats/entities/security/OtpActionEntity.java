@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.entities.security;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 import ru.akvine.fitstats.exceptions.security.NoMoreNewOtpAvailableException;
@@ -13,7 +14,8 @@ import java.time.LocalDateTime;
 
 import static java.time.LocalDateTime.now;
 
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @Embeddable
 public class OtpActionEntity {

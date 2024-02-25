@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.entities;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.base.BaseEntity;
 import ru.akvine.fitstats.enums.Gender;
@@ -10,7 +11,8 @@ import ru.akvine.fitstats.enums.WeightMeasurement;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @Entity
 @Table(name = "BIOMETRIC_ENTITY")

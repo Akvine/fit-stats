@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.entities.security;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.enums.ActionState;
 
@@ -8,7 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "ACCESS_RESTORE_ACTION_ENTITY")
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 public class AccessRestoreActionEntity implements OneTimePasswordable {
     @Id

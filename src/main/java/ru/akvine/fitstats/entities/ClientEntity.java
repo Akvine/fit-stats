@@ -1,13 +1,15 @@
 package ru.akvine.fitstats.entities;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.base.SoftBaseEntity;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @Entity
 @Table(name = "CLIENT_ENTITY")

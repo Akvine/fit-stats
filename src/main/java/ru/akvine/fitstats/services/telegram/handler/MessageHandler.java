@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.akvine.fitstats.constants.MessageResolverCodes;
 import ru.akvine.fitstats.context.ClientSettingsContext;
@@ -34,6 +35,7 @@ import ru.akvine.fitstats.services.telegram.TelegramAuthService;
 import ru.akvine.fitstats.services.telegram.TelegramExceptionHandler;
 import ru.akvine.fitstats.services.telegram.factory.BaseMessagesFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

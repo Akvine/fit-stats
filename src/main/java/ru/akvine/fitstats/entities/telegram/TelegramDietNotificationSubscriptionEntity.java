@@ -1,7 +1,8 @@
 package ru.akvine.fitstats.entities.telegram;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.enums.telegram.DietNotificationSubscriptionType;
@@ -12,7 +13,8 @@ import javax.persistence.*;
 @Table(name = "TELEGRAM_DIET_NOTIFICATION_SUBSCRIPTION_ENTITY")
 @SuperBuilder
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class TelegramDietNotificationSubscriptionEntity extends TelegramNotificationSubscriptionEntity {
     @Id
     @Column(name = "ID", nullable = false)

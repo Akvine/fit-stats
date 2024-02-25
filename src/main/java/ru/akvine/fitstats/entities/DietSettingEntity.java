@@ -1,13 +1,15 @@
 package ru.akvine.fitstats.entities;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.base.SoftBaseEntity;
 import ru.akvine.fitstats.enums.Diet;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @Entity
 @Table(name = "DIET_SETTING_ENTITY")

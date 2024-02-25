@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.entities;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.base.BaseEntity;
 
@@ -9,7 +10,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "WEIGHT_RECORD_ENTITY")
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 public class WeightRecordEntity extends BaseEntity  {
     @Id

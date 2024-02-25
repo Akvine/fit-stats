@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.entities.profile;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.security.AccountPasswordable;
 import ru.akvine.fitstats.entities.security.OneTimePasswordable;
@@ -11,7 +12,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "PROFILE_CHANGE_EMAIL_ACTION_ENTITY")
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 public class ProfileChangeEmailActionEntity implements OneTimePasswordable, AccountPasswordable {
     @Id

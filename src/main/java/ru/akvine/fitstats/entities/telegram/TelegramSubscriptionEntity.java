@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.entities.telegram;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.ClientEntity;
 import ru.akvine.fitstats.entities.base.SoftBaseEntity;
@@ -9,7 +10,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "TELEGRAM_SUBSCRIPTION_ENTITY")
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 public class TelegramSubscriptionEntity extends SoftBaseEntity {
     @Id

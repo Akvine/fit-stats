@@ -1,7 +1,8 @@
 package ru.akvine.fitstats.entities.telegram;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import ru.akvine.fitstats.entities.ClientEntity;
@@ -11,7 +12,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TELEGRAM_AUTH_CODE_ENTITY")
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @ToString(exclude = {"client", "code", "expiredAt"})
 @EqualsAndHashCode(exclude = {"client"})
