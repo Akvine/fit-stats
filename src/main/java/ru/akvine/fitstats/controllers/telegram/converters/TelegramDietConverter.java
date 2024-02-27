@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.constants.MessageResolverCodes;
 import ru.akvine.fitstats.context.ClientSettingsContext;
+import ru.akvine.fitstats.controllers.rest.converter.scanner.barcode.BarCodeScanResult;
 import ru.akvine.fitstats.controllers.telegram.dto.common.TelegramBaseRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordByBarCodeRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietAddRecordRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDeleteRecordRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.diet.TelegramDietDisplayRequest;
@@ -75,6 +77,17 @@ public class TelegramDietConverter {
                 .setClientUuid(telegramDietAddRecordRequest.getClientUuid())
                 .setVolume(volume)
                 .setDate(LocalDate.now());
+    }
+
+    public AddDietRecordStart convertToAddDietRecordStart(TelegramDietAddRecordByBarCodeRequest request, BarCodeScanResult result) {
+        Preconditions.checkNotNull(request, "telegramDietAddRecordByBarCodeRequest is null");
+        Preconditions.checkNotNull(result, "barCodeScanResult is null");
+
+        return new AddDietRecordStart()
+                .setDate(LocalDate.now())
+                .setClientUuid(request.getClientUuid())
+                .setVolume(request.getVolume())
+                .setBarCodeNumber(result.getNumber());
     }
 
     public SendMessage convertToAddDietRecordFinishResponse(String chatId,

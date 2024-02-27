@@ -6,10 +6,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.constants.MessageResolverCodes;
 import ru.akvine.fitstats.context.ClientSettingsContext;
 import ru.akvine.fitstats.enums.Language;
+import ru.akvine.fitstats.exceptions.barcode.BarCodeScanException;
 import ru.akvine.fitstats.exceptions.diet.DietRecordsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.diet.ProductsNotUniqueResultException;
 import ru.akvine.fitstats.exceptions.product.ProductNotFoundException;
 import ru.akvine.fitstats.exceptions.security.BlockedCredentialsException;
+import ru.akvine.fitstats.exceptions.telegram.TelegramLoadPhotoException;
 import ru.akvine.fitstats.exceptions.telegram.parse.*;
 import ru.akvine.fitstats.services.MessageResolveService;
 
@@ -35,6 +37,8 @@ public class TelegramExceptionHandler {
           return handleDietRecordsNotUniqueException(chatId);
         } else if (exception instanceof BlockedCredentialsException) {
             return handleBlockedCredentialsException(chatId);
+        } else if (exception instanceof BarCodeScanException) {
+            return handleBarCodeScanException(chatId);
         } else {
             return handleException(chatId);
         }
@@ -78,8 +82,14 @@ public class TelegramExceptionHandler {
         Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_UUID_NOT_UNIQUE_ERROR_CODE, language));
     }
+
     private SendMessage handleBlockedCredentialsException(String chatId) {
         Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
         return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_BLOCKED_CREDENTIALS_ERROR_CODE, language));
+    }
+
+    private SendMessage handleBarCodeScanException(String chatId) {
+        Language language = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getLanguage();
+        return new SendMessage(chatId, messageResolveService.message(MessageResolverCodes.TELEGRAM_BARCODE_SCAN_ERROR_CODE, language));
     }
 }

@@ -48,23 +48,27 @@ public class KeyboardFactory {
     }
 
     public ReplyKeyboardMarkup getProductsKeyboard(Language language) {
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_ADD_CODE, language)));
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_LIST_CODE, language)));
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
+        KeyboardRow firstRow = new KeyboardRow();
+        KeyboardRow secondRow = new KeyboardRow();
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_ADD_CODE, language)));
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_LIST_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_GET_BY_BARCODE_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
-        return getKeyboard(List.of(row));
+        return getKeyboard(List.of(firstRow, secondRow));
     }
 
     public ReplyKeyboardMarkup getDietKeyboard(Language language) {
-        KeyboardRow row = new KeyboardRow();
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_ADD_CODE, language)));
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_LIST_CODE, language)));
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_DELETE_CODE, language)));
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_STATISTIC_DISPLAY_CODE, language)));
-        row.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
+        KeyboardRow firstRow = new KeyboardRow();
+        KeyboardRow secondRow = new KeyboardRow();
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_ADD_CODE, language)));
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_LIST_CODE, language)));
+        firstRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_DELETE_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_STATISTIC_DISPLAY_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_ADD_BY_BARCODE_CODE, language)));
+        secondRow.add(new KeyboardButton(messageResolveService.message(MessageResolverCodes.TELEGRAM_BACK_CODE, language)));
 
-        return getKeyboard(List.of(row));
+        return getKeyboard(List.of(firstRow, secondRow));
     }
 
     public ReplyKeyboardMarkup getProfileKeyboard(Language language) {

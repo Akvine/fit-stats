@@ -19,9 +19,11 @@ public enum CommandEnum {
     COMMAND_PRODUCTS("/products"),
     COMMAND_PRODUCTS_ADD("/products/add"),
     COMMAND_PRODUCTS_LIST("/products/list"),
+    COMMAND_PRODUCTS_GET_BY_BARCODE("/products/get/barcode"),
 
     COMMAND_DIET("/diet"),
     COMMAND_DIET_RECORD_ADD("/diet/record/add"),
+    COMMAND_DIET_RECORD_ADD_BY_BARCODE("/diet/record/add/barcode"),
     COMMAND_DIET_RECORD_LIST("/diet/record/list"),
     COMMAND_DIET_RECORD_DELETE("/diet/record/delete"),
     COMMAND_DIET_STATISTIC_DISPLAY("/diet/display"),

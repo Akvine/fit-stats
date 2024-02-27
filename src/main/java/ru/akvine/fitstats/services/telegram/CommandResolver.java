@@ -68,6 +68,11 @@ public class CommandResolver {
                 command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_LIST_CODE, language));
     }
 
+    public boolean isProductGetByBarCodeCommand(String command, Language language) {
+        return CommandEnum.COMMAND_PRODUCTS_GET_BY_BARCODE.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_GET_BY_BARCODE_CODE, language));
+    }
+
     public boolean isDietButton(String command, Language language) {
         return CommandEnum.COMMAND_DIET.getCommandName().equals(command) ||
                 command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_CODE, language));
@@ -91,6 +96,11 @@ public class CommandResolver {
     public boolean isDietStatisticDisplayCommand(String command, Language language) {
         return CommandEnum.COMMAND_DIET_STATISTIC_DISPLAY.getCommandName().equals(command) ||
                 command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_STATISTIC_DISPLAY_CODE, language));
+    }
+
+    public boolean isDietAddByBarCodeCommand(String command, Language language) {
+        return CommandEnum.COMMAND_DIET_RECORD_ADD_BY_BARCODE.getCommandName().equals(command) ||
+                command.equals(messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_ADD_BY_BARCODE_CODE, language));
     }
 
     public boolean isProfileButton(String command, Language language) {

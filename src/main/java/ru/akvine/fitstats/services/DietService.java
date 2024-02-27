@@ -21,6 +21,7 @@ import ru.akvine.fitstats.services.dto.DateRange;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 import ru.akvine.fitstats.services.dto.diet.*;
+import ru.akvine.fitstats.services.dto.product.GetByBarCode;
 import ru.akvine.fitstats.services.dto.profile.DietRecordExport;
 import ru.akvine.fitstats.services.listeners.AddDietRecordEvent;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
@@ -111,6 +112,16 @@ public class DietService {
                 .setVol(dietRecordBean.getVol())
                 .setVolume(dietRecordBean.getVolume())
                 .setVolumeMeasurement(dietRecordBean.getProductBean().getMeasurement());
+    }
+
+    public AddDietRecordFinish addByBarCode(AddDietRecordStart addDietRecordStart) {
+        Preconditions.checkNotNull(addDietRecordStart, "addDietRecordStart is null");
+        GetByBarCode getByBarCode = new GetByBarCode()
+                .setClientUuid(addDietRecordStart.getClientUuid())
+                .setNumber(addDietRecordStart.getBarCodeNumber());
+        String productUuid = productService.getByBarCodeNumber(getByBarCode).getUuid();
+        addDietRecordStart.setProductUuid(productUuid);
+        return add(addDietRecordStart);
     }
 
     public DietRecordBean add(DietRecordBean dietRecordBean) {

@@ -39,6 +39,13 @@ public class BaseMessagesFactory {
         );
     }
 
+    public SendMessage geProductBarCodeSendWaiting(String chatId, Language language) {
+        return new SendMessage(
+                chatId,
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_PRODUCT_BARCODE_SEND_CODE, language)
+        );
+    }
+
     public SendMessage getDietKeyboard(String chatId, Language language) {
         SendMessage sendMessage = new SendMessage(
                 chatId,
@@ -53,6 +60,13 @@ public class BaseMessagesFactory {
         return new SendMessage(
                 chatId,
                 messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_RECORD_ADD_CODE, language)
+        );
+    }
+
+    public SendMessage getDietRecordAddByBarCodeInput(String chatId, Language language) {
+        return new SendMessage(
+                chatId,
+                messageResolveService.message(MessageResolverCodes.TELEGRAM_DIET_ADD_BARCODE_SEND_CODE, language)
         );
     }
 

@@ -16,4 +16,6 @@ public class AddDietRecordStart {
     private LocalDate date;
     @Nullable
     private LocalTime time;
+    @Nullable
+    private String barCodeNumber;
 }

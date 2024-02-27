@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.enums.BarCodeType;
 import ru.akvine.fitstats.exceptions.barcode.BarCodeScanException;
-import ru.akvine.fitstats.services.dto.barcode.BarCodeBean;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 @Component
@@ -24,6 +24,10 @@ public class BarCodeScanner {
         } catch (Exception exception) {
             throw new BarCodeScanException("Bar code scan error, can't get input stream from photo = " + exception.getMessage());
         }
+    }
+
+    public BarCodeScanResult scan(byte[] file) {
+        return scan(new ByteArrayInputStream(file));
     }
 
     public BarCodeScanResult scan(InputStream file) {

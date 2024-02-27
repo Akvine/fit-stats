@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.akvine.fitstats.entities.BarCodeEntity;
 import ru.akvine.fitstats.entities.ProductEntity;
 import ru.akvine.fitstats.exceptions.barcode.BarCodeNotFoundException;
@@ -59,6 +60,7 @@ public class BarCodeService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public BarCodeBean get(GetBarCode getBarCode) {
         Preconditions.checkNotNull(getBarCode, "getBarCode is null");
 

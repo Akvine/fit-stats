@@ -79,8 +79,11 @@ public class MessageResolverCodes {
     public static final String TELEGRAM_PRODUCT_CODE = "telegram.product.code";
     public static final String TELEGRAM_PRODUCT_ADD_CODE = "telegram.product.add.code";
     public static final String TELEGRAM_PRODUCT_LIST_CODE = "telegram.product.list.code";
+    public static final String TELEGRAM_PRODUCT_GET_BY_BARCODE_CODE = "telegram.product.get.by.barcode.code";
     public static final String TELEGRAM_DIET_CODE = "telegram.diet.code";
     public static final String TELEGRAM_DIET_ADD_CODE = "telegram.diet.add.code";
+    public static final String TELEGRAM_DIET_ADD_BY_BARCODE_CODE = "telegram.diet.add.by.barcode.code";
+    public static final String TELEGRAM_DIET_ADD_BARCODE_SEND_CODE = "telegram.diet.add.barcode.send.code";
     public static final String TELEGRAM_DIET_LIST_CODE = "telegram.diet.list.code";
     public static final String TELEGRAM_DIET_DELETE_CODE = "telegram.diet.delete.code";
     public static final String TELEGRAM_DIET_STATISTIC_DISPLAY_CODE = "telegram.diet.statistic.display.code";
@@ -99,6 +102,7 @@ public class MessageResolverCodes {
     public static final String TELEGRAM_PROFILE_BIOMETRIC_INPUT_NEW_DATA_CODE = "telegram.profile.biometric.input.new.data.code";
     public static final String TELEGRAM_PROFILE_SETTINGS_INPUT_NEW_DATA_CODE = "telegram.profile.settings.input.new.data.code";
     public static final String TELEGRAM_PRODUCT_INPUT_FILTER_CODE = "telegram.product.input.filter.code";
+    public static final String TELEGRAM_PRODUCT_BARCODE_SEND_CODE = "telegram.product.barcode.send.code";
     public static final String TELEGRAM_DIET_RECORD_DELETE_CODE = "telegram.diet.record.delete.code";
     public static final String TELEGRAM_DIET_RECORD_ADD_CODE = "telegram.diet.record.add.code";
     public static final String TELEGRAM_PRODUCT_INPUT_ADD_CODE = "telegram.product.add.input.code";
@@ -112,4 +116,5 @@ public class MessageResolverCodes {
     public static final String TELEGRAM_PRODUCT_UUID_NOT_UNIQUE_ERROR_CODE = "telegram.product.uuid.notUnique.error.code";
     public static final String TELEGRAM_DIET_UUID_NOT_UNIQUE_ERROR_CODE = "telegram.diet.uuid.notUnique.error.code";
     public static final String TELEGRAM_BLOCKED_CREDENTIALS_ERROR_CODE = "telegram.blocked.credentials.error.code";
+    public static final String TELEGRAM_BARCODE_SCAN_ERROR_CODE = "telegram.barcode.scan.error.code";
 }

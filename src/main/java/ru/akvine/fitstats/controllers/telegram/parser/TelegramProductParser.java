@@ -2,8 +2,12 @@ package ru.akvine.fitstats.controllers.telegram.parser;
 
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
+import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductGetByBarCodeRequest;
 import ru.akvine.fitstats.exceptions.telegram.parse.TelegramFatsParseException;
+
+import java.io.InputStream;
 
 @Component
 public class TelegramProductParser {
@@ -52,5 +56,17 @@ public class TelegramProductParser {
                 .setCarbohydrates(carbohydrates)
                 .setVol(vol)
                 .setVolumeMeasurement(volumeMeasurement);
+    }
+
+    public TelegramProductGetByBarCodeRequest parseToTelegramProductGetByBarCodeRequest(
+            String chatId,
+            String clientUuid,
+            byte[] photo) {
+        Preconditions.checkNotNull(clientUuid, "clientUuid null");
+        Preconditions.checkNotNull(photo, "photo is null");
+        return (TelegramProductGetByBarCodeRequest) new TelegramProductGetByBarCodeRequest()
+                .setPhoto(photo)
+                .setChatId(chatId)
+                .setClientUuid(clientUuid);
     }
 }

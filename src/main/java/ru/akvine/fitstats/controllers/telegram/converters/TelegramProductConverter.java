@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.akvine.fitstats.constants.MessageResolverCodes;
 import ru.akvine.fitstats.context.ClientSettingsContext;
+import ru.akvine.fitstats.controllers.rest.converter.scanner.barcode.BarCodeScanResult;
 import ru.akvine.fitstats.controllers.telegram.dto.product.TelegramProductAddRequest;
 import ru.akvine.fitstats.enums.Language;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
@@ -13,6 +14,7 @@ import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.services.MessageResolveService;
 import ru.akvine.fitstats.services.dto.client.ClientSettingsBean;
+import ru.akvine.fitstats.services.dto.product.GetByBarCode;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.utils.MathUtils;
 
@@ -64,6 +66,13 @@ public class TelegramProductConverter {
                 .setVol(request.getVol())
                 .setMeasurement(VolumeMeasurement.safeValueOf(request.getVolumeMeasurement()))
                 .setClientUuid(request.getClientUuid());
+    }
+
+    public GetByBarCode convertToGetByBarCode(String clientUuid, BarCodeScanResult request) {
+        Preconditions.checkNotNull(request, "barCodeScanResult is null");
+        return new GetByBarCode()
+                .setClientUuid(clientUuid)
+                .setNumber(request.getNumber());
     }
 
     public SendMessage convertToProductAddResponse(String chatId,
@@ -129,6 +138,7 @@ public class TelegramProductConverter {
                     .append(NEXT_LINE);
             sb.append("8. ")
                     .append(messageResolveService.message(MessageResolverCodes.CALORIES_CODE, language))
+                    .append(": ")
                     .append(round(products.get(i).getCalories(), roundAccuracy))
                     .append(NEXT_LINE);
             if (i == lastElementIndex) {
@@ -178,6 +188,7 @@ public class TelegramProductConverter {
                 .append(NEXT_LINE);
         sb.append("8. ")
                 .append(messageResolveService.message(MessageResolverCodes.CALORIES_CODE, language))
+                .append(": ")
                 .append(round(productBean.getCalories(), roundAccuracy))
                 .append(NEXT_LINE);
         sb.append("======================");
