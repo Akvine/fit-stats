@@ -11,7 +11,7 @@ import ru.akvine.fitstats.services.dto.client.ClientBean;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-public class SecurityUtils {
+public final class SecurityUtils {
     public static HttpSession getSession(HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession(false);
         if (session == null) {

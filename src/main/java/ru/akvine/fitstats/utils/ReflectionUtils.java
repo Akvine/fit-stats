@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReflectionUtils {
+public final class ReflectionUtils {
     public static <T> List<String> getFieldNames(Class<T> clazz) {
         Preconditions.checkNotNull(clazz, "class is null");
         List<String> fieldNames = new ArrayList<>();

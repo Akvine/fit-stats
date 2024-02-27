@@ -2,7 +2,7 @@ package ru.akvine.fitstats.utils;
 
 import java.util.UUID;
 
-public class UUIDGenerator {
+public final class UUIDGenerator {
     private final static int START_INDEX = 0;
 
     public static String uuid() {

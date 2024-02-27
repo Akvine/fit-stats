@@ -1,6 +1,6 @@
 package ru.akvine.fitstats.utils;
 
-public class MathUtils {
+public final class MathUtils {
     public static double round(double value, int roundAccuracy) {
         return Math.round(value * Math.pow(10, roundAccuracy)) / Math.pow(10, roundAccuracy);
     }

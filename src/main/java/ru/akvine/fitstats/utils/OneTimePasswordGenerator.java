@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 
 import java.security.SecureRandom;
 
-public class OneTimePasswordGenerator {
+public final class OneTimePasswordGenerator {
     private static final SecureRandom secureRandom = new SecureRandom();
 
     public static String generate(int length) {

@@ -7,7 +7,7 @@ import ru.akvine.fitstats.enums.PhysicalActivity;
 import ru.akvine.fitstats.services.dto.Macronutrients;
 import ru.akvine.fitstats.services.dto.client.BiometricBean;
 
-public class DietUtils {
+public final class DietUtils {
     private static final double HEIGHT_COEFFICIENT = 6.25;
     private static final double WEIGHT_COEFFICIENT = 10;
     private static final double AGE_COEFFICIENT = 5;

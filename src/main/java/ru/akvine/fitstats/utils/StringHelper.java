@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringHelper {
+public final class StringHelper {
     public static List<String> splitter(String filter, List<String> delimiters) {
         String regex = "(" + String.join("|", delimiters.stream().map(Pattern::quote).toArray(String[]::new)) + ")";
         Pattern pattern = Pattern.compile(regex);
