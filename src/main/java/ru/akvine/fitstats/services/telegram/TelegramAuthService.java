@@ -30,6 +30,8 @@ public class TelegramAuthService {
     private final TelegramSubscriptionService telegramSubscriptionService;
     private final PropertyParseService propertyParseService;
 
+    private static final Long TELEGRAM_SUBSCRIPTION_TYPE = 1L;
+
     @Value("telegram.bot.authcode.length")
     private String authCodeLength;
     @Value("telegram.bot.authcode.lifetime.seconds")
@@ -83,7 +85,7 @@ public class TelegramAuthService {
 
     public void authenticateTelegramClient(String text, Long telegramId, String chatId) {
         TelegramAuthCode authCode = getByAuthCode(text);
-        telegramSubscriptionService.save(telegramId, authCode, chatId);
+        telegramSubscriptionService.save(telegramId, authCode, chatId, TELEGRAM_SUBSCRIPTION_TYPE);
         deleteById(authCode.getId());
     }
 

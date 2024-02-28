@@ -195,7 +195,7 @@ public class TelegramDietConverter {
             sb.append("7. ")
                     .append(messageResolveService.message(MessageResolverCodes.CARBOHYDRATES_CODE, language))
                     .append(": ")
-                    .append(round(records.get(i).getCalories(), roundAccuracy))
+                    .append(round(records.get(i).getCarbohydrates(), roundAccuracy))
                     .append(NEXT_LINE);
             sb.append("8. ")
                     .append(messageResolveService.message(MessageResolverCodes.MEASUREMENT_TYPE_CODE, language))

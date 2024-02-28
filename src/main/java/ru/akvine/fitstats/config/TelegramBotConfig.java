@@ -9,8 +9,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.LongPollingBot;
+import org.telegram.telegrambots.meta.generics.TelegramBot;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.akvine.fitstats.controllers.telegram.bot.DummyTelegramBot;
+import ru.akvine.fitstats.controllers.telegram.bot.TelegramLongPoolingBot;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.GetWebhookInfoResponse;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.GetWebhookRequest;
 import ru.akvine.fitstats.controllers.telegram.dto.webhook.SetWebhookRequest;
@@ -18,6 +25,9 @@ import ru.akvine.fitstats.controllers.telegram.dto.webhook.SetWebhookResponse;
 import ru.akvine.fitstats.exceptions.telegram.TelegramConfigurationException;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.controllers.telegram.bot.TelegramAppWebHookBot;
+import ru.akvine.fitstats.services.telegram.MessageProcessor;
+import ru.akvine.fitstats.services.telegram.TelegramMessageProcessor;
+import ru.akvine.fitstats.services.telegram.handler.MessageHandler;
 import ru.akvine.fitstats.services.telegram.handler.MessageHandlerFacade;
 
 import java.util.List;
@@ -67,26 +77,42 @@ public class TelegramBotConfig {
     }
 
     @Bean
-    public TelegramWebhookBot telegramBot(MessageHandlerFacade messageHandlerFacade,
-                                          DefaultBotOptions defaultBotOptions) {
-        boolean isEnabled = propertyParseService.parseBoolean(enabledPropertyName);
-        if (!isEnabled) {
-            return new DummyTelegramBot(defaultBotOptions);
-        }
-
-        String botToken = propertyParseService.get(botTokenPropertyName);
+    public TelegramLongPoolingBot telegramLongPollingBot(DefaultBotOptions defaultBotOptions, MessageHandler messageHandler) throws TelegramApiException {
         String botUsername = propertyParseService.get(botUsernamePropertyName);
-        String botPath = propertyParseService.get(botWebhookPathPropertyName);
-        String botSecret = propertyParseService.get(botSecretPropertyName);
-        TelegramAppWebHookBot bot = new TelegramAppWebHookBot(
-                defaultBotOptions,
+        String botToken = propertyParseService.get(botTokenPropertyName);
+        TelegramLongPoolingBot bot = new TelegramLongPoolingBot(defaultBotOptions,
                 botToken,
-                messageHandlerFacade);
-        bot.setBotUsername(botUsername);
-        bot.setBotPath(botPath);
-        setWebhook(botToken, botPath, botSecret);
+                botUsername,
+                messageHandler);
+        TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+        telegramBotsApi.registerBot(bot);
         return bot;
     }
+
+    @Bean
+    public MessageProcessor messageProcessor(TelegramBot telegramBot) {
+        return new TelegramMessageProcessor((TelegramLongPollingBot) telegramBot, propertyParseService);
+    }
+//    public TelegramWebhookBot telegramBot(MessageHandlerFacade messageHandlerFacade,
+//                                          DefaultBotOptions defaultBotOptions) {
+//        boolean isEnabled = propertyParseService.parseBoolean(enabledPropertyName);
+//        if (!isEnabled) {
+//            return new DummyTelegramBot(defaultBotOptions);
+//        }
+//
+//        String botToken = propertyParseService.get(botTokenPropertyName);
+//        String botUsername = propertyParseService.get(botUsernamePropertyName);
+//        String botPath = propertyParseService.get(botWebhookPathPropertyName);
+//        String botSecret = propertyParseService.get(botSecretPropertyName);
+//        TelegramAppWebHookBot bot = new TelegramAppWebHookBot(
+//                defaultBotOptions,
+//                botToken,
+//                messageHandlerFacade);
+//        bot.setBotUsername(botUsername);
+//        bot.setBotPath(botPath);
+//        setWebhook(botToken, botPath, botSecret);
+//        return bot;
+//    }
 
     private void setWebhook(String botToken,
                             String botPath,

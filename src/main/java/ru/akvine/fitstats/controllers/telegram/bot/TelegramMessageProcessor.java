@@ -11,22 +11,22 @@ import ru.akvine.fitstats.services.properties.PropertyParseService;
 
 import java.io.Serializable;
 
-@Component
-@Slf4j
-@RequiredArgsConstructor
-public class TelegramMessageProcessor {
-    @Value("telegram.bot.enabled")
-    private String enabledPropertyName;
-
-    private final PropertyParseService propertyParseService;
-    private final TelegramWebhookBot telegramWebhookBot;
-
-    public BotApiMethod<? extends Serializable> processIncomingMessage(Update update) {
-        boolean isEnabled = propertyParseService.parseBoolean(enabledPropertyName);
-        if (!isEnabled) {
-            logger.debug("Telegram bot disabled");
-            return null;
-        }
-        return telegramWebhookBot.onWebhookUpdateReceived(update);
-    }
-}
+//@Component
+//@Slf4j
+//@RequiredArgsConstructor
+//public class TelegramMessageProcessor {
+//    @Value("telegram.bot.enabled")
+//    private String enabledPropertyName;
+//
+//    private final PropertyParseService propertyParseService;
+//    private final TelegramWebhookBot telegramWebhookBot;
+//
+//    public BotApiMethod<? extends Serializable> processIncomingMessage(Update update) {
+//        boolean isEnabled = propertyParseService.parseBoolean(enabledPropertyName);
+//        if (!isEnabled) {
+//            logger.debug("Telegram bot disabled");
+//            return null;
+//        }
+//        return telegramWebhookBot.onWebhookUpdateReceived(update);
+//    }
+//}
