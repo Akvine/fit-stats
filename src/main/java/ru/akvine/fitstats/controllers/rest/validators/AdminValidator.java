@@ -6,15 +6,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import ru.akvine.fitstats.controllers.rest.dto.admin.*;
-import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
-import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.barcode.UpdateBarCodeRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.client.BlockClientRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.client.UnblockClientRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductXlsxRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.*;
 import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorCsvWrapper;
 import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorXlsxWrapper;
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
+import ru.akvine.fitstats.validators.BarCodeTypeValidator;
 import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.VolumeMeasurementValidator;
 import ru.akvine.fitstats.validators.file.FileValidator;
@@ -39,18 +43,21 @@ public class AdminValidator {
     private final AdminValidatorCsvWrapper adminValidatorCsvWrapper;
     private final AdminValidatorXlsxWrapper adminValidatorXlsxWrapper;
     private final PropertyParseService propertyParseService;
+    private final BarCodeTypeValidator barCodeTypeValidator;
 
     public AdminValidator(VolumeMeasurementValidator volumeMeasurementValidator,
                           ConverterTypeValidator converterTypeValidator,
                           List<FileValidator> fileValidators,
                           AdminValidatorCsvWrapper adminValidatorCsvWrapper,
                           AdminValidatorXlsxWrapper adminValidatorXlsxWrapper,
-                          PropertyParseService propertyParseService) {
+                          PropertyParseService propertyParseService,
+                          BarCodeTypeValidator barCodeTypeValidator) {
         this.volumeMeasurementValidator = volumeMeasurementValidator;
         this.adminValidatorCsvWrapper = adminValidatorCsvWrapper;
         this.adminValidatorXlsxWrapper = adminValidatorXlsxWrapper;
         this.converterTypeValidator = converterTypeValidator;
         this.propertyParseService = propertyParseService;
+        this.barCodeTypeValidator = barCodeTypeValidator;
         this.availableFileValidators = fileValidators
                 .stream()
                 .collect(toMap(FileValidator::getType, identity()));
@@ -174,6 +181,15 @@ public class AdminValidator {
             throw new ValidationException(
                     CommonErrorCodes.Validation.FIELD_NOT_PRESENTED_ERROR,
                     "Uuid or email not presented. Must present uuid or email");
+        }
+    }
+
+    public void verifyUpdateBarCodeRequest(UpdateBarCodeRequest request) {
+        Preconditions.checkNotNull(request, "updateBarCodeRequest is null");
+        verifySecret(request.getSecret());
+
+        if (StringUtils.isNotBlank(request.getType())) {
+            barCodeTypeValidator.validate(request.getType());
         }
     }
 

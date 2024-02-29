@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.akvine.fitstats.controllers.rest.dto.common.ErrorResponse;
+import ru.akvine.fitstats.exceptions.barcode.BarCodeAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.barcode.BarCodeNotFoundException;
 import ru.akvine.fitstats.exceptions.client.ClientAlreadyExistsException;
 import ru.akvine.fitstats.exceptions.client.ClientNotFoundException;
@@ -264,6 +265,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.info("Barcode not found exception=", exception);
         ErrorResponse errorResponse = errorResponseBuilder.build(
                 BarCode.BAR_CODE_NOT_FOUND_ERROR,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({BarCodeAlreadyExistsException.class})
+    public ResponseEntity<ErrorResponse> handleBarCodeAlreadyExistsException(BarCodeAlreadyExistsException exception) {
+        logger.info("Barcode already exists exception=", exception);
+        ErrorResponse errorResponse = errorResponseBuilder.build(
+                BarCode.BAR_CODE_ALREADY_EXISTS_ERROR,
                 exception.getMessage()
         );
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST);

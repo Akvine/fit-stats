@@ -6,7 +6,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductXlsxRow;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.exceptions.util.ExcelException;
 

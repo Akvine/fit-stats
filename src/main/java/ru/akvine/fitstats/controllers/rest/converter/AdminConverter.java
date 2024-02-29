@@ -9,11 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.context.ClientSettingsContext;
-import ru.akvine.fitstats.controllers.rest.dto.admin.*;
-import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
-import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.barcode.DeleteBarCodeRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.barcode.UpdateBarCodeRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.barcode.UpdateBarCodeResponse;
+import ru.akvine.fitstats.controllers.rest.dto.admin.client.*;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.*;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductXlsxRow;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductDto;
 import ru.akvine.fitstats.controllers.rest.dto.product.ProductResponse;
+import ru.akvine.fitstats.enums.BarCodeType;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.managers.ParsersManager;
@@ -21,10 +26,12 @@ import ru.akvine.fitstats.services.dto.admin.BlockClientEntry;
 import ru.akvine.fitstats.services.dto.admin.BlockClientFinish;
 import ru.akvine.fitstats.services.dto.admin.BlockClientStart;
 import ru.akvine.fitstats.services.dto.admin.UnblockClient;
+import ru.akvine.fitstats.services.dto.barcode.BarCodeBean;
+import ru.akvine.fitstats.services.dto.barcode.DeleteBarCode;
+import ru.akvine.fitstats.services.dto.barcode.UpdateBarCode;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.utils.DateUtils;
-import ru.akvine.fitstats.utils.MathUtils;
 import ru.akvine.fitstats.utils.SecurityUtils;
 
 import java.time.LocalDateTime;
@@ -149,6 +156,35 @@ public class AdminConverter {
         }
         return unblockClient;
     }
+
+    public UpdateBarCode convertToUpdateBarCode(UpdateBarCodeRequest request) {
+        Preconditions.checkNotNull(request, "updateBarCodeRequest is null");
+
+        return new UpdateBarCode()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setProductUuid(request.getProductUuid())
+                .setNumber(request.getNumber())
+                .setNewNumber(StringUtils.isNotBlank(request.getNewNumber()) ? request.getNewNumber() : null)
+                .setType(StringUtils.isNotBlank(request.getType()) ? BarCodeType.valueOf(request.getType()) : null);
+    }
+
+    public UpdateBarCodeResponse convertToUpdateBarCodeResponse(BarCodeBean barCodeBean) {
+        Preconditions.checkNotNull(barCodeBean, "barCodeBean is null");
+
+        return new UpdateBarCodeResponse()
+                .setNumber(barCodeBean.getNumber())
+                .setProductUuid(barCodeBean.getProductBean().getUuid())
+                .setType(barCodeBean.getBarCodeType().name());
+    }
+
+    public DeleteBarCode convertToDeleteBarCode(DeleteBarCodeRequest request) {
+        Preconditions.checkNotNull(request, "deleteBarCodeRequest is null");
+        return new DeleteBarCode()
+                .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
+                .setProductUuid(request.getProductUuid())
+                .setNumber(request.getNumber());
+    }
+
 
     private ProductDto buildProductDto(ProductBean productBean) {
         int roundAccuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();

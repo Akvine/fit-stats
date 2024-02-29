@@ -5,15 +5,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ru.akvine.fitstats.controllers.rest.dto.admin.ImportProducts;
-import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductCsvRow;
-import ru.akvine.fitstats.controllers.rest.dto.admin.file.ProductXlsxRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.ImportProducts;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductCsvRow;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductXlsxRow;
 import ru.akvine.fitstats.entities.security.BlockedCredentialsEntity;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.enums.VolumeMeasurement;
 import ru.akvine.fitstats.managers.ConvertersManager;
 import ru.akvine.fitstats.services.client.ClientService;
 import ru.akvine.fitstats.services.dto.admin.*;
+import ru.akvine.fitstats.services.dto.barcode.BarCodeBean;
+import ru.akvine.fitstats.services.dto.barcode.DeleteBarCode;
+import ru.akvine.fitstats.services.dto.barcode.UpdateBarCode;
 import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.product.UpdateProduct;
 import ru.akvine.fitstats.services.security.BlockingService;
@@ -30,6 +33,7 @@ import static ru.akvine.fitstats.constants.MacronutrientsConstants.DEFAULT_VOLUM
 @RequiredArgsConstructor
 public class AdminService {
     private final ProductService productService;
+    private final BarCodeService barCodeService;
     private final BlockingService blockingService;
     private final ClientService clientService;
     private final ConvertersManager convertersManager;
@@ -83,6 +87,14 @@ public class AdminService {
                 productService.add(productBean);
             }
         });
+    }
+
+    public BarCodeBean updateBarCode(UpdateBarCode updateBarCode) {
+        return barCodeService.update(updateBarCode);
+    }
+
+    public void deleteBarCode(DeleteBarCode deleteBarCode) {
+        barCodeService.delete(deleteBarCode);
     }
 
     public ProductBean updateProduct(UpdateProduct updateProduct) {

@@ -3,9 +3,9 @@ package ru.akvine.fitstats.api.rest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.akvine.fitstats.api.config.RestMethods;
-import ru.akvine.fitstats.controllers.rest.dto.admin.DeleteProductRequest;
-import ru.akvine.fitstats.controllers.rest.dto.admin.ExportProductsRequest;
-import ru.akvine.fitstats.controllers.rest.dto.admin.UpdateProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.DeleteProductRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.ExportProductsRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.UpdateProductRequest;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 

@@ -1,7 +1,8 @@
-package ru.akvine.fitstats.controllers.rest.dto.admin;
+package ru.akvine.fitstats.controllers.rest.dto.admin.client;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import ru.akvine.fitstats.controllers.rest.dto.admin.client.BlockClientDto;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
 
 import java.util.ArrayList;

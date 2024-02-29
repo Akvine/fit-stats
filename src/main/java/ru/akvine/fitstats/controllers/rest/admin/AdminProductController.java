@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.controllers.rest;
+package ru.akvine.fitstats.controllers.rest.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.converter.AdminConverter;
-import ru.akvine.fitstats.controllers.rest.dto.admin.*;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.*;
 import ru.akvine.fitstats.controllers.rest.dto.common.Response;
 import ru.akvine.fitstats.controllers.rest.dto.common.SuccessfulResponse;
-import ru.akvine.fitstats.controllers.rest.meta.AdminProductControllerMeta;
+import ru.akvine.fitstats.controllers.rest.admin.meta.AdminProductControllerMeta;
 import ru.akvine.fitstats.controllers.rest.validators.AdminValidator;
 import ru.akvine.fitstats.enums.ConverterType;
 import ru.akvine.fitstats.services.AdminService;

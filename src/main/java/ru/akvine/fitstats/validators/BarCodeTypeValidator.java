@@ -19,7 +19,7 @@ public class BarCodeTypeValidator implements Validator<String> {
             BarCodeType.valueOf(type.toUpperCase());
         } catch (Exception exception) {
             throw new ValidationException(CommonErrorCodes.Validation.BarCode.BAR_CODE_TYPE_INVALID_ERROR,
-                    "Bar code type is blank. Field name: type");
+                    "Bar code type is invalid. Field name: type");
         }
     }
 }

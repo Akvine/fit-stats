@@ -1,4 +1,4 @@
-package ru.akvine.fitstats.controllers.rest.dto.admin.file;
+package ru.akvine.fitstats.controllers.rest.dto.admin.product.file;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

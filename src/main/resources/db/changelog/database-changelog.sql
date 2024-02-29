@@ -459,3 +459,8 @@ CREATE TABLE BARCODE_ENTITY
     CONSTRAINT BARCODE_PRODUCT_FKEY FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT_ENTITY (ID)
 );
 CREATE SEQUENCE SEQ_BARCODE_ENTITY START WITH 1 INCREMENT BY 1000;
+
+--changeset lymar-sa:FIT-STATS-1-27
+--preconditions onFail:MARK_RAN onError:HALT onUpdateSQL:FAIL
+--precondition-sql-check expectedResult:0 select count(*) from information_schema.columns where upper(table_name) = 'BARCODE_ENTITY' and upper(column_name) = 'TYPE' and table_schema = 'public' AND is_nullable = 'YES';
+ALTER TABLE BARCODE_ENTITY ALTER COLUMN TYPE DROP NOT NULL;

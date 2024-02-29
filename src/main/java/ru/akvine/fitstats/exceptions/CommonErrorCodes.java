@@ -13,6 +13,7 @@ public class CommonErrorCodes {
 
     public interface BarCode {
         String BAR_CODE_NOT_FOUND_ERROR = "barcode.not.found.error";
+        String BAR_CODE_ALREADY_EXISTS_ERROR = "barcode.already.exists.error";
     }
 
     public interface Telegram {

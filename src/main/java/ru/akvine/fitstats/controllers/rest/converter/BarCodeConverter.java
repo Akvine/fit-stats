@@ -20,7 +20,7 @@ public class BarCodeConverter {
     public AddBarCode convertToAddBarCode(AddBarCodeRequest request) {
         Preconditions.checkNotNull(request, "addBarCodeRequest is null");
         return new AddBarCode()
-                .setBarCodeType(StringUtils.isBlank(request.getType()) ? BarCodeType.valueOf(request.getType()) : null)
+                .setBarCodeType(StringUtils.isBlank(request.getType()) ?  null : BarCodeType.valueOf(request.getType()))
                 .setClientUuid(SecurityUtils.getCurrentUser().getUuid())
                 .setNumber(request.getNumber())
                 .setProductUuid(request.getProductUuid());
@@ -81,6 +81,6 @@ public class BarCodeConverter {
     private BarCodeDto buildBarCodeDto(BarCodeBean barCodeBean) {
         return new BarCodeDto()
                 .setNumber(barCodeBean.getNumber())
-                .setType(barCodeBean.getBarCodeType().name());
+                .setType(barCodeBean.getBarCodeType() != null ? barCodeBean.getBarCodeType().name() : null);
     }
 }
