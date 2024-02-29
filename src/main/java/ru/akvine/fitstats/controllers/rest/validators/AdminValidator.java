@@ -1,6 +1,7 @@
 package ru.akvine.fitstats.controllers.rest.validators;
 
 import com.google.common.base.Preconditions;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,28 +10,25 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.akvine.fitstats.controllers.rest.dto.admin.barcode.UpdateBarCodeRequest;
 import ru.akvine.fitstats.controllers.rest.dto.admin.client.BlockClientRequest;
 import ru.akvine.fitstats.controllers.rest.dto.admin.client.UnblockClientRequest;
+import ru.akvine.fitstats.controllers.rest.dto.admin.product.*;
 import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductCsvRow;
 import ru.akvine.fitstats.controllers.rest.dto.admin.product.file.ProductXlsxRow;
-import ru.akvine.fitstats.controllers.rest.dto.admin.product.*;
 import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorCsvWrapper;
 import ru.akvine.fitstats.controllers.rest.validators.wrapper.AdminValidatorXlsxWrapper;
 import ru.akvine.fitstats.enums.FileType;
 import ru.akvine.fitstats.exceptions.CommonErrorCodes;
 import ru.akvine.fitstats.exceptions.validation.ValidationException;
+import ru.akvine.fitstats.managers.FileValidatorsManager;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
 import ru.akvine.fitstats.validators.BarCodeTypeValidator;
 import ru.akvine.fitstats.validators.ConverterTypeValidator;
 import ru.akvine.fitstats.validators.VolumeMeasurementValidator;
-import ru.akvine.fitstats.validators.file.FileValidator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 @Component
+@RequiredArgsConstructor
 public class AdminValidator {
     @Value("admin.secret")
     private String secret;
@@ -39,29 +37,11 @@ public class AdminValidator {
 
     private final VolumeMeasurementValidator volumeMeasurementValidator;
     private final ConverterTypeValidator converterTypeValidator;
-    private final Map<FileType, FileValidator> availableFileValidators;
+    private final FileValidatorsManager fileValidatorsManager;
     private final AdminValidatorCsvWrapper adminValidatorCsvWrapper;
     private final AdminValidatorXlsxWrapper adminValidatorXlsxWrapper;
     private final PropertyParseService propertyParseService;
     private final BarCodeTypeValidator barCodeTypeValidator;
-
-    public AdminValidator(VolumeMeasurementValidator volumeMeasurementValidator,
-                          ConverterTypeValidator converterTypeValidator,
-                          List<FileValidator> fileValidators,
-                          AdminValidatorCsvWrapper adminValidatorCsvWrapper,
-                          AdminValidatorXlsxWrapper adminValidatorXlsxWrapper,
-                          PropertyParseService propertyParseService,
-                          BarCodeTypeValidator barCodeTypeValidator) {
-        this.volumeMeasurementValidator = volumeMeasurementValidator;
-        this.adminValidatorCsvWrapper = adminValidatorCsvWrapper;
-        this.adminValidatorXlsxWrapper = adminValidatorXlsxWrapper;
-        this.converterTypeValidator = converterTypeValidator;
-        this.propertyParseService = propertyParseService;
-        this.barCodeTypeValidator = barCodeTypeValidator;
-        this.availableFileValidators = fileValidators
-                .stream()
-                .collect(toMap(FileValidator::getType, identity()));
-    }
 
     public void verifyExportProductsRequest(ExportProductsRequest exportProductsRequest) {
         Preconditions.checkNotNull(exportProductsRequest, "exportProductsRequest is null");
@@ -76,7 +56,8 @@ public class AdminValidator {
         verifySecret(secret);
         converterTypeValidator.validate(converterType);
         FileType type = FileType.valueOf(converterType);
-        availableFileValidators
+        fileValidatorsManager
+                .getAvailableFileValidators()
                 .get(type)
                 .validate(file);
     }
