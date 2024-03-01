@@ -12,15 +12,18 @@ public final class DietUtils {
     private static final double WEIGHT_COEFFICIENT = 10;
     private static final double AGE_COEFFICIENT = 5;
 
+    private final static double GAIN_CALORIES_COEFFICIENT = 0.1;
     private final static double GAIN_PROTEIN_COEFFICIENT = 1.7;
     private final static double GAIN_FATS_COEFFICIENT = 1.2;
+
+    private final static double DRYING_CALORIES_COEFFICIENT = 0.2;
     private final static double DRYING_FATS_COEFFICIENT = 0.7;
 
     private final static int MALE_HEIGHT_COEFFICIENT = 100;
     private final static int FEMALE_HEIGHT_COEFFICIENT = 110;
 
     private final static int PROTEINS_CALORIES_COEFFICIENT = 4;
-    private final static int CARBOHYDRATES_CALORIES_COEFFICIENT = 4;;
+    private final static int CARBOHYDRATES_CALORIES_COEFFICIENT = 4;
     private final static int FATS_CALORIES_COEFFICIENT = 9;
 
     private final static int ALCOHOL_ZERO = 0;
@@ -63,7 +66,7 @@ public final class DietUtils {
 
         switch (diet) {
             case GAIN:
-                maxCalories = dailyCaloriesIntake + dailyCaloriesIntake * 0.15;
+                maxCalories = dailyCaloriesIntake + dailyCaloriesIntake * GAIN_CALORIES_COEFFICIENT;
                 maxProteins = weight * GAIN_PROTEIN_COEFFICIENT;
                 maxFats = weight * GAIN_FATS_COEFFICIENT;
                 break;
@@ -72,7 +75,7 @@ public final class DietUtils {
                 maxFats = weight;
                 break;
             case DRYING:
-                maxCalories = dailyCaloriesIntake - dailyCaloriesIntake * 0.2;
+                maxCalories = dailyCaloriesIntake - dailyCaloriesIntake * DRYING_CALORIES_COEFFICIENT;
                 maxProteins = gender == Gender.MALE ? (height - MALE_HEIGHT_COEFFICIENT) * GAIN_PROTEIN_COEFFICIENT
                         : (height - FEMALE_HEIGHT_COEFFICIENT) * GAIN_PROTEIN_COEFFICIENT;
                 maxFats = gender == Gender.MALE ? (height - MALE_HEIGHT_COEFFICIENT) * DRYING_FATS_COEFFICIENT : (height - FEMALE_HEIGHT_COEFFICIENT) * DRYING_FATS_COEFFICIENT;
