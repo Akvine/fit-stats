@@ -19,8 +19,6 @@ import ru.akvine.fitstats.services.dto.product.ProductBean;
 import ru.akvine.fitstats.services.dto.statistic.*;
 import ru.akvine.fitstats.services.processors.statistic.additional.ModeStatisticProcessor;
 import ru.akvine.fitstats.services.processors.statistic.additional.PercentStatisticProcessor;
-import ru.akvine.fitstats.services.properties.PropertyParseService;
-import ru.akvine.fitstats.utils.MathUtils;
 
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
@@ -48,7 +46,6 @@ public class StatisticService {
     private final PercentStatisticProcessor percentStatisticProcessor;
     private final StatisticProcessorsManager statisticProcessorsManager;
     private final MacronutrientProcessorsManager macronutrientProcessorsManager;
-    private final PropertyParseService propertyParseService;
 
     public DescriptiveStatisticInfo calculateDescriptiveStatisticInfo(DescriptiveStatistic descriptiveStatistic) {
         Preconditions.checkNotNull(descriptiveStatistic, "descriptiveStatistic is null");
