@@ -21,7 +21,6 @@ import ru.akvine.fitstats.services.processors.statistic.additional.ModeStatistic
 import ru.akvine.fitstats.services.processors.statistic.additional.PercentStatisticProcessor;
 
 import java.time.LocalDate;
-import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +38,7 @@ public class StatisticService {
     private static final String ALCOHOL_NAME = "alcohol";
 
     private static final int MONTH_AVERAGE_COUNT = 30;
+    private static final int YEARS_COUNT = 5;
 
     private final DietRecordRepository dietRecordRepository;
     private final ClientService clientService;
@@ -46,6 +46,7 @@ public class StatisticService {
     private final PercentStatisticProcessor percentStatisticProcessor;
     private final StatisticProcessorsManager statisticProcessorsManager;
     private final MacronutrientProcessorsManager macronutrientProcessorsManager;
+    private final StatisticAggregationService statisticAggregationService;
 
     public DescriptiveStatisticInfo calculateDescriptiveStatisticInfo(DescriptiveStatistic descriptiveStatistic) {
         Preconditions.checkNotNull(descriptiveStatistic, "descriptiveStatistic is null");
@@ -164,16 +165,16 @@ public class StatisticService {
         List<DietRecordEntity> records = dietRecordRepository.findAll();
         switch (duration) {
             case DAY:
-                statisticHistoryMap = calculatePerPastDays(records);
+                statisticHistoryMap = statisticAggregationService.calculatePastDays(records, MONTH_AVERAGE_COUNT);
                 break;
             case WEEK:
-                statisticHistoryMap = calculateWeeksPerHalfYear(records);
+                statisticHistoryMap = statisticAggregationService.calculateWeeksPerHalfYear(records);
                 break;
             case MONTH:
-                statisticHistoryMap = calculatePastMonths(records);
+                statisticHistoryMap = statisticAggregationService.calculateMonths(records);
                 break;
             case YEAR:
-                statisticHistoryMap = calculatePastFiveYears(records);
+                statisticHistoryMap = statisticAggregationService.calculateYears(records, YEARS_COUNT);
                 break;
             default:
                 throw new IllegalArgumentException("Duration type = [" + duration + "] is not supported!");
@@ -261,119 +262,6 @@ public class StatisticService {
                 .setHistory(macronutrientHistory)
                 .setAverage(average)
                 .setMedian(median);
-    }
-
-    private Map<String, DietStatisticHistory> calculatePerPastDays(List<DietRecordEntity> entities) {
-        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
-        return entities.stream()
-                .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusDays(MONTH_AVERAGE_COUNT)))
-                .collect(Collectors.groupingBy(
-                        entity -> entity.getDate().toString(),
-                        LinkedHashMap::new,
-                        Collectors.reducing(
-                                new DietStatisticHistory(),
-                                entity -> new DietStatisticHistory(
-                                        entity.getDate().toString(),
-                                        entity.getProteins(),
-                                        entity.getFats(),
-                                        entity.getCarbohydrates(),
-                                        entity.getAlcohol(),
-                                        entity.getCalories()
-                                ),
-                                (agg1, agg2) -> new DietStatisticHistory(
-                                        agg1.getDate(),
-                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
-                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
-                                )
-                        )
-                ));
-    }
-
-    private Map<String, DietStatisticHistory> calculateWeeksPerHalfYear(List<DietRecordEntity> entities) {
-        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
-        return entities.stream()
-                .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusMonths(6)))
-                .collect(Collectors.groupingBy(
-                        entity -> String.valueOf(entity.getDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)),
-                        Collectors.reducing(
-                                new DietStatisticHistory(),
-                                entity -> new DietStatisticHistory(
-                                        String.valueOf(entity.getDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)),
-                                        entity.getProteins(),
-                                        entity.getFats(),
-                                        entity.getCarbohydrates(),
-                                        entity.getAlcohol(),
-                                        entity.getCalories()
-                                ),
-                                (agg1, agg2) -> new DietStatisticHistory(
-                                        agg1.getDate(),
-                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
-                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
-                                )
-                        )
-                ));
-    }
-
-    private Map<String, DietStatisticHistory> calculatePastMonths(List<DietRecordEntity> entities) {
-        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
-        return entities.stream()
-                .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusYears(1)))
-                .collect(Collectors.groupingBy(
-                        entity -> String.valueOf(entity.getDate().getMonthValue()),
-                        Collectors.reducing(
-                                new DietStatisticHistory(),
-                                entity -> new DietStatisticHistory(
-                                        String.valueOf(entity.getDate().getMonthValue()),
-                                        entity.getProteins(),
-                                        entity.getFats(),
-                                        entity.getCarbohydrates(),
-                                        entity.getAlcohol(),
-                                        entity.getCalories()
-                                ),
-                                (agg1, agg2) -> new DietStatisticHistory(
-                                        agg1.getDate(),
-                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        round(agg1.getAlcohol() + agg2.getAlcohol(), 2),
-                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
-                                )
-                        )
-                ));
-    }
-
-    private Map<String, DietStatisticHistory> calculatePastFiveYears(List<DietRecordEntity> entities) {
-        int accuracy = ClientSettingsContext.getClientSettingsContextHolder().getBySessionForCurrent().getRoundAccuracy();
-        return entities.stream()
-                .filter(entity -> entity.getDate().isAfter(LocalDate.now().minusYears(5)))
-                .collect(Collectors.groupingBy(
-                        entity -> String.valueOf(entity.getDate().getYear()),
-                        Collectors.reducing(
-                                new DietStatisticHistory(),
-                                entity -> new DietStatisticHistory(
-                                        String.valueOf(entity.getDate().getYear()),
-                                        entity.getProteins(),
-                                        entity.getFats(),
-                                        entity.getCarbohydrates(),
-                                        entity.getAlcohol(),
-                                        entity.getCalories()
-                                ),
-                                (agg1, agg2) -> new DietStatisticHistory(
-                                        agg1.getDate(),
-                                        round(agg1.getProteins() + agg2.getProteins(), accuracy),
-                                        round(agg1.getFats() + agg2.getFats(), accuracy),
-                                        round(agg1.getCarbohydrates() + agg2.getCarbohydrates(), accuracy),
-                                        round(agg1.getAlcohol() + agg2.getAlcohol(), accuracy),
-                                        round(agg1.getCalories() + agg2.getCalories(), accuracy)
-                                )
-                        )
-                ));
     }
 
     private DateRange getDateRange(Statistic statistic) {
