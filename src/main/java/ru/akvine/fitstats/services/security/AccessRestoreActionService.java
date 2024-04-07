@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.constants.DBLockPrefixesConstants;
 import ru.akvine.fitstats.entities.security.AccessRestoreActionEntity;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.entities.security.OtpInfo;
@@ -43,30 +44,35 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
 
         verifyNotBlocked(login);
 
-        AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
-        if (accessRestoreAction == null) {
-            return buildActionInfo(createNewActionAndSendOtp(login, sessionId));
-        }
-        // Действие просрочено
-        if (accessRestoreAction.getOtpAction().isActionExpired()) {
-            accessRestoreActionRepository.delete(accessRestoreAction);
-            return buildActionInfo(createNewActionAndSendOtp(login, sessionId));
-        }
-        // Код уже был введен - все корректно
-        if (isInFinalState(accessRestoreAction)) {
-            return buildActionInfo(accessRestoreAction);
-        }
-        // Действие не просрочено и код еще годен
-        if (accessRestoreAction.getOtpAction().isNotExpiredOtp()) {
-            return buildActionInfo(accessRestoreAction);
-        }
-        // Код просрочен, но новый сгенерровать не можем - лимит исчерпан
-        if (accessRestoreAction.getOtpAction().isNewOtpLimitReached()) {
-            handleNoMoreNewOtp(accessRestoreAction);
-            throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
-        }
-        // Действие не просрочено, но просрочен код, нужно сгенерировать новый - лимит еще есть
-        return buildActionInfo(updateNewOtpAndSendToClient(accessRestoreAction));
+        AccessRestoreActionEntity accessRestoreActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
+            if (accessRestoreAction == null) {
+                return createNewActionAndSendOtp(login, sessionId);
+            }
+            // Действие просрочено
+            if (accessRestoreAction.getOtpAction().isActionExpired()) {
+                accessRestoreActionRepository.delete(accessRestoreAction);
+                return createNewActionAndSendOtp(login, sessionId);
+            }
+            // Код уже был введен - все корректно
+            if (isInFinalState(accessRestoreAction)) {
+                return accessRestoreAction;
+            }
+            // Действие не просрочено и код еще годен
+            if (accessRestoreAction.getOtpAction().isNotExpiredOtp()) {
+                return accessRestoreAction;
+            }
+            // Код просрочен, но новый сгенерровать не можем - лимит исчерпан
+            if (accessRestoreAction.getOtpAction().isNewOtpLimitReached()) {
+                handleNoMoreNewOtp(accessRestoreAction);
+                throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
+            }
+
+            // Действие не просрочено, но просрочен код, нужно сгенерировать новый - лимит еще есть
+            return updateNewOtpAndSendToClient(accessRestoreAction);
+        });
+
+        return buildActionInfo(accessRestoreActionEntity);
     }
 
     public AccessRestoreActionResult generateNewOneTimePassword(AccessRestoreActionRequest request) {
@@ -82,51 +88,56 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
         String login = actionRequest.getLogin();
         String otpValue = actionRequest.getOtp();
 
-        AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
-        if (accessRestoreAction == null) {
-            logger.info("Client tried to check otp of {}, but action is not started", getActionName());
-            throw new ActionNotStartedException(String.format("Can't be check otp of %s, action not initiated!", getActionName()));
-        }
+        AccessRestoreActionEntity accessRestoreActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
+            if (accessRestoreAction == null) {
+                logger.info("Client tried to check otp of {}, but action is not started", getActionName());
+                throw new ActionNotStartedException(String.format("Can't be check otp of %s, action not initiated!", getActionName()));
+            }
 
-        verifyNotBlocked(login);
+            verifyNotBlocked(login);
 
-        // Действие просрочено
-        if (accessRestoreAction.getOtpAction().isActionExpired()) {
-            logger.info("Client with email = {} tried to check otp {}, but action is expired", login, getActionName());
-            accessRestoreActionRepository.delete(accessRestoreAction);
-            throw new ActionNotStartedException(String.format("Can't check otp of %s, action not initiated", getActionName()));
-        }
+            // Действие просрочено
+            if (accessRestoreAction.getOtpAction().isActionExpired()) {
+                logger.info("Client with email = {} tried to check otp {}, but action is expired", login, getActionName());
+                accessRestoreActionRepository.delete(accessRestoreAction);
+                throw new ActionNotStartedException(String.format("Can't check otp of %s, action not initiated", getActionName()));
+            }
 
-        // Код уже был введен - все корректно
-        if (isInFinalState(accessRestoreAction)) {
-            return buildActionInfo(accessRestoreAction);
-        }
+            // Код уже был введен - все корректно
+            if (isInFinalState(accessRestoreAction)) {
+                return accessRestoreAction;
+            }
 
-        if (noCurrentOtpInfoAvailable(accessRestoreAction)) {
-            return buildActionInfo(accessRestoreAction);
-        }
+            if (noCurrentOtpInfoAvailable(accessRestoreAction)) {
+                return accessRestoreAction;
+            }
 
-        // Действие не просрочено, но просрочен код
-        if (accessRestoreAction.getOtpAction().isExpiredOtp()) {
-            logger.info("Client with email = {} tried to check otp {}, but otp is expired! New otp left = {}", login,
-                    getActionName(), accessRestoreAction.getOtpAction().getOtpValue());
-            throw new OtpExpiredException(accessRestoreAction.getOtpAction().getOtpCountLeft());
-        }
+            // Действие не просрочено, но просрочен код
+            if (accessRestoreAction.getOtpAction().isExpiredOtp()) {
+                logger.info("Client with email = {} tried to check otp {}, but otp is expired! New otp left = {}", login,
+                        getActionName(), accessRestoreAction.getOtpAction().getOtpValue());
+                throw new OtpExpiredException(accessRestoreAction.getOtpAction().getOtpCountLeft());
+            }
 
-        // Действие не просрочено и код еще активен - проверяем
-        if (accessRestoreAction.getOtpAction().isOtpValid(otpValue)) {
-            logger.debug("Client with email = {} successfully passed otp for state = {}", login, accessRestoreAction.getState());
-            return buildActionInfo(handleValidOtp(accessRestoreAction));
-        }
+            // Действие не просрочено и код еще активен - проверяем
+            if (accessRestoreAction.getOtpAction().isOtpValid(otpValue)) {
+                logger.debug("Client with email = {} successfully passed otp for state = {}", login, accessRestoreAction.getState());
+                return handleValidOtp(accessRestoreAction);
+            }
 
-        // Неверный ввод
-        int otpInvalidAttemptsLeft = accessRestoreAction.getOtpAction().decrementInvalidAttemptsLeft();
-        AccessRestoreActionEntity updatedPasswordChangeAction = accessRestoreActionRepository.save(accessRestoreAction);
-        if (otpInvalidAttemptsLeft == 0) {
-            handleNoMoreOtpInvalidAttemptsLeft(updatedPasswordChangeAction);
-            throw new BlockedCredentialsException(login);
-        }
-        throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+            // Неверный ввод
+            int otpInvalidAttemptsLeft = accessRestoreAction.getOtpAction().decrementInvalidAttemptsLeft();
+            AccessRestoreActionEntity updatedPasswordChangeAction = accessRestoreActionRepository.save(accessRestoreAction);
+            if (otpInvalidAttemptsLeft == 0) {
+                handleNoMoreOtpInvalidAttemptsLeft(updatedPasswordChangeAction);
+                throw new BlockedCredentialsException(login);
+            }
+
+            throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+        });
+
+        return buildActionInfo(accessRestoreActionEntity);
     }
 
     public ClientBean finishAccessRestore(AccessRestoreActionRequest actionRequest) {
@@ -135,33 +146,40 @@ public class AccessRestoreActionService extends OtpActionService<AccessRestoreAc
         String login = actionRequest.getLogin();
         String password = actionRequest.getPassword();
 
-        AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
-        if (accessRestoreAction == null) {
-            logger.info("Client tried to finish {}, but action is not started", getActionName());
-            throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated", getActionName()));
-        }
+        return lockHelper.doWithLock(getLock(login), () -> {
+            AccessRestoreActionEntity accessRestoreAction = accessRestoreActionRepository.findCurrentAction(login);
+            if (accessRestoreAction == null) {
+                logger.info("Client tried to finish {}, but action is not started", getActionName());
+                throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated", getActionName()));
+            }
 
-        verifyNotBlocked(login);
+            verifyNotBlocked(login);
 
-        // Действие просрочено
-        if (accessRestoreAction.getOtpAction().isActionExpired()) {
-            logger.info("Client with email = {} tried to finish {}, but action is expired!", login, getActionName());
-            accessRestoreActionRepository.delete(accessRestoreAction);
-            logger.trace("Expired {}[id={}] removed from DB", getActionName(), accessRestoreAction.getId());
-            throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated", getActionName()));
-        }
+            // Действие просрочено
+            if (accessRestoreAction.getOtpAction().isActionExpired()) {
+                logger.info("Client with email = {} tried to finish {}, but action is expired!", login, getActionName());
+                accessRestoreActionRepository.delete(accessRestoreAction);
+                logger.trace("Expired {}[id={}] removed from DB", getActionName(), accessRestoreAction.getId());
+                throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated", getActionName()));
+            }
 
-        if (accessRestoreAction.getState() == ActionState.OTP_PASSED) {
-            accessRestoreActionRepository.delete(accessRestoreAction);
-            return clientService.updatePassword(login, password);
-        }
+            if (accessRestoreAction.getState() == ActionState.OTP_PASSED) {
+                accessRestoreActionRepository.delete(accessRestoreAction);
+                return clientService.updatePassword(login, password);
+            }
 
-        throw new OtpAuthRequiredException(String.format("Can't finish %s, otp auth required!", getActionName()));
+            throw new OtpAuthRequiredException(String.format("Can't finish %s, otp auth required!", getActionName()));
+        });
     }
 
     @Override
     protected String getActionName() {
         return "access-restore-action";
+    }
+
+    @Override
+    protected String getLock(String payload) {
+        return DBLockPrefixesConstants.ACCESS_RESTORE_PREFIX + payload;
     }
 
     @Override

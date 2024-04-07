@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.constants.DBLockPrefixesConstants;
 import ru.akvine.fitstats.entities.profile.ProfileDeleteActionEntity;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.exceptions.security.*;
@@ -44,37 +45,41 @@ public class ProfileDeleteActionService extends PasswordRequiredActionService<Pr
         ClientBean clientBean = clientService.getByUuid(clientUuid);
         String login = clientBean.getEmail();
 
-        ProfileDeleteActionEntity profileDeleteActionEntity = getRepository().findCurrentAction(login);
-        if (profileDeleteActionEntity == null) {
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, true);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
+        ProfileDeleteActionEntity profileDeleteActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            ProfileDeleteActionEntity profileDeleteAction = getRepository().findCurrentAction(login);
+            if (profileDeleteAction == null) {
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, true);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
 
-        // Действие просрочено
-        if (profileDeleteActionEntity.getOtpAction().isActionExpired()) {
-            getRepository().delete(profileDeleteActionEntity);
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, true);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
+            // Действие просрочено
+            if (profileDeleteAction.getOtpAction().isActionExpired()) {
+                getRepository().delete(profileDeleteAction);
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, true);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
 
-        // otp не был сгенерирован, т.к. вводили неправильный пароль
-        if (profileDeleteActionEntity.getOtpAction().getOtpNumber() == null) {
-            return buildActionInfo(updateNewOtpAndSendToClient(profileDeleteActionEntity));
-        }
+            // otp не был сгенерирован, т.к. вводили неправильный пароль
+            if (profileDeleteAction.getOtpAction().getOtpNumber() == null) {
+                return updateNewOtpAndSendToClient(profileDeleteAction);
+            }
 
-        // Действие не просрочено и код еще годен
-        if (profileDeleteActionEntity.getOtpAction().isNotExpiredOtp()) {
-            return buildActionInfo(profileDeleteActionEntity);
-        }
+            // Действие не просрочено и код еще годен
+            if (profileDeleteAction.getOtpAction().isNotExpiredOtp()) {
+                return profileDeleteAction;
+            }
 
-        // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
-        if (profileDeleteActionEntity.getOtpAction().isNewOtpLimitReached()) {
-            handleNoMoreNewOtp(profileDeleteActionEntity);
-            throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
-        }
+            // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
+            if (profileDeleteAction.getOtpAction().isNewOtpLimitReached()) {
+                handleNoMoreNewOtp(profileDeleteAction);
+                throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
+            }
 
-        // Действие не просрочен, но просрочен код, нужно сгенерировать новый - лимит еще есть
-        return buildActionInfo(updateNewOtpAndSendToClient(profileDeleteActionEntity));
+            // Действие не просрочен, но просрочен код, нужно сгенерировать новый - лимит еще есть
+            return updateNewOtpAndSendToClient(profileDeleteAction);
+        });
+
+        return buildActionInfo(profileDeleteActionEntity);
     }
 
     public ProfileDeleteActionResult newOtpProfileDelete(String clientUuid) {
@@ -94,42 +99,45 @@ public class ProfileDeleteActionService extends PasswordRequiredActionService<Pr
         String otp = profileDeleteActionRequest.getOtp();
         String login = clientBean.getEmail();
 
-        ProfileDeleteActionEntity deleteActionEntity = getRepository().findCurrentAction(login);
-        if (deleteActionEntity == null) {
-            logger.info("Client with email = {} tried to {}, but action is not started", login, getActionName());
-            throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated!", getActionName()));
-        }
+        String lockId = getLock(login);
+        lockHelper.doWithLock(lockId, () -> {
+            ProfileDeleteActionEntity deleteActionEntity = getRepository().findCurrentAction(login);
+            if (deleteActionEntity == null) {
+                logger.info("Client with email = {} tried to {}, but action is not started", login, getActionName());
+                throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated!", getActionName()));
+            }
 
-        // Действие просрочено
-        if (deleteActionEntity.getOtpAction().isActionExpired()) {
-            logger.info("Client with email = {} tried to {}, but action is expired", login, getActionName());
-            getRepository().delete(deleteActionEntity);
-            logger.info("Expired action = {}[id = {}] removed from DB", getActionName(), deleteActionEntity.getId());
-            throw new ActionNotStartedException(String.format("Can't finish %s, action is expired!", getActionName()));
-        }
+            // Действие просрочено
+            if (deleteActionEntity.getOtpAction().isActionExpired()) {
+                logger.info("Client with email = {} tried to {}, but action is expired", login, getActionName());
+                getRepository().delete(deleteActionEntity);
+                logger.info("Expired action = {}[id = {}] removed from DB", getActionName(), deleteActionEntity.getId());
+                throw new ActionNotStartedException(String.format("Can't finish %s, action is expired!", getActionName()));
+            }
 
-        // Действие не просрочено, но просрочен код
-        if (deleteActionEntity.getOtpAction().isExpiredOtp()) {
-            logger.info("Client with email = {} tried to finish = {}, but otp is expired! New otp left = {}", login, getActionName(), deleteActionEntity.getOtpAction().getOtpCountLeft());
-            throw new OtpExpiredException(deleteActionEntity.getOtpAction().getOtpCountLeft());
-        }
+            // Действие не просрочено, но просрочен код
+            if (deleteActionEntity.getOtpAction().isExpiredOtp()) {
+                logger.info("Client with email = {} tried to finish = {}, but otp is expired! New otp left = {}", login, getActionName(), deleteActionEntity.getOtpAction().getOtpCountLeft());
+                throw new OtpExpiredException(deleteActionEntity.getOtpAction().getOtpCountLeft());
+            }
 
-        // Действие не просрочено и код еще активен - проверяем
-        if (deleteActionEntity.getOtpAction().isOtpValid(otp)) {
-            clientService.delete(login);
-            logger.info("Client with email = {} successfully passed one-time-password and was deleted", login);
+            // Действие не просрочено и код еще активен - проверяем
+            if (deleteActionEntity.getOtpAction().isOtpValid(otp)) {
+                clientService.delete(login);
+                logger.info("Client with email = {} successfully passed one-time-password and was deleted", login);
 
-            getRepository().delete(deleteActionEntity);
-            return;
-        }
+                getRepository().delete(deleteActionEntity);
+                return true;
+            }
 
-        int otpInvalidAttemptsLeft = deleteActionEntity.getOtpAction().decrementInvalidAttemptsLeft();
-        ProfileDeleteActionEntity updatedDeleteAction = getRepository().save(deleteActionEntity);
-        if (otpInvalidAttemptsLeft == 0) {
-            handleNoMoreOtpInvalidAttemptsLeft(updatedDeleteAction);
-            throw new BlockedCredentialsException(login);
-        }
-        throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+            int otpInvalidAttemptsLeft = deleteActionEntity.getOtpAction().decrementInvalidAttemptsLeft();
+            ProfileDeleteActionEntity updatedDeleteAction = getRepository().save(deleteActionEntity);
+            if (otpInvalidAttemptsLeft == 0) {
+                handleNoMoreOtpInvalidAttemptsLeft(updatedDeleteAction);
+                throw new BlockedCredentialsException(login);
+            }
+            throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+        });
     }
 
     @Override
@@ -162,6 +170,11 @@ public class ProfileDeleteActionService extends PasswordRequiredActionService<Pr
     @Override
     protected String getActionName() {
         return "profile-delete-action";
+    }
+
+    @Override
+    protected String getLock(String payload) {
+        return DBLockPrefixesConstants.PROFILE_DELETE_PREFIX + payload;
     }
 
     @Override

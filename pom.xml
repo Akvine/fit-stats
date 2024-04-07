@@ -149,6 +149,11 @@
 			<artifactId>javase</artifactId>
 			<version>${zxing.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>ru.akvine.akvine-commons</groupId>
+			<artifactId>akvine-commons-cluster</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

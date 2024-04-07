@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.constants.DBLockPrefixesConstants;
 import ru.akvine.fitstats.entities.profile.ProfileChangeEmailActionEntity;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.exceptions.security.*;
@@ -44,34 +45,39 @@ public class ProfileChangeEmailActionService extends PasswordRequiredActionServi
         String sessionId = profileChangeEmailActionRequest.getSessionId();
         String newEmail = profileChangeEmailActionRequest.getNewEmail();
 
-        ProfileChangeEmailActionEntity profileChangeEmailActionEntity = getRepository().findCurrentAction(login);
-        if (profileChangeEmailActionEntity == null) {
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newEmail, sessionId, isPasswordValid);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
+        ProfileChangeEmailActionEntity profileChangeEmailActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            ProfileChangeEmailActionEntity profileChangeEmailAction = getRepository().findCurrentAction(login);
+            if (profileChangeEmailAction == null) {
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newEmail, sessionId, isPasswordValid);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
 
-        // Действие просрочено
-        if (profileChangeEmailActionEntity.getOtpAction().isActionExpired()) {
-            getRepository().delete(profileChangeEmailActionEntity);
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newEmail, sessionId, isPasswordValid);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
+            // Действие просрочено
+            if (profileChangeEmailAction.getOtpAction().isActionExpired()) {
+                getRepository().delete(profileChangeEmailAction);
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newEmail, sessionId, isPasswordValid);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
 
-        // otp не был сгенерирован, т.к. вводили неправильный пароль
-        if (profileChangeEmailActionEntity.getOtpAction().getOtpNumber() == null) {
-            return buildActionInfo(updateNewOtpAndSendToClient(profileChangeEmailActionEntity));
-        }
+            // otp не был сгенерирован, т.к. вводили неправильный пароль
+            if (profileChangeEmailAction.getOtpAction().getOtpNumber() == null) {
+                return updateNewOtpAndSendToClient(profileChangeEmailAction);
+            }
 
-        // Действие не просрочено и код еще годен
-        if (profileChangeEmailActionEntity.getOtpAction().isNotExpiredOtp()) {
-            return buildActionInfo(profileChangeEmailActionEntity);
-        }
+            // Действие не просрочено и код еще годен
+            if (profileChangeEmailAction.getOtpAction().isNotExpiredOtp()) {
+                return profileChangeEmailAction;
+            }
 
-        // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
-        if (profileChangeEmailActionEntity.getOtpAction().isNewOtpLimitReached()) {
-            handleNoMoreNewOtp(profileChangeEmailActionEntity);
-            throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
-        }
+            // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
+            if (profileChangeEmailAction.getOtpAction().isNewOtpLimitReached()) {
+                handleNoMoreNewOtp(profileChangeEmailAction);
+                throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
+            }
+
+            // Действие не просрочено, но просрочен код, нужно сгенерировать новый - лимит еще есть
+            return updateNewOtpAndSendToClient(profileChangeEmailAction);
+        });
 
         return buildActionInfo(profileChangeEmailActionEntity);
     }
@@ -92,44 +98,47 @@ public class ProfileChangeEmailActionService extends PasswordRequiredActionServi
         String otp = profileChangeEmailActionRequest.getOtp();
         String login = clientBean.getEmail();
 
-        ProfileChangeEmailActionEntity profileChangeEmailActionEntity = getRepository().findCurrentAction(login);
-        if (profileChangeEmailActionEntity == null) {
-            logger.info("Client with email = {} tried to finish action = {}, but action is not started!", login, getActionName());
-            throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated!", getActionName()));
-        }
+        String lockId = getLock(login);
+        lockHelper.doWithLock(lockId, () -> {
+            ProfileChangeEmailActionEntity profileChangeEmailActionEntity = getRepository().findCurrentAction(login);
+            if (profileChangeEmailActionEntity == null) {
+                logger.info("Client with email = {} tried to finish action = {}, but action is not started!", login, getActionName());
+                throw new ActionNotStartedException(String.format("Can't finish %s, action not initiated!", getActionName()));
+            }
 
-        // Действие просрочено
-        if (profileChangeEmailActionEntity.getOtpAction().isActionExpired()) {
-            logger.info("Client with email = {} tried to finish action = {}, but action is not started", login, getActionName());
-            getRepository().delete(profileChangeEmailActionEntity);
-            logger.info("Expired action = {}[id={}] removed from DB", getActionName(), profileChangeEmailActionEntity.getId());
-            throw new ActionNotStartedException(String.format("Can't finish %s, action is expired!", getActionName()));
-        }
+            // Действие просрочено
+            if (profileChangeEmailActionEntity.getOtpAction().isActionExpired()) {
+                logger.info("Client with email = {} tried to finish action = {}, but action is not started", login, getActionName());
+                getRepository().delete(profileChangeEmailActionEntity);
+                logger.info("Expired action = {}[id={}] removed from DB", getActionName(), profileChangeEmailActionEntity.getId());
+                throw new ActionNotStartedException(String.format("Can't finish %s, action is expired!", getActionName()));
+            }
 
-        // Действие не просрочено, но просрочен код
-        if (profileChangeEmailActionEntity.getOtpAction().isExpiredOtp()) {
-            logger.info("Client with email = {} tried to finish action = {}, but otp is expired! New otp left = {}",
-                    login, getActionName(), profileChangeEmailActionEntity.getOtpAction().getOtpCountLeft());
-            throw new OtpExpiredException(profileChangeEmailActionEntity.getOtpAction().getOtpCountLeft());
-        }
+            // Действие не просрочено, но просрочен код
+            if (profileChangeEmailActionEntity.getOtpAction().isExpiredOtp()) {
+                logger.info("Client with email = {} tried to finish action = {}, but otp is expired! New otp left = {}",
+                        login, getActionName(), profileChangeEmailActionEntity.getOtpAction().getOtpCountLeft());
+                throw new OtpExpiredException(profileChangeEmailActionEntity.getOtpAction().getOtpCountLeft());
+            }
 
-        // Действие не просрочено и код еще активен - проверяем
-        if (profileChangeEmailActionEntity.getOtpAction().isOtpValid(otp)) {
-            String newEmail = getRepository().findCurrentAction(login).getNewEmail();
-            clientService.updateEmail(login, newEmail);
-            logger.info("Client with email = {} successfully passed one-time-password and was updated his email", login);
+            // Действие не просрочено и код еще активен - проверяем
+            if (profileChangeEmailActionEntity.getOtpAction().isOtpValid(otp)) {
+                String newEmail = getRepository().findCurrentAction(login).getNewEmail();
+                clientService.updateEmail(login, newEmail);
+                logger.info("Client with email = {} successfully passed one-time-password and was updated his email", login);
 
-            getRepository().delete(profileChangeEmailActionEntity);
-            return;
-        }
+                getRepository().delete(profileChangeEmailActionEntity);
+                return true;
+            }
 
-        int otpInvalidAttemptsLeft = profileChangeEmailActionEntity.getOtpAction().decrementInvalidAttemptsLeft();
-        getRepository().save(profileChangeEmailActionEntity);
-        if (otpInvalidAttemptsLeft == 0) {
-            handleNoMoreNewOtp(profileChangeEmailActionEntity);
-            throw new BlockedCredentialsException(login);
-        }
-        throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+            int otpInvalidAttemptsLeft = profileChangeEmailActionEntity.getOtpAction().decrementInvalidAttemptsLeft();
+            getRepository().save(profileChangeEmailActionEntity);
+            if (otpInvalidAttemptsLeft == 0) {
+                handleNoMoreNewOtp(profileChangeEmailActionEntity);
+                throw new BlockedCredentialsException(login);
+            }
+            throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+        });
     }
 
     @Override
@@ -156,6 +165,11 @@ public class ProfileChangeEmailActionService extends PasswordRequiredActionServi
     @Override
     protected String getActionName() {
         return "profile-change-email-action";
+    }
+
+    @Override
+    protected String getLock(String payload) {
+        return DBLockPrefixesConstants.PROFILE_CHANGE_EMAIL_PREFIX + payload;
     }
 
     @Override

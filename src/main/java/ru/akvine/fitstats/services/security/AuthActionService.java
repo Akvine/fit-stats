@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.constants.DBLockPrefixesConstants;
 import ru.akvine.fitstats.entities.security.AuthActionEntity;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.exceptions.security.NoMoreNewOtpAvailableException;
@@ -46,36 +47,41 @@ public class AuthActionService extends PasswordRequiredActionService<AuthActionE
         ClientBean clientBean = clientService.getByEmail(login);
         final boolean isPasswordValid = isValidPassword(clientBean, password);
 
-        AuthActionEntity authActionEntity = getRepository().findCurrentAction(login);
-        if (authActionEntity == null) {
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, isPasswordValid);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
+        AuthActionEntity authActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            AuthActionEntity authAction = getRepository().findCurrentAction(login);
+            if (authAction == null) {
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, isPasswordValid);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
 
-        // Действие просрочено
-        if (authActionEntity.getOtpAction().isActionExpired()) {
-            getRepository().delete(authActionEntity);
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, isPasswordValid);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
-        if (!isPasswordValid) {
-            handleInvalidPasswordInput(authActionEntity);
-        }
-        // otp не был сгенерирован, т.к. вводили неправильный пароль
-        if (authActionEntity.getOtpAction().getOtpNumber() == null) {
-            return buildActionInfo(updateNewOtpAndSend(authActionEntity));
-        }
-        // Действие не просрочено и код еще годен ... вернем текущее состояние
-        if (authActionEntity.getOtpAction().isNotExpiredOtp()) {
-            return buildActionInfo(authActionEntity);
-        }
-        // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
-        if (authActionEntity.getOtpAction().isNewOtpLimitReached()) {
-            handleNoMoreNewOtp(authActionEntity);
-            throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
-        }
-        // Действие не просрочено, но просрочен код, нужно сгенерировать новый - лимит еще есть
-        return buildActionInfo(updateNewOtpAndSendToClient(authActionEntity));
+            // Действие просрочено
+            if (authAction.getOtpAction().isActionExpired()) {
+                getRepository().delete(authAction);
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, sessionId, isPasswordValid);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
+            if (!isPasswordValid) {
+                handleInvalidPasswordInput(authAction);
+            }
+            // otp не был сгенерирован, т.к. вводили неправильный пароль
+            if (authAction.getOtpAction().getOtpNumber() == null) {
+                return updateNewOtpAndSend(authAction);
+            }
+            // Действие не просрочено и код еще годен ... вернем текущее состояние
+            if (authAction.getOtpAction().isNotExpiredOtp()) {
+                return authAction;
+            }
+            // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
+            if (authAction.getOtpAction().isNewOtpLimitReached()) {
+                handleNoMoreNewOtp(authAction);
+                throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
+            }
+
+            // Действие не просрочено, но просрочен код, нужно сгенерировать новый - лимит еще есть
+            return updateNewOtpAndSendToClient(authAction);
+        });
+
+        return buildActionInfo(authActionEntity);
     }
 
     public ClientBean finishAuth(AuthActionRequest request) {
@@ -87,9 +93,13 @@ public class AuthActionService extends PasswordRequiredActionService<AuthActionE
 
         verifyNotBlocked(login);
         ClientBean clientBean = clientService.getByEmail(login);
-        AuthActionEntity authActionEntity = checkOtpInput(login, otp, sessionId);
-        getRepository().delete(authActionEntity);
-        return clientBean;
+
+        return lockHelper.doWithLock((getLock(login)), () -> {
+            AuthActionEntity authActionEntity = checkOtpInput(login, otp, sessionId);
+            logger.info("Client with email = {} successfully passed otp!", login);
+            getRepository().delete(authActionEntity);
+            return clientBean;
+        });
     }
 
     @Override
@@ -121,6 +131,11 @@ public class AuthActionService extends PasswordRequiredActionService<AuthActionE
     @Override
     protected String getActionName() {
         return "auth-action";
+    }
+
+    @Override
+    protected String getLock(String payload) {
+        return DBLockPrefixesConstants.AUTH_PREFIX + payload;
     }
 
     @Override

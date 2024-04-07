@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.constants.DBLockPrefixesConstants;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.entities.security.RegistrationActionEntity;
 import ru.akvine.fitstats.enums.ActionState;
@@ -45,32 +46,36 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
 
         verifyNotBlocked(login);
 
-        RegistrationActionEntity registrationAction = getRepository().findCurrentAction(login);
-        if (registrationAction == null) {
-            return buildActionInfo(createNewActionAndSendOtp(login, sessionId));
-        }
-        // Действие просрочено
-        if (registrationAction.getOtpAction().isActionExpired()) {
-            getRepository().delete(registrationAction);
-            return buildActionInfo(createNewActionAndSendOtp(login, sessionId));
-        }
-        // Действие не просрочено и код еще годе ... вернем текущее состояние
-        if (registrationAction.getOtpAction().getOtpExpiredAt() != null && registrationAction.getOtpAction().isNotExpiredOtp()) {
-            return buildActionInfo(registrationAction);
-        }
-        // Пользователь не захотел вводить пароль, OTP уже было использовано, генерируем новый код
-        if (registrationAction.getOtpAction().getOtpExpiredAt() == null) {
-            getRepository().delete(registrationAction);
-            return buildActionInfo(createNewActionAndSendOtp(login, sessionId));
-        }
-        // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
-        if (registrationAction.getOtpAction().isNewOtpLimitReached()) {
-            handleNoMoreNewOtp(registrationAction);
-            throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
-        }
+        RegistrationActionEntity registrationActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            RegistrationActionEntity registrationAction = getRepository().findCurrentAction(login);
+            if (registrationAction == null) {
+                return createNewActionAndSendOtp(login, sessionId);
+            }
+            // Действие просрочено
+            if (registrationAction.getOtpAction().isActionExpired()) {
+                getRepository().delete(registrationAction);
+                return createNewActionAndSendOtp(login, sessionId);
+            }
+            // Действие не просрочено и код еще годе ... вернем текущее состояние
+            if (registrationAction.getOtpAction().getOtpExpiredAt() != null && registrationAction.getOtpAction().isNotExpiredOtp()) {
+                return registrationAction;
+            }
+            // Пользователь не захотел вводить пароль, OTP уже было использовано, генерируем новый код
+            if (registrationAction.getOtpAction().getOtpExpiredAt() == null) {
+                getRepository().delete(registrationAction);
+                return createNewActionAndSendOtp(login, sessionId);
+            }
+            // Код просрочен, но новый сгенерировать не можем - лимит исчерпан
+            if (registrationAction.getOtpAction().isNewOtpLimitReached()) {
+                handleNoMoreNewOtp(registrationAction);
+                throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
+            }
 
-        // Действие не просрочено, но просрочен код, нужно сгенерировать нвоый - лимит еще есть
-        return buildActionInfo(updateNewOtpAndSendToClient(registrationAction));
+            // Действие не просрочено, но просрочен код, нужно сгенерировать нвоый - лимит еще есть
+            return updateNewOtpAndSendToClient(registrationAction);
+        });
+
+        return buildActionInfo(registrationActionEntity);
     }
 
     public RegistrationActionResult checkOneTimePassword(RegistrationActionRequest request) {
@@ -86,12 +91,17 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
 
         verifyNotBlocked(login);
 
-        RegistrationActionEntity registrationAction = checkOtpInput(login, otp, sessionId);
-        registrationAction.setState(ActionState.OTP_PASSED);
-        registrationAction.getOtpAction().setOtpValueToNull();
+        RegistrationActionEntity registrationActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            RegistrationActionEntity registrationAction = checkOtpInput(login, otp, sessionId);
+            registrationAction.setState(ActionState.OTP_PASSED);
+            registrationAction.getOtpAction().setOtpValueToNull();
 
-        RegistrationActionEntity savedRegistrationAction = getRepository().save(registrationAction);
-        return buildActionInfo(savedRegistrationAction);
+            RegistrationActionEntity savedRegistrationAction = getRepository().save(registrationAction);
+            logger.info("Client with email = {} was successfully passed otp!", login);
+            return  savedRegistrationAction;
+        });
+
+        return buildActionInfo(registrationActionEntity);
     }
 
     public RegistrationActionResult generateNewOneTimePassword(RegistrationActionRequest request) {
@@ -107,39 +117,41 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
         String login = request.getLogin();
         verifyNotBlocked(login);
 
-        RegistrationActionEntity registrationAction = getRepository().findCurrentAction(login);
-        if (registrationAction == null) {
-            logger.info("Registration for email = {} not started yet!", login);
-            throw new RegistrationNotStartedException("Registration not started yet");
-        }
+        return lockHelper.doWithLock(getLock(login), () -> {
+            RegistrationActionEntity registrationAction = getRepository().findCurrentAction(login);
+            if (registrationAction == null) {
+                logger.info("Registration for email = {} not started yet!", login);
+                throw new RegistrationNotStartedException("Registration not started yet");
+            }
 
-        // Действие просрочено
-        if (registrationAction.getOtpAction().isActionExpired()) {
+            // Действие просрочено
+            if (registrationAction.getOtpAction().isActionExpired()) {
+                getRepository().delete(registrationAction);
+                logger.info("Registration for email = {} not started yet!", login);
+                throw new RegistrationNotStartedException("Registration not started yet!");
+            }
+
+            verifySession(registrationAction, request.getSessionId());
+            verifyState(ActionState.OTP_PASSED, registrationAction);
+
             getRepository().delete(registrationAction);
-            logger.info("Registration for email = {} not started yet!", login);
-            throw new RegistrationNotStartedException("Registration not started yet!");
-        }
 
-        verifySession(registrationAction, request.getSessionId());
-        verifyState(ActionState.OTP_PASSED, registrationAction);
-
-        getRepository().delete(registrationAction);
-
-        ClientRegister clientRegister = new ClientRegister()
-                .setEmail(login)
-                .setPassword(request.getPassword())
-                .setFirstName(request.getFirstName())
-                .setSecondName(request.getSecondName())
-                .setThirdName(request.getThirdName())
-                .setAge(request.getAge())
-                .setGender(request.getGender())
-                .setHeight(request.getHeight())
-                .setWeight(request.getWeight())
-                .setDiet(request.getDiet())
-                .setPhysicalActivity(request.getPhysicalActivity())
-                .setHeightMeasurement(request.getHeightMeasurement())
-                .setWeightMeasurement(request.getWeightMeasurement());
-        return clientService.register(clientRegister);
+            ClientRegister clientRegister = new ClientRegister()
+                    .setEmail(login)
+                    .setPassword(request.getPassword())
+                    .setFirstName(request.getFirstName())
+                    .setSecondName(request.getSecondName())
+                    .setThirdName(request.getThirdName())
+                    .setAge(request.getAge())
+                    .setGender(request.getGender())
+                    .setHeight(request.getHeight())
+                    .setWeight(request.getWeight())
+                    .setDiet(request.getDiet())
+                    .setPhysicalActivity(request.getPhysicalActivity())
+                    .setHeightMeasurement(request.getHeightMeasurement())
+                    .setWeightMeasurement(request.getWeightMeasurement());
+            return clientService.register(clientRegister);
+        });
     }
 
     protected RegistrationActionEntity createNewActionAndSendOtp(String login, String sessionId) {
@@ -162,6 +174,11 @@ public class RegistrationActionService extends OtpActionService<RegistrationActi
     @Override
     protected String getActionName() {
         return "registration-action";
+    }
+
+    @Override
+    protected String getLock(String payload) {
+        return DBLockPrefixesConstants.REG_PREFIX + payload;
     }
 
     @Override

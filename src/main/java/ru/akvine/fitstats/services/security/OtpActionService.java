@@ -13,12 +13,15 @@ import ru.akvine.fitstats.exceptions.security.*;
 import ru.akvine.fitstats.repositories.security.ActionRepository;
 import ru.akvine.fitstats.services.notification.NotificationProvider;
 import ru.akvine.fitstats.services.properties.PropertyParseService;
+import ru.akvine.fitstats.utils.LockHelper;
 
 import java.time.LocalDateTime;
 
 @Service
 @Slf4j
 public abstract class OtpActionService<T extends OneTimePasswordable> {
+    @Autowired
+    protected LockHelper lockHelper;
     @Autowired
     protected BlockingService blockingService;
     @Autowired
@@ -34,37 +37,44 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
     public <R> R generateNewOtp(String payload) {
         Preconditions.checkNotNull(payload, "payload is null");
 
-        T action = getRepository().findCurrentAction(payload);
-        if (action == null) {
-            logger.info("Client tried to get new otp, but {} is not initiated", getActionName());
-            throw new ActionNotStartedException("Can'[t generate new one-time-password, action not started!");
-        }
+        String lockId = getLock(payload);
 
-        verifyNotBlocked(action.getLogin());
+        T otpAction = lockHelper.doWithLock(lockId, () -> {
+            T action = getRepository().findCurrentAction(payload);
+            if (action == null) {
+                logger.info("Client tried to get new otp, but {} is not initiated", getActionName());
+                throw new ActionNotStartedException("Can'[t generate new one-time-password, action not started!");
+            }
 
-        // Действие просрочено
-        if (action.getOtpAction().isActionExpired()) {
-            logger.info("Client with email = {} tried to get new otp, but {} is expired", action.getLogin(), getActionName());
-            getRepository().delete(action);
-            logger.info("Expired {}[id = {}] removed from DB", getActionName(), action.getId());
-            throw new ActionNotStartedException("Can't generate new one-time-password, action not started!");
-        }
+            verifyNotBlocked(action.getLogin());
 
-        if (noCurrentOtpInfoAvailable(action)) {
-            return buildActionInfo(action);
-        }
+            // Действие просрочено
+            if (action.getOtpAction().isActionExpired()) {
+                logger.info("Client with email = {} tried to get new otp, but {} is expired", action.getLogin(), getActionName());
+                getRepository().delete(action);
+                logger.info("Expired {}[id = {}] removed from DB", getActionName(), action.getId());
+                throw new ActionNotStartedException("Can't generate new one-time-password, action not started!");
+            }
 
-        // Действие не просрочено и не прошла задержка между генерациями
-        if (newOtpDelayIsNotPassed(action)) {
-            return buildActionInfo(action);
-        }
-        // Задержка прошла, но новый сгенерировать не можем - лимит исчерпан
-        if (action.getOtpAction().isNewOtpLimitReached()) {
-            handleNoMoreNewOtp(action);
-            throw new NoMoreNewOtpAvailableException("No more one-time-password can be generatef!");
-        }
-        // Действие не просрчоено, задержка прошла, лимит не исчерпан - генериурем новый код
-        return buildActionInfo(updateNewOtpAndSendToClient(action));
+            if (noCurrentOtpInfoAvailable(action)) {
+                return action;
+            }
+
+            // Действие не просрочено и не прошла задержка между генерациями
+            if (newOtpDelayIsNotPassed(action)) {
+                return action;
+            }
+            // Задержка прошла, но новый сгенерировать не можем - лимит исчерпан
+            if (action.getOtpAction().isNewOtpLimitReached()) {
+                handleNoMoreNewOtp(action);
+                throw new NoMoreNewOtpAvailableException("No more one-time-password can be generate!");
+            }
+
+            // Действие не просрчоено, задержка прошла, лимит не исчерпан - генериурем новый код
+            return updateNewOtpAndSendToClient(action);
+        });
+
+        return buildActionInfo(otpAction);
     }
 
     protected T checkOtpInput(String payload, String clientInput, String sessionId) {
@@ -135,6 +145,7 @@ public abstract class OtpActionService<T extends OneTimePasswordable> {
     }
 
     protected abstract String getActionName();
+    protected abstract String getLock(String payload);
     protected abstract ActionRepository<T> getRepository();
     protected abstract void sendNewOtpToClient(T action);
     protected abstract <R> R buildActionInfo(T action);

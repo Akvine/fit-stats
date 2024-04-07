@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.akvine.fitstats.constants.DBLockPrefixesConstants;
 import ru.akvine.fitstats.entities.profile.ProfileChangePasswordActionEntity;
 import ru.akvine.fitstats.entities.security.OtpActionEntity;
 import ru.akvine.fitstats.exceptions.security.*;
@@ -45,37 +46,41 @@ public class ProfileChangePasswordActionService extends PasswordRequiredActionSe
         String newPassword = request.getNewPassword();
         String sessionId = request.getSessionId();
 
-        ProfileChangePasswordActionEntity changePasswordAction = getRepository().findCurrentAction(login);
-        if (changePasswordAction == null) {
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newPassword, sessionId, isPasswordValid);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
+        ProfileChangePasswordActionEntity profileChangePasswordActionEntity = lockHelper.doWithLock(getLock(login), () -> {
+            ProfileChangePasswordActionEntity changePasswordAction = getRepository().findCurrentAction(login);
+            if (changePasswordAction == null) {
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newPassword, sessionId, isPasswordValid);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
 
-        // Действие просрочено
-        if (changePasswordAction.getOtpAction().isActionExpired()) {
-            getRepository().delete(changePasswordAction);
-            OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newPassword, sessionId, isPasswordValid);
-            return buildActionInfo(createNewActionAndSendOtp(otpCreateNewAction));
-        }
+            // Действие просрочено
+            if (changePasswordAction.getOtpAction().isActionExpired()) {
+                getRepository().delete(changePasswordAction);
+                OtpCreateNewAction otpCreateNewAction = new OtpCreateNewAction(login, newPassword, sessionId, isPasswordValid);
+                return createNewActionAndSendOtp(otpCreateNewAction);
+            }
 
-        // otp не был сгенерирован т.к. вводили неправильный пароль
-        if (changePasswordAction.getOtpAction().getOtpNumber() == null) {
-            return buildActionInfo(updateNewOtpAndSendToClient(changePasswordAction));
-        }
+            // otp не был сгенерирован т.к. вводили неправильный пароль
+            if (changePasswordAction.getOtpAction().getOtpNumber() == null) {
+                return updateNewOtpAndSendToClient(changePasswordAction);
+            }
 
-        // Действие не просрочено и код еще годен
-        if (changePasswordAction.getOtpAction().isNotExpiredOtp()) {
-            return buildActionInfo(changePasswordAction);
-        }
+            // Действие не просрочено и код еще годен
+            if (changePasswordAction.getOtpAction().isNotExpiredOtp()) {
+                return changePasswordAction;
+            }
 
-        // Код просрочен, но новый сгенерить не можем - лимит исчерпан
-        if (changePasswordAction.getOtpAction().isNewOtpLimitReached()) {
-            handleNoMoreNewOtp(changePasswordAction);
-            throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
-        }
+            // Код просрочен, но новый сгенерить не можем - лимит исчерпан
+            if (changePasswordAction.getOtpAction().isNewOtpLimitReached()) {
+                handleNoMoreNewOtp(changePasswordAction);
+                throw new NoMoreNewOtpAvailableException("No more one-time-password can be generated!");
+            }
 
-        // Действие не просрочено, но просрочен код, нужно сгенерировать новый - лимит еще есть
-        return buildActionInfo(changePasswordAction);
+            // Действие не просрочено, но просрочен код, нужно сгенерировать новый - лимит еще есть
+            return updateNewOtpAndSendToClient(changePasswordAction);
+        });
+
+        return buildActionInfo(profileChangePasswordActionEntity);
     }
 
     public ProfileChangePasswordActionResult newOtpChangePassword(String clientUuid) {
@@ -116,51 +121,58 @@ public class ProfileChangePasswordActionService extends PasswordRequiredActionSe
         String login = client.getEmail();
         String otp = profileChangePassword.getOtp();
 
+        String lockId = getLock(login);
+        lockHelper.doWithLock(lockId, () -> {
+            ProfileChangePasswordActionEntity profileChangePasswordAction = getRepository().findCurrentAction(login);
+            if (profileChangePasswordAction == null) {
+                logger.info("Client with email = {} tried to {}, but action is not started", login, getActionName());
+                throw new ActionNotStartedException("Can`t finish " + getActionName() + ", action not initiated!");
+            }
 
-        ProfileChangePasswordActionEntity profileChangePasswordAction = getRepository().findCurrentAction(login);
-        if (profileChangePasswordAction == null) {
-            logger.info("Client with email = {} tried to {}, but action is not started", login, getActionName());
-            throw new ActionNotStartedException("Can`t finish " + getActionName() + ", action not initiated!");
-        }
+            // Действие просрочено
+            if (profileChangePasswordAction.getOtpAction().isActionExpired()) {
+                logger.info("Client with email = {} tired to finish action = {}, but action is expired", login, getActionName());
+                getRepository().delete(profileChangePasswordAction);
+                logger.info("Expired action = {}[id={}] removed from DB", getActionName(), profileChangePasswordAction.getId());
+                throw new ActionNotStartedException("Can`t finish " + getActionName() + ", action is expired!");
+            }
 
-        // Действие просрочено
-        if (profileChangePasswordAction.getOtpAction().isActionExpired()) {
-            logger.info("Client with email = {} tired to finish action = {}, but action is expired", login, getActionName());
-            getRepository().delete(profileChangePasswordAction);
-            logger.info("Expired action = {}[id={}] removed from DB", getActionName(), profileChangePasswordAction.getId());
-            throw new ActionNotStartedException("Can`t finish " + getActionName() + ", action is expired!");
-        }
+            // Действие не просрочено, но просрочен код
+            if (profileChangePasswordAction.getOtpAction().isExpiredOtp()) {
+                logger.info("Client with email = {} tried to finish action = {}, but otp is expired! New otp left = {}", login, getActionName(),
+                        profileChangePasswordAction.getOtpAction().getOtpCountLeft());
+                throw new OtpExpiredException(profileChangePasswordAction.getOtpAction().getOtpCountLeft());
+            }
 
-        // Действие не просрочено, но просрочен код
-        if (profileChangePasswordAction.getOtpAction().isExpiredOtp()) {
-            logger.info("Client with email = {} tried to finish action = {}, but otp is expired! New otp left = {}", login, getActionName(),
-                    profileChangePasswordAction.getOtpAction().getOtpCountLeft());
-            throw new OtpExpiredException(profileChangePasswordAction.getOtpAction().getOtpCountLeft());
-        }
+            // Действие не просрочено и код еще активен - проверяем
+            if (profileChangePasswordAction.getOtpAction().isOtpValid(otp)) {
+                String newPasswordHash = profileChangePasswordAction.getNewHash();
+                clientService.updatePassword(login, newPasswordHash);
+                logger.info("Client with email = {} successfully passed one-time-password and was updated his password", login);
 
-        // Действие не просрочено и код еще активен - проверяем
-        if (profileChangePasswordAction.getOtpAction().isOtpValid(otp)) {
-            String newPasswordHash = profileChangePasswordAction.getNewHash();
-            clientService.updatePassword(login, newPasswordHash);
-            logger.info("Client with email = {} successfully passed one-time-password and was updated his password", login);
+                getRepository().delete(profileChangePasswordAction);
+                return true;
+            }
 
-            getRepository().delete(profileChangePasswordAction);
-            return;
-        }
-
-        // Неверный ввод
-        int otpInvalidAttemptsLeft = profileChangePasswordAction.getOtpAction().decrementInvalidAttemptsLeft();
-        ProfileChangePasswordActionEntity updatedChangePasswordAction = getRepository().save(profileChangePasswordAction);
-        if (otpInvalidAttemptsLeft == 0) {
-            handleNoMoreOtpInvalidAttemptsLeft(updatedChangePasswordAction);
-            throw new BlockedCredentialsException(login);
-        }
-        throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+            // Неверный ввод
+            int otpInvalidAttemptsLeft = profileChangePasswordAction.getOtpAction().decrementInvalidAttemptsLeft();
+            ProfileChangePasswordActionEntity updatedChangePasswordAction = getRepository().save(profileChangePasswordAction);
+            if (otpInvalidAttemptsLeft == 0) {
+                handleNoMoreOtpInvalidAttemptsLeft(updatedChangePasswordAction);
+                throw new BlockedCredentialsException(login);
+            }
+            throw new OtpInvalidAttemptException(login, otpInvalidAttemptsLeft);
+        });
     }
 
     @Override
     protected String getActionName() {
         return "profile-change-password-action";
+    }
+
+    @Override
+    protected String getLock(String payload) {
+        return DBLockPrefixesConstants.PROFILE_CHANGE_PASSWORD_PREFIX + payload;
     }
 
     @Override
