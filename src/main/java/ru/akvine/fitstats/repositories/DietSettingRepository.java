@@ -12,9 +12,9 @@ import java.util.Optional;
 public interface DietSettingRepository extends JpaRepository<DietSettingEntity, Long> {
     @Query("from DietSettingEntity dse where dse.client.uuid = :clientUuid " +
             "and " +
-            "dse.deleted = false and dse.deletedDate is null " +
+            "dse.deleted = false " +
             "and " +
-            "dse.client.deleted = false and dse.client.deletedDate is null")
+            "dse.client.deleted = false")
     Optional<DietSettingEntity> findByClientUuid(@Param("clientUuid") String clientUuid);
 
     @Transactional

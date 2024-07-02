@@ -1,5 +1,6 @@
 package ru.akvine.fitstats.repositories;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, J
             "pe.uuid = :uuid")
     Optional<ProductEntity> findByUuidAndNotDeleted(@Param("uuid") String uuid);
 
-    @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null " +
+    @Query("from ProductEntity pe where pe.deleted = false " +
             "and " +
             "pe.uuid like concat('%', :uuid, '%')")
     List<ProductEntity> findByPartialUuidAndNotDeleted(@Param("uuid") String uuid);
@@ -24,5 +25,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, J
     Optional<ProductEntity> findByUuid(@Param("uuid") String uuid);
 
     @Query("from ProductEntity pe where pe.deleted = false and pe.deletedDate is null")
+    @NotNull
     List<ProductEntity> findAll();
 }

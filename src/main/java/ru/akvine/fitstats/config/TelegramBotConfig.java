@@ -31,6 +31,7 @@ import ru.akvine.fitstats.services.telegram.handler.MessageHandler;
 import ru.akvine.fitstats.services.telegram.handler.MessageHandlerFacade;
 
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @RequiredArgsConstructor
@@ -67,7 +68,7 @@ public class TelegramBotConfig {
             return defaultBotOptions;
         }
         String proxyHost = environment.getProperty(HTTPS_PROXY_HOST_PROPERTY_NAME);
-        int proxyPort = Integer.parseInt(environment.getProperty(HTTPS_PROXY_PORT_PROPERTY_NAME));
+        int proxyPort = Integer.parseInt(Objects.requireNonNull(environment.getProperty(HTTPS_PROXY_PORT_PROPERTY_NAME)));
         DefaultBotOptions.ProxyType proxyType = DefaultBotOptions.ProxyType.HTTP;
 
         defaultBotOptions.setProxyType(proxyType);

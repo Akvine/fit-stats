@@ -13,7 +13,7 @@ public interface BiometricRepository extends JpaRepository<BiometricEntity, Long
     @Query("from BiometricEntity be where " +
             "be.clientEntity.uuid = :clientUuid " +
             "and " +
-            "be.clientEntity.deleted = false and be.clientEntity.deletedDate is null")
+            "be.clientEntity.deleted = false")
     Optional<BiometricEntity> findByClientUuid(@Param("clientUuid") String clientUuid);
 
     @Modifying

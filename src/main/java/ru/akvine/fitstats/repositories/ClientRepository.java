@@ -10,11 +10,11 @@ import java.util.Optional;
 public interface ClientRepository extends JpaRepository<ClientEntity, Long> {
     @Query("from ClientEntity ce where ce.email = :email " +
             "and " +
-            "ce.deletedDate is null and ce.deleted = false")
+            "ce.deleted = false")
     Optional<ClientEntity> findByEmail(@Param("email") String email);
 
     @Query("from ClientEntity ce where ce.uuid = :uuid " +
             "and " +
-            "ce.deletedDate is null and ce.deleted = false")
+            "ce.deleted = false")
     Optional<ClientEntity> findByUuid(@Param("uuid") String uuid);
 }
